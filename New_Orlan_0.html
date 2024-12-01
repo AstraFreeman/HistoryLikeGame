@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>100 ігор з історії</title>
+  <style>
+    /* Заголовок */
+    #title {
+      text-align: center;
+      font-family: Arial, sans-serif;
+      font-weight: bold;
+      font-size: 36px;
+      color: #8B0000; /* Бордовий */
+      margin-top: 20px;
+      text-shadow: 2px 2px #e5e5e5;
+    }
+
+    /* Основні стилі для персонажа */
+    #assistant {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      width: 150px;
+      height: auto;
+      z-index: 1000;
+      cursor: pointer;
+      transition: top 1s ease, left 1s ease; /* Плавна анімація */
+    }
+
+    #assistant-image {
+      width: 100%;
+    }
+
+    /* Контент розділів */
+    .section {
+      padding: 20px;
+      margin: 20px auto;
+      border-radius: 10px;
+      background-color: #f7f2e9; /* Пастельний фон */
+      border: 1px solid #e4d7c3; /* Пастельна рамка */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      max-width: 900px;
+    }
+
+    .section h2 {
+      margin-top: 0;
+      color: #5d5d5d;
+    }
+
+    .links {
+      margin-top: 10px;
+    }
+
+    .links a {
+      display: block;
+      color: #007bff;
+      text-decoration: none;
+      margin: 5px 0;
+    }
+
+    .links a:hover {
+      text-decoration: underline;
+    }
+
+    /* Панель кнопок */
+    .control-buttons {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      padding: 10px;
+      background-color: #f0f0f0;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      z-index: 1200;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .control-buttons button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .control-buttons button:hover {
+      background-color: #0056b3;
+    }
+
+    /* Медіа-запити для адаптивності */
+    @media (max-width: 768px) {
+      #title {
+        font-size: 28px;
+      }
+
+      #assistant {
+        width: 120px;
+      }
+
+      .section {
+        margin: 10px;
+        padding: 15px;
+      }
+
+      .control-buttons {
+        bottom: 10px;
+        left: 10px;
+        flex-direction: column;
+      }
+
+      .control-buttons button {
+        padding: 8px 16px;
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Заголовок -->
+  <div id="title">100 ІГОР З ІСТОРІЇ</div>
+
+  <!-- Вставка персонажа -->
+  <div id="assistant" style="display: none;">
+    <img src="image/Sprut_Idle.gif" alt="Тітонька Півонія" id="assistant-image">
+  </div>
+
+  <!-- Панель кнопок -->
+  <div class="control-buttons">
+    <button id="toggle-assistant">Показати помічника</button>
+    <button id="fact-button">Факт!</button>
+    <button id="dance-button">Танець!</button>
+  </div>
+
+  <!-- Контент розділів -->
+  <div class="section">
+    <h2>Розділ А: Для зірочок підготовчих курсів</h2>
+    <div class="links">
+      <a href="map_file.html">Історичний квест?</a>
+    </div>
+
+  <div class="section">
+    <h2>Розділ 1: Давня історія</h2>
+    <div class="links">
+      <a href="New_Orlan_1.html">Переглянути New_Orlan_1</a>
+      <a href="New_Orlan_2.html">Переглянути New_Orlan_2</a>
+      <a href="New_Orlan_3.html">Переглянути New_Orlan_3</a>
+    </div>
+  </div>
+  <div class="section">
+    <h2>Розділ 2: Середньовіччя</h2>
+    <div class="links">
+      <a href="Taxes_1.html">Переглянути Taxes_1</a>
+      <a href="Taxes_2.html">Переглянути Taxes_2</a>
+      <a href="Taxes_3.html">Переглянути Taxes_3</a>
+    </div>
+  </div>
+  <div class="section">
+    <h2>Розділ 3: Новий Макако</h2>
+    <div class="links">
+      <a href="New_Makako_1.html">Переглянути New_Makako_1</a>
+      <a href="New_Makako_2.html">Переглянути New_Makako_2</a>
+      <a href="New_Makako_3.html">Переглянути New_Makako_3</a>
+    </div>
+  </div>
+  <div class="section">
+    <h2>Розділ 4: Лова</h2>
+    <div class="links">
+      <a href="Lowa_1.html">Переглянути Lowa_1</a>
+      <a href="Lowa_2.html">Переглянути Lowa_2</a>
+      <a href="Lowa_3.html">Переглянути Lowa_3</a>
+    </div>
+  </div>
+  <div class="section">
+    <h2>Розділ 5: Невода</h2>
+    <div class="links">
+      <a href="Nevoda_1.html">Переглянути Nevoda_1</a>
+      <a href="Nevoda_2.html">Переглянути Nevoda_2</a>
+      <a href="Nevoda_3.html">Переглянути Nevoda_3</a>
+    </div>
+  </div>
+  <div class="section">
+    <h2>Розділ 6: Шивафорнія</h2>
+    <div class="links">
+      <a href="Shivafornia_1.html">Переглянути Shivafornia_1</a>
+      <a href="Shivafornia_2.html">Переглянути Shivafornia_2</a>
+      <a href="Shivafornia_3.html">Переглянути Shivafornia_3</a>
+    </div>
+  </div>
+  <div class="section">
+    <h2>Розділ 7: Місіпісі</h2>
+    <div class="links">
+      <a href="Misipici_1.html">Переглянути Misipici_1</a>
+      <a href="Misipici_2.html">Переглянути Misipici_2</a>
+      <a href="Misipici_3.html">Переглянути Misipici_3</a>
+    </div>
+  </div>
+
+  <script>
+    const assistant = document.getElementById('assistant');
+    const assistantImage = document.getElementById('assistant-image');
+    const toggleButton = document.getElementById('toggle-assistant');
+    const factButton = document.getElementById('fact-button');
+    const danceButton = document.getElementById('dance-button');
+
+    // Масив фактів
+    const facts = [
+      "У Стародавньому Єгипті винайшли першу зубну пасту.",
+      "Галілео Галілей створив телескоп у 1609 році.",
+      "Перший друкарський верстат з'явився в Китаї.",
+      "Олександр Македонський заснував понад 20 міст із назвою Александрія.",
+      "Вікінги першими дісталися до Північної Америки за 500 років до Колумба."
+    ];
+
+    // Випадкове посилання на сторінці
+    function getRandomLink() {
+      const links = document.querySelectorAll('.links a');
+      const randomIndex = Math.floor(Math.random() * links.length);
+      return links[randomIndex].href;
+    }
+
+    // Показати/приховати помічника
+    toggleButton.addEventListener('click', () => {
+      if (assistant.style.display === 'none') {
+        assistant.style.display = 'block';
+        toggleButton.textContent = 'Прибрати помічника';
+      } else {
+        assistant.style.display = 'none';
+        toggleButton.textContent = 'Показати помічника';
+      }
+    });
+
+    // Перехід за випадковим посиланням
+    assistant.addEventListener('click', () => {
+      const randomLink = getRandomLink();
+      alert('Ось, спробуй це!');
+      window.location.href = randomLink;
+    });
+
+    // Танець
+    danceButton.addEventListener('click', () => {
+      assistantImage.src = "image/Sprut_Dance.gif";
+      setTimeout(() => {
+        assistantImage.src = "image/Sprut_Idle.gif";
+      }, 5000); // 5 секунд анімації
+    });
+
+    // Показати випадковий факт
+    factButton.addEventListener('click', () => {
+      const randomFact = facts[Math.floor(Math.random() * facts.length)];
+      alert(`Цікавий факт: ${randomFact}`);
+    });
+
+    // Плавне переміщення помічника
+    function moveAssistant() {
+      const windowWidth = window.innerWidth;
+      const windowHeight = window.innerHeight;
+      const assistantWidth = assistant.offsetWidth;
+      const assistantHeight = assistant.offsetHeight;
+
+      const x = Math.random() * (windowWidth - assistantWidth);
+      const y = Math.random() * (windowHeight - assistantHeight);
+
+      assistantImage.src = "image/Sprut_Move.gif";
+      assistant.style.left = `${x}px`;
+      assistant.style.top = `${y}px`;
+
+      setTimeout(() => {
+        assistantImage.src = "image/Sprut_Idle.gif";
+      }, 2000);
+    }
+
+    setInterval(moveAssistant, 15000); // Рух кожні 15 секунд
+  </script>
+</body>
+</html>
