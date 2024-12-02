@@ -17,13 +17,15 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            height: 100vh;
+            box-sizing: border-box;
         }
 
         #gameArea {
             position: relative;
             width: 90%;
             max-width: 600px;
-            height: 70vh;
+            height: calc(60vh - 20px); /* Адаптивна висота */
             border: 5px solid #9a6702;
             border-radius: 15px;
             background: rgba(255, 248, 220, 0.8);
@@ -71,10 +73,10 @@
             animation: fadeIn 1s ease-in;
         }
 
-        #inputBox {
-            margin-top: 15px;
+        #inputBox, #numPad, #controls {
             width: 90%;
             max-width: 600px;
+            margin-top: 10px;
         }
 
         #input {
@@ -86,7 +88,6 @@
         }
 
         #numPad {
-            margin-top: 10px;
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
@@ -133,6 +134,16 @@
             background: #cccccc;
             cursor: not-allowed;
             box-shadow: none;
+        }
+
+        @media (max-height: 600px) {
+            #gameArea {
+                height: calc(50vh - 20px); /* Менша висота для компактних екранів */
+            }
+
+            .numButton {
+                font-size: 1em; /* Зменшений розмір шрифту кнопок */
+            }
         }
     </style>
 </head>
