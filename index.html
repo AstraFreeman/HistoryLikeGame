@@ -63,6 +63,50 @@
       text-decoration: underline;
     }
 
+    #welcome {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('image/story_A.jpg') no-repeat center center/cover;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+
+    #welcome h1 {
+      font-size: 48px;
+      margin: 0;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+    }
+
+    #welcome p {
+      font-size: 24px;
+      margin: 10px 0;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+    }
+
+    #welcome button {
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    #welcome button:hover {
+      background-color: #0056b3;
+    }
+
     /* Панель кнопок */
     .control-buttons {
       position: fixed;
@@ -123,6 +167,12 @@
 <body>
   <!-- Заголовок -->
   <div id="title">100 ІГОР З ІСТОРІЇ</div>
+ 
+  <div id="welcome">
+    <h1>Ласкаво просимо!</h1>
+    <p>100 ігор з історії – досліджуйте та навчайтесь!</p>
+    <button id="start-button">Почати</button>
+  </div>
 
   <!-- Вставка персонажа -->
   <div id="assistant" style="display: none;">
@@ -137,66 +187,61 @@
   </div>
 
   <!-- Контент розділів -->
-  <div class="section">
-    <h2>Розділ А: Для зірочок підготовчих курсів</h2>
-    <div class="links">
-      <a href="map_file.html">Історичний квест?</a>
-    </div>
 
   <div class="section">
     <h2>Розділ 1: Давня історія</h2>
     <div class="links">
-      <a href="New_Orlan_1.html">Переглянути New_Orlan_1</a>
-      <a href="New_Orlan_2.html">Переглянути New_Orlan_2</a>
-      <a href="New_Orlan_3.html">Переглянути New_Orlan_3</a>
+      <a href="compas.html">Переглянути New_Orlan_1</a>
+      <a href="compas.html">Переглянути New_Orlan_2</a>
+      <a href="compas.html">Переглянути New_Orlan_3</a>
     </div>
   </div>
   <div class="section">
     <h2>Розділ 2: Середньовіччя</h2>
     <div class="links">
       <a href="Taxes_1.html">Переглянути Taxes_1</a>
-      <a href="Taxes_2.html">Переглянути Taxes_2</a>
-      <a href="Taxes_3.html">Переглянути Taxes_3</a>
+      <a href="compas.html">Переглянути Taxes_2</a>
+      <a href="compas.html">Переглянути Taxes_3</a>
     </div>
   </div>
   <div class="section">
     <h2>Розділ 3: Новий Макако</h2>
     <div class="links">
-      <a href="New_Makako_1.html">Переглянути New_Makako_1</a>
-      <a href="New_Makako_2.html">Переглянути New_Makako_2</a>
-      <a href="New_Makako_3.html">Переглянути New_Makako_3</a>
+      <a href="compas.html">Переглянути New_Makako_1</a>
+      <a href="compas.html">Переглянути New_Makako_2</a>
+      <a href="compas.html">Переглянути New_Makako_3</a>
     </div>
   </div>
   <div class="section">
     <h2>Розділ 4: Лова</h2>
     <div class="links">
-      <a href="Lowa_1.html">Переглянути Lowa_1</a>
-      <a href="Lowa_2.html">Переглянути Lowa_2</a>
-      <a href="Lowa_3.html">Переглянути Lowa_3</a>
+      <a href="compas.html">Переглянути Lowa_1</a>
+      <a href="compas.html">Переглянути Lowa_2</a>
+      <a href="compas.html">Переглянути Lowa_3</a>
     </div>
   </div>
   <div class="section">
     <h2>Розділ 5: Невода</h2>
     <div class="links">
-      <a href="Nevoda_1.html">Переглянути Nevoda_1</a>
-      <a href="Nevoda_2.html">Переглянути Nevoda_2</a>
-      <a href="Nevoda_3.html">Переглянути Nevoda_3</a>
+      <a href="compas.html">Переглянути Nevoda_1</a>
+      <a href="compas.html">Переглянути Nevoda_2</a>
+      <a href="compas.html">Переглянути Nevoda_3</a>
     </div>
   </div>
   <div class="section">
     <h2>Розділ 6: Шивафорнія</h2>
     <div class="links">
-      <a href="Shivafornia_1.html">Переглянути Shivafornia_1</a>
-      <a href="Shivafornia_2.html">Переглянути Shivafornia_2</a>
-      <a href="Shivafornia_3.html">Переглянути Shivafornia_3</a>
+      <a href="compas.html">Переглянути Shivafornia_1</a>
+      <a href="compas.html">Переглянути Shivafornia_2</a>
+      <a href="compas.html">Переглянути Shivafornia_3</a>
     </div>
   </div>
   <div class="section">
     <h2>Розділ 7: Місіпісі</h2>
     <div class="links">
-      <a href="Misipici_1.html">Переглянути Misipici_1</a>
-      <a href="Misipici_2.html">Переглянути Misipici_2</a>
-      <a href="Misipici_3.html">Переглянути Misipici_3</a>
+      <a href="compas.html">Переглянути Misipici_1</a>
+      <a href="compas.html">Переглянути Misipici_2</a>
+      <a href="compas.html">Переглянути Misipici_3</a>
     </div>
   </div>
 
@@ -206,6 +251,17 @@
     const toggleButton = document.getElementById('toggle-assistant');
     const factButton = document.getElementById('fact-button');
     const danceButton = document.getElementById('dance-button');
+    const welcomeScreen = document.getElementById('welcome');
+    const startButton = document.getElementById('start-button');
+    const title = document.getElementById('title');
+    const controlButtons = document.querySelector('.control-buttons');
+
+    // Приховуємо розділ привітання після натискання кнопки
+    startButton.addEventListener('click', () => {
+      welcomeScreen.style.display = 'none';
+      title.classList.remove('hidden');
+      controlButtons.classList.remove('hidden');
+    });
 
     // Масив фактів
     const facts = [
