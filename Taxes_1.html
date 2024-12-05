@@ -1,219 +1,3 @@
-<!DOCTYPE html>
-<html lang="uk">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Історична Вікторина</title>
-    <style>
-        body {
-            font-family: 'Times New Roman', serif;
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background: url('https://example.com/ancient-parchment-bg.jpg') no-repeat center center fixed;
-            background-size: cover;
-            color: #3b2805;
-            text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            height: 100vh;
-            box-sizing: border-box;
-        }
-
-        #gameArea {
-            position: relative;
-            width: 90%;
-            max-width: 600px;
-            height: calc(60vh - 20px); /* Адаптивна висота */
-            border: 5px solid #9a6702;
-            border-radius: 15px;
-            background: rgba(255, 248, 220, 0.8);
-            overflow: hidden;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-        }
-
-        #stats {
-            margin-top: 10px;
-            font-size: 1.2em;
-            color: #6f4e37;
-            display: flex;
-            justify-content: space-between;
-            width: 90%;
-            max-width: 600px;
-        }
-
-        #answersBox {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            width: 30%;
-            max-width: 200px;
-            background: rgba(255, 248, 220, 0.9);
-            border: 2px solid #9a6702;
-            border-radius: 10px;
-            padding: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            text-align: left;
-            font-size: 0.9em;
-            overflow-y: auto;
-            max-height: 200px;
-        }
-
-        .question {
-            position: absolute;
-            font-size: 1em;
-            background: #f5deb3;
-            padding: 10px 15px;
-            border-radius: 10px;
-            color: #3b2805;
-            font-weight: bold;
-            border: 2px solid #9a6702;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-            animation: fadeIn 1s ease-in;
-        }
-
-        #inputBox, #numPad, #controls {
-            width: 90%;
-            max-width: 600px;
-            margin-top: 10px;
-        }
-
-        #input {
-            width: 100%;
-            padding: 10px;
-            font-size: 1em;
-            border: 2px solid #9a6702;
-            border-radius: 5px;
-        }
-
-        #numPad {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .numButton {
-            width: 20%;
-            max-width: 60px;
-            padding: 10px;
-            font-size: 1.2em;
-            cursor: pointer;
-            border: 2px solid #9a6702;
-            border-radius: 5px;
-            background: #f5deb3;
-            color: #3b2805;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s ease-in-out, background-color 0.2s;
-        }
-
-        .numButton:hover {
-            background: #d2aa6e;
-            transform: scale(1.1);
-        }
-
-        button {
-            padding: 10px 15px;
-            font-size: 1em;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-            background: #9a6702;
-            color: white;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s ease-in-out;
-        }
-
-        button:hover {
-            background: #6f4e37;
-            transform: scale(1.1);
-        }
-
-        button:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
-
-        @media (max-height: 600px) {
-            #gameArea {
-                height: calc(50vh - 20px); /* Менша висота для компактних екранів */
-            }
-
-            .numButton {
-                font-size: 1em; /* Зменшений розмір шрифту кнопок */
-            }
-        }
-
-        #clearButton {
-            width: 40%; /* Удвічі більша за звичайну кнопку */
-            max-width: 120px;
-            padding: 10px;
-            font-size: 1.2em;
-            cursor: pointer;
-            border: 2px solid #9a6702;
-            border-radius: 5px;
-            background: #f5deb3;
-            color: #3b2805;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s ease-in-out, background-color 0.2s;
-        }
-
-        #clearButton:hover {
-            background: #d2aa6e;
-            transform: scale(1.1);
-        }
-    </style>
-</head>
-<body>
-    <h1>Історична Вікторина</h1>
-    <div id="gameArea"></div>
-    <div id="stats">
-        <div>
-            <p>Рахунок: <span id="score">0</span></p>
-            <p>Життя: <span id="lives">3</span></p>
-        </div>
-        <div id="answersBox">
-            <h3>Правильні відповіді:</h3>
-            <ul id="answersList" style="list-style: none; padding: 0; margin: 0;"></ul>
-        </div>
-    </div>
-    <div id="inputBox">
-        <input type="text" id="input" placeholder="Введіть відповідь..." disabled>
-    </div>
-    <div id="numPad">
-        <!-- Кнопки для вводу цифр -->
-        <button class="numButton" data-value="0">0</button>
-        <button class="numButton" data-value="1">1</button>
-        <button class="numButton" data-value="2">2</button>
-        <button class="numButton" data-value="3">3</button>
-        <button class="numButton" data-value="4">4</button>
-        <button class="numButton" data-value="5">5</button>
-        <button class="numButton" data-value="6">6</button>
-        <button class="numButton" data-value="7">7</button>
-        <button class="numButton" data-value="8">8</button>
-        <button class="numButton" data-value="9">9</button>
-        <button id="clearButton">Стерти</button>
-    </div>
-    <div id="controls">
-        <button id="startButton">Розпочати Гру</button>
-        <button id="restartButton" disabled>Перезапустити</button>
-        <button id="exitButton">Вийти</button>
-    </div>
-
-    <script>
-        const questions = [
-            { question: "Укладення ченцем Нестором першої редакції «Повісті минулих літ»", answer: "1113" },
-            { question: "створення «Слова о полку Ігоревім»", answer: "1187" },
-            { question: "спорудження Софійського собору в Києві", answer: "1037" },
-            { question: "Спасо-Преображенський собор в Чернігові", answer: "1036" },
-            { question: "Перша письмова згадка України", answer: "1187" },
-            { question: "Коли була заснована Київська Русь?", answer: "882" },
-            { question: "створення Остромирового Євангелія", answer: "1057" },
-            { question: "будівництво Десятинної церкви в Києві", answer: "996" }
-        ];
-
         const gameArea = document.getElementById("gameArea");
         const inputElement = document.getElementById("input");
         const clearButton = document.getElementById("clearButton");
@@ -223,6 +7,7 @@
         const startButton = document.getElementById("startButton");
         const restartButton = document.getElementById("restartButton");
         const exitButton = document.getElementById("exitButton");
+        const backgroundMusic = document.getElementById('backgroundMusic'); // Новий елемент
 
         let activeQuestions = [];
         let usedQuestions = new Set();
@@ -231,42 +16,10 @@
         let gameInterval;
         let dropInterval;
 
-        clearButton.addEventListener("click", () => {
-    inputElement.value = ""; // Очищуємо поле введення
-});
-        
-        document.querySelectorAll('.numButton').forEach(button => {
-            button.addEventListener('click', () => {
-                const value = button.getAttribute('data-value');
-                inputElement.value += value; // Додає натиснуту цифру до поля введення
-                checkAnswer(inputElement.value.trim());
-            });
-        });
-
-        function checkAnswer(input) {
-            const matchedQuestionIndex = activeQuestions.findIndex(q => q.answer.toLowerCase() === input.toLowerCase());
-
-            if (matchedQuestionIndex !== -1) {
-                const matchedQuestion = activeQuestions[matchedQuestionIndex];
-                matchedQuestion.element.remove();
-                activeQuestions.splice(matchedQuestionIndex, 1);
-
-                score++;
-                scoreElement.textContent = score;
-                inputElement.value = ""; // Очищуємо поле введення після правильної відповіді
-
-                if (score >= 50) {
-                    endGame(true);
-                }
-            }
-        }
-
-        inputElement.addEventListener("input", () => {
-            checkAnswer(inputElement.value.trim());
-        });
-
+        // Функції гри
         function startGame() {
             resetGame();
+            backgroundMusic.play(); // Запуск музики
             inputElement.disabled = false;
             inputElement.focus();
             startButton.disabled = true;
@@ -289,64 +42,8 @@
             clearInterval(gameInterval);
             clearInterval(dropInterval);
             inputElement.value = "";
-        }
-
-        function addQuestion() {
-            if (activeQuestions.length >= 5) return;
-
-            if (usedQuestions.size === questions.length) {
-                usedQuestions.clear();
-            }
-
-            const availableQuestions = questions.filter(q => !usedQuestions.has(q.question));
-            const randomIndex = Math.floor(Math.random() * availableQuestions.length);
-            const questionData = availableQuestions[randomIndex];
-            usedQuestions.add(questionData.question);
-
-            const questionElement = document.createElement("div");
-            questionElement.classList.add("question");
-            questionElement.textContent = questionData.question;
-
-            const startX = Math.random() * (gameArea.offsetWidth - 150);
-            questionElement.style.left = `${startX}px`;
-            questionElement.style.top = `0px`;
-
-            gameArea.appendChild(questionElement);
-
-            activeQuestions.push({
-                question: questionData.question,
-                answer: questionData.answer,
-                element: questionElement,
-                top: 0
-            });
-        }
-
-        function moveQuestions() {
-            activeQuestions.forEach((q, index) => {
-                q.top += 1;
-                q.element.style.top = `${q.top}px`;
-
-                if (q.top > gameArea.offsetHeight) {
-                    addAnswerToBox(q.question, q.answer);
-                    q.element.remove();
-                    activeQuestions.splice(index, 1);
-                    loseLife();
-                }
-            });
-        }
-
-        function addAnswerToBox(question, answer) {
-            const listItem = document.createElement("li");
-            listItem.textContent = `${question}: ${answer}`;
-            answersList.appendChild(listItem);
-        }
-
-        function loseLife() {
-            lives--;
-            livesElement.textContent = lives;
-            if (lives <= 0) {
-                endGame(false);
-            }
+            backgroundMusic.pause(); // Зупинка музики при скиданні
+            backgroundMusic.currentTime = 0;
         }
 
         function endGame(isWin) {
@@ -356,20 +53,10 @@
             activeQuestions = [];
             inputElement.disabled = true;
 
+            backgroundMusic.pause(); // Зупинка музики
+            backgroundMusic.currentTime = 0;
+
             if (isWin) {
-                const winImage = document.createElement("img");
-                winImage.src = "image/Kyiv.jpg"; // Замініть шлях на реальне зображення
-                winImage.alt = "Вітаємо!";
-                winImage.style.maxWidth = "100%";
-                winImage.style.maxHeight = "100%";
-                winImage.style.objectFit = "contain";
-                winImage.style.marginTop = "20px";
-                winImage.style.borderRadius = "10px";
-
-                const gameArea = document.getElementById("gameArea");
-                gameArea.innerHTML = "";
-                gameArea.appendChild(winImage);
-
                 alert("Вітаємо! Ви виграли!");
             } else {
                 alert("Гру завершено!");
@@ -388,6 +75,3 @@
             resetGame();
             alert("Ви вийшли з гри. До зустрічі!");
         });
-    </script>
-</body> 
-</html>
