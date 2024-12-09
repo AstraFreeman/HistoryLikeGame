@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Україна в міжнародних договорах XVII ст.</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: row;
+            height: 100vh;
+            background: url('https://www.transparenttextures.com/patterns/fabric-of-squares.png');
+            color: #333;
+        }
+        .map-container {
+            position: relative;
+            background-color: #f0f0f0;
+            border-right: 2px solid #ccc;
+            width: 40%;
+            height: 100%;
+        }
+        .map-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .map-container img.overlay {
+            display: none;
+            z-index: 10;
+        }
+        .map-container img.overlay.active {
+            display: block;
+        }
+        .controls {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 20;
+        }
+        .controls button {
+            margin: 0 5px;
+            padding: 10px 15px;
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .controls button:hover {
+            background-color: #003d80;
+        }
+        .layer-text {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 8px;
+            font-weight: bold;
+            z-index: 20;
+            text-align: center;
+            font-size: 18px;
+        }
+        .info-container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        .info-container h1, .info-container h2 {
+            text-align: center;
+            color: #0056b3;
+        }
+        .info-container p {
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .final-button {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .final-button a {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .final-button a:hover {
+            background-color: #1e7e34;
+        }
+    </style>
+</head>
+<body>
+    <div class="map-container">
+        <!-- Кнопки для шарів -->
+        <div class="controls">
+            <button onclick="changeLayer(1, 'Андрусівське мир (1667 р.)')">Шар 1</button>
+            <button onclick="changeLayer(2, 'Бучацький мир (1672 р.)')">Шар 2</button>
+            <button onclick="changeLayer(3, 'Бахчисарайський договір (1681 р.)')">Шар 3</button>
+            <button onclick="changeLayer(4, 'Вічний мир (1686 р.)')">Шар 4</button>
+            <button onclick="changeLayer(5, 'Карловицький договір (1699 р.)')">Шар 5</button>
+        </div>
+
+        <!-- Постійний шар -->
+        <img src="image/map_svnt_1.png" alt="Карта 1">
+
+        <!-- Інші шари -->
+        <img src="image/map_svnt_2.png" alt="Карта 2" class="overlay">
+        <img src="image/map_svnt_3.png" alt="Карта 3" class="overlay">
+        <img src="image/map_svnt_4.png" alt="Карта 4" class="overlay">
+        <img src="image/map_svnt_5.png" alt="Карта 5" class="overlay">
+        <img src="image/map_svnt_6.png" alt="Карта 6" class="overlay">
+
+        <!-- Текстове поле для назви шару -->
+        <div class="layer-text" id="layer-text">Натисність "Шар"</div>
+    </div>
+
+    <div class="info-container">
+        <!-- Заголовки -->
+        <h1>Україна в міжнародних договорах</h1>
+        <h2>Друга половина XVII століття</h2>
+
+        <!-- Описова інформація -->
+        <p>У другій половині XVII століття Україна перебувала в центрі європейських дипломатичних і військових подій. Подія-символ цього періоду це Андрусівський мир за яким Річ Посполита та Московія розділили козацьку Україну по Дніпру.</p>
+    </div>
+
+    <div class="final-button">
+        <a href="New_Makako_2.html">ПО КОНЯМ</a>
+    </div>
+
+    <script>
+        const overlays = document.querySelectorAll('.map-container img.overlay');
+        const layerText = document.getElementById('layer-text');
+
+        function changeLayer(index, text) {
+            overlays.forEach((img, i) => {
+                img.classList.toggle('active', i === index - 1);
+            });
+            layerText.textContent = text;
+        }
+    </script>
+</body>
+</html>
