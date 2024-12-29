@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Різдвяна Вікторина</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .header {
+            background-color: #d9534f;
+            color: white;
+            padding: 20px;
+        }
+        .header h1 {
+            font-size: 36px;
+            margin: 0;
+        }
+        .header h2 {
+            font-size: 24px;
+            margin: 10px 0 0;
+        }
+        .header h3 {
+            font-size: 18px;
+            margin: 10px 0 0;
+            color: #fff9;
+        }
+        .quiz-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            padding: 20px;
+        }
+        .quiz-grid button {
+            font-size: 18px;
+            padding: 15px;
+            background-color: #0275d8;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .quiz-grid button:hover {
+            background-color: #025aa5;
+        }
+        .quiz-grid button.opened {
+            background-color: #5cb85c;
+            cursor: default;
+        }
+        .omega-button {
+            margin: 20px auto;
+            padding: 15px 30px;
+            background-color: #f0ad4e;
+            color: white;
+            border: none;
+            font-size: 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .omega-button:hover {
+            background-color: #ec971f;
+        }
+        .score {
+            margin: 20px;
+            font-size: 20px;
+            color: #333;
+        }
+    </style>
+    <script>
+        let score = 0;
+
+        // Об'єкт з паролями для кнопок
+        const passwords = {
+            '1_1': 'Богдан Хмельницький', '1_2': 'Скоропадський Іван', '1_3': 'Павло Полуботок', '1_4': 'Данило Апостол', '1_5': 'Автономія',
+            '2_1': 'Самар', '2_2': 'Іван Гонта', '2_3': 'Слобожанщина', '2_4': 'Таврія', '2_5': 'Самар',
+            '3_1': 'Запорізька Січ', '3_2': 'Кріпацтво', '3_3': 'Козацьке бароко', '3_4': 'Галичина', '3_5': 'Буковина',
+            '4_1': 'Борітеся', '4_2': 'Поборете', '4_3': 'Вам', '4_4': 'Бог', '4_5': 'Помагає',
+            '5_1': 'Pass21', '5_2': 'Pass22', '5_3': 'Pass23', '5_4': 'Pass24', '5_5': 'Pass25'
+        };
+
+        function updateScore(points) {
+            score += points;
+            document.getElementById('score-display').textContent = `Відкриті бали: ${score}`;
+        }
+
+        function openQuestion(row, col, button) {
+            if (button.classList.contains('opened')) {
+                alert("Ця кнопка вже відкрита!");
+                return;
+            }
+
+            const key = `${row}_${col}`;
+            const password = prompt("Введіть пароль для цієї кнопки:");
+
+            if (password === passwords[key]) {
+                window.open(`game/Crstm_S_${row}_${col}.html`, '_blank');
+                button.classList.add('opened');
+                updateScore(row * 100);
+            } else {
+                alert("Неправильний пароль!");
+            }
+        }
+
+        function openOmega(button) {
+            if (button.classList.contains('opened')) {
+                alert("Ця кнопка вже відкрита!");
+                return;
+            }
+            const password = prompt("Введіть пароль для кнопки Омега:");
+            if (password === "L0v3 H1sT0r") {
+                window.open('game/Crstm_S_Omega.html', '_blank');
+                button.classList.add('opened');
+                updateScore(500);
+            } else {
+                alert("Неправильний пароль!");
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="header">
+        <h1>НЕ ЗАКРИВАЙТЕ СТОРІНКУ</h1>
+        <h2>Різдвяний спец. випуск. Вікторина</h2>
+        <h3>Перший пароль до кнопки *знак Омега* - L0v3 H1sT0r</h3>
+    </div>
+
+    <div class="score" id="score-display">Відкриті бали: 0</div>
+
+    <div class="quiz-grid">
+        <!-- Генерація кнопок -->
+        <script>
+            for (let row = 1; row <= 5; row++) {
+                for (let col = 1; col <= 5; col++) {
+                    document.write(`<button onclick="openQuestion(${row}, ${col}, this)">${row * 100}</button>`);
+                }
+            }
+        </script>
+    </div>
+
+    <button class="omega-button" onclick="openOmega(this)">Ω</button>
+</body>
+</html>
