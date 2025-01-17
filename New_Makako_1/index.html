@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Історична Вікторина</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Історична Вікторина</h1>
+    <div id="gameArea"></div>
+    <div id="stats">
+        <div id="scoreLivesBox">
+            <p>Рахунок: <span id="score">0</span></p>
+            <p>Життя: <span id="lives">3</span></p>
+        </div>
+        <div id="answersBox">
+            <h4>Відповіді:</h4>
+            <ul id="answersList" style="list-style: none; padding: 0; margin: 0;"></ul>
+        </div>
+    </div>
+
+    <div id="inputBox">
+        <input type="text" id="input" placeholder="Введіть відповідь..." disabled>
+    </div>
+    <div id="numPad">
+        <button class="numButton" data-value="0">0</button>
+        <button class="numButton" data-value="1">1</button>
+        <button class="numButton" data-value="2">2</button>
+        <button class="numButton" data-value="3">3</button>
+        <button class="numButton" data-value="4">4</button>
+        <button class="numButton" data-value="5">5</button>
+        <button class="numButton" data-value="6">6</button>
+        <button class="numButton" data-value="7">7</button>
+        <button class="numButton" data-value="8">8</button>
+        <button class="numButton" data-value="9">9</button>
+        <button id="clearButton">Стерти</button>
+    </div>
+    <div id="controls">
+        <button id="startButton">Розпочати Гру</button>
+        <button id="restartButton" disabled>Перезапустити</button>
+        <button id="exitButton">Вийти</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

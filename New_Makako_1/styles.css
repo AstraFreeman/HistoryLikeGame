@@ -1,0 +1,162 @@
+body {
+    font-family: 'Times New Roman', serif;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: url('https://example.com/ancient-parchment-bg.jpg') no-repeat center center fixed;
+    background-size: cover;
+    color: #3b2805;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    box-sizing: border-box;
+}
+
+#gameArea {
+    position: relative;
+    width: 90%;
+    max-width: 600px;
+    height: calc(60vh - 20px);
+    border: 5px solid #9a6702;
+    border-radius: 15px;
+    background: rgba(255, 248, 220, 0.8);
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+#stats {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    width: 25%;
+}
+
+#answersBox {
+    flex-grow: 1;
+    background: rgba(255, 248, 220, 0.9);
+    border: 1px solid #9a6702;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 0.9em;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    overflow-y: auto;
+    max-height: 150px;
+}
+
+#scoreLivesBox {
+    background: rgba(255, 248, 220, 0.9);
+    border: 1px solid #9a6702;
+    border-radius: 5px;
+    padding: 10px;
+    font-size: 0.9em;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    width: 40%;
+    max-width: 150px;
+}
+
+.question {
+    position: absolute;
+    font-size: 1em;
+    background: #f5deb3;
+    padding: 10px 15px;
+    border-radius: 10px;
+    color: #3b2805;
+    font-weight: bold;
+    border: 2px solid #9a6702;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    animation: fadeIn 1s ease-in;
+}
+
+#inputBox, #numPad, #controls {
+    width: 90%;
+    max-width: 600px;
+    margin-top: 10px;
+}
+
+#input {
+    width: 100%;
+    padding: 10px;
+    font-size: 1em;
+    border: 2px solid #9a6702;
+    border-radius: 5px;
+}
+
+#numPad {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.numButton {
+    width: 20%;
+    max-width: 60px;
+    padding: 10px;
+    font-size: 1.2em;
+    cursor: pointer;
+    border: 2px solid #9a6702;
+    border-radius: 5px;
+    background: #f5deb3;
+    color: #3b2805;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease-in-out, background-color 0.2s;
+}
+
+.numButton:hover {
+    background: #d2aa6e;
+    transform: scale(1.1);
+}
+
+button {
+    padding: 10px 15px;
+    font-size: 1em;
+    cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    background: #9a6702;
+    color: white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease-in-out;
+}
+
+button:hover {
+    background: #6f4e37;
+    transform: scale(1.1);
+}
+
+button:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+#clearButton {
+    width: 40%;
+    max-width: 120px;
+    padding: 10px;
+    font-size: 1.2em;
+    cursor: pointer;
+    border: 2px solid #9a6702;
+    border-radius: 5px;
+    background: #f5deb3;
+    color: #3b2805;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease-in-out, background-color 0.2s;
+}
+
+#clearButton:hover {
+    background: #d2aa6e;
+    transform: scale(1.1);
+}
+
+@media (max-height: 600px) {
+    #gameArea {
+        height: calc(50vh - 20px);
+    }
+
+    .numButton {
+        font-size: 1em;
+    }
+}
