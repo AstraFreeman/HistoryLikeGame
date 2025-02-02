@@ -1,0 +1,91 @@
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f5f3e0;
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #2a3d66;
+    color: white;
+    padding: 20px;
+}
+
+.games {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.game {
+    background: #fff;
+    border: 2px solid #2a3d66;
+    border-radius: 10px;
+    width: 250px;
+    margin: 10px;
+    padding: 15px;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s;
+}
+
+.game:hover {
+    transform: scale(1.05);
+}
+
+a {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 5px 10px;
+    background-color: #2a3d66;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+/* Control Panel */
+.control-panel {
+    margin-top: 20px;
+}
+
+button {
+    margin: 5px;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #2a3d66;
+    color: white;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #1d2b4f;
+}
+
+/* 🐙 Octopus Assistant */
+#octopus {
+    position: fixed;
+    bottom: 50px;
+    right: 50px;
+    width: 100px;
+    cursor: pointer;
+}
+
+/* Floating Fact Box */
+#factBox {
+    position: fixed;
+    bottom: 120px;
+    right: 50px;
+    background: rgba(255, 255, 204, 0.9);
+    padding: 10px;
+    border-radius: 5px;
+    border: 2px solid #2a3d66;
+    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
+    font-weight: bold;
+    display: none;
+}
+
+.hidden {
+    display: none;
+}
