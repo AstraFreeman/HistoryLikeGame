@@ -2,205 +2,211 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>AR.js A-Frame Marker-based</title>
-    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://unpkg.com/aframe-environment-component@1.1.0/dist/aframe-environment-component.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/3.4.5/aframe/build/aframe-ar.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 </head>
 <body>
-    <a-scene embedded arjs='sourceType: webcam; debugUIEnabled: false'>
-        <a-marker preset="hiro">
-            <a-assets>
-                <img id="rev" src="image/22_1.jpg">
-                <img id="ww2" src="image/29_1.jpg">
-                <img id="krch" src="image/30_1.jpg">
-            </a-assets>
+    <a-scene embedded arjs> </a-scene>
+    <a-marker preset="hiro">
+        <a-assets>
+            <img id="rev" src="image/22_1.jpg">
+            <img id="ww2" src="image/29_1.jpg">
+            <img id="krch" src="image/30_1.jpg">
+        </a-assets>
 
-            <!-- Light green base plane -->
-            <a-plane 
-                position="0 0 -4" 
-                rotation="-90 0 0" 
-                width="10" 
-                height="10" 
-                color="#90EE90">
-            </a-plane>
 
-            <!-- Title Plane -->
-            <a-text 
-                value="Choose a Poster of the «Thaw»" 
-                align="center" 
-                position="2 4 -3" 
-                color="black"
-                scale="0.8 0.8 0.8">
-            </a-text>
 
-            <!-- First Image Plane -->
-            <a-plane 
-                id="krch-image"
-                position="-1 1 -2" 
-                rotation="0 90 0" 
-                width="1.5" 
-                height="2" 
-                color="white" 
-                src="#krch"
-                data-image="true"
-                animation__cursor-enter="property: scale; 
-                                         from: 1 1 1; 
-                                         to: 1.1 1.1 1.1; 
-                                         dur: 200; 
-                                         startEvents: mouseenter"
-                animation__cursor-leave="property: scale; 
-                                         from: 1.1 1.1 1.1; 
-                                         to: 1 1 1; 
-                                         dur: 200; 
-                                         startEvents: mouseleave"
-                animation__click-up="property: position; 
-                                 from: -1 1 -2; 
-                                 to: -1 2.5 -2; 
-                                 dur: 500; 
-                                 easing: easeOutQuad; 
-                                 startEvents: click-up"
-                animation__click-down="property: position; 
-                                 from: -1 2.5 -2; 
-                                 to: -1 1 -2; 
-                                 dur: 500; 
-                                 easing: easeOutQuad; 
-                                 startEvents: click-down">
-            </a-plane>
+        <!-- Light green base plane -->
+        <a-plane 
+            position="0 0 -4" 
+            rotation="-90 0 0" 
+            width="10" 
+            height="10" 
+            color="#90EE90">
+        </a-plane>
 
-            <!-- Hidden Button for KRCH Image -->
-            <a-entity 
-                id="krch-hidden-button" 
-                position="2 3 -3" 
-                visible="false">
-                <a-box 
-                    color="#4CC3D9" 
-                    depth="0.2" 
-                    height="0.5" 
-                    width="1"
-                    id="krch-move-button">
-                </a-box>
-            </a-entity>
+        <!-- Title Plane -->
+        <a-text 
+        value="Choose a Poster of the «Thaw»" 
+        align="center" 
+        position="2 4 -3" 
+        color="black"
+        scale="0.8 0.8 0.8">
+    </a-text>
 
-            <!-- Second Image Plane -->
-            <a-plane 
-                id="ww2-image"
-                position="-2 1 -3" 
-                rotation="0 -90 0" 
-                width="1.5" 
-                height="2" 
-                color="white" 
-                src="#ww2"
-                data-image="true"
-                animation__cursor-enter="property: scale; 
-                                         from: 1 1 1; 
-                                         to: 1.1 1.1 1.1; 
-                                         dur: 200; 
-                                         startEvents: mouseenter"
-                animation__cursor-leave="property: scale; 
-                                         from: 1.1 1.1 1.1; 
-                                         to: 1 1 1; 
-                                         dur: 200; 
-                                         startEvents: mouseleave"
-                animation__click-up="property: position; 
-                                 from: -2 1 -3; 
-                                 to: -2 2.5 -3; 
-                                 dur: 500; 
-                                 easing: easeOutQuad; 
-                                 startEvents: click-up"
-                animation__click-down="property: position; 
-                                 from: -2 2.5 -3; 
-                                 to: -2 1 -3; 
-                                 dur: 500; 
-                                 easing: easeOutQuad; 
-                                 startEvents: click-down">
-            </a-plane>
+        <!-- First Image Plane -->
+        <a-plane 
+            id="krch-image"
+            position="-1 1 -2" 
+            rotation="0 90 0" 
+            width="1.5" 
+            height="2" 
+            color="white" 
+            src="#krch"
+            data-image="true"
+            animation__cursor-enter="property: scale; 
+                                     from: 1 1 1; 
+                                     to: 1.1 1.1 1.1; 
+                                     dur: 200; 
+                                     startEvents: mouseenter"
+            animation__cursor-leave="property: scale; 
+                                     from: 1.1 1.1 1.1; 
+                                     to: 1 1 1; 
+                                     dur: 200; 
+                                     startEvents: mouseleave"
+            animation__click-up="property: position; 
+                             from: 0 1 -3; 
+                             to: 0 2.5 -3; 
+                             dur: 500; 
+                             easing: easeOutQuad; 
+                             startEvents: click-up"
+            animation__click-down="property: position; 
+                             from: 0 2.5 -3; 
+                             to: 0 1 -3; 
+                             dur: 500; 
+                             easing: easeOutQuad; 
+                             startEvents: click-down">
+        </a-plane>
 
-            <!-- Third Image Plane -->
-            <a-plane 
-                id="rev-image"
-                position="2 1 -3" 
-                rotation="0 0 0" 
-                width="1.5" 
-                height="2" 
-                color="white" 
-                src="#rev"
-                data-image="true"
-                animation__cursor-enter="property: scale; 
-                                         from: 1 1 1; 
-                                         to: 1.1 1.1 1.1; 
-                                         dur: 200; 
-                                         startEvents: mouseenter"
-                animation__cursor-leave="property: scale; 
-                                         from: 1.1 1.1 1.1; 
-                                         to: 1 1 1; 
-                                         dur: 200; 
-                                         startEvents: mouseleave"
-                animation__click-up="property: position; 
-                                 from: 2 1 -3; 
-                                 to: 2 2.5 -3; 
-                                 dur: 500; 
-                                 easing: easeOutQuad; 
-                                 startEvents: click-up"
-                animation__click-down="property: position; 
-                                 from: 2 2.5 -3; 
-                                 to: 2 1 -3; 
-                                 dur: 500; 
-                                 easing: easeOutQuad; 
-                                 startEvents: click-down">
-            </a-plane>
-        </a-marker>
+        <!-- Hidden Button for KRCH Image -->
+        <a-entity 
+            id="krch-hidden-button" 
+            position="2 3 -3" 
+            visible="false">
+            <a-box 
+                color="#4CC3D9" 
+                depth="0.2" 
+                height="0.5" 
+                width="1"
+                id="krch-move-button">
+                
+            </a-box>
+
+        </a-entity>
+
+
+
+        <!-- Second Image Plane -->
+        <a-plane 
+            id="ww2-image"
+            position="-2 1 -3" 
+            rotation="0 -90 0" 
+            width="1.5" 
+            height="2" 
+            color="white" 
+            src="#ww2"
+            data-image="true"
+            animation__cursor-enter="property: scale; 
+                                     from: 1 1 1; 
+                                     to: 1.1 1.1 1.1; 
+                                     dur: 200; 
+                                     startEvents: mouseenter"
+            animation__cursor-leave="property: scale; 
+                                     from: 1.1 1.1 1.1; 
+                                     to: 1 1 1; 
+                                     dur: 200; 
+                                     startEvents: mouseleave"
+            animation__click-up="property: position; 
+                             from: -2 1 -3; 
+                             to: -2 2.5 -3; 
+                             dur: 500; 
+                             easing: easeOutQuad; 
+                             startEvents: click-up"
+            animation__click-down="property: position; 
+                             from: -2 2.5 -3; 
+                             to: -2 1 -3; 
+                             dur: 500; 
+                             easing: easeOutQuad; 
+                             startEvents: click-down">
+        </a-plane>
+
+        <!-- Third Image Plane -->
+        <a-plane 
+            id="rev-image"
+            position="2 1 -3" 
+            rotation="0 0 0" 
+            width="1.5" 
+            height="2" 
+            color="white" 
+            src="#rev"
+            data-image="true"
+            animation__cursor-enter="property: scale; 
+                                     from: 1 1 1; 
+                                     to: 1.1 1.1 1.1; 
+                                     dur: 200; 
+                                     startEvents: mouseenter"
+            animation__cursor-leave="property: scale; 
+                                     from: 1.1 1.1 1.1; 
+                                     to: 1 1 1; 
+                                     dur: 200; 
+                                     startEvents: mouseleave"
+            animation__click-up="property: position; 
+                             from: 2 1 -3; 
+                             to: 2 2.5 -3; 
+                             dur: 500; 
+                             easing: easeOutQuad; 
+                             startEvents: click-up"
+            animation__click-down="property: position; 
+                             from: 2 2.5 -3; 
+                             to: 2 1 -3; 
+                             dur: 500; 
+                             easing: easeOutQuad; 
+                             startEvents: click-down">
+        </a-plane>
+
+</a-marker>
 
         <!-- Updated Camera with Specified Attributes -->
         <a-entity camera look-controls wasd-controls="acceleration: 25" position="0 1.3 1">
             <a-entity id="mouseCursor" cursor="rayOrigin: mouse"></a-entity>
         </a-entity>
-    </a-scene>
 
-    <script>
-        // Get references to the image planes and hidden button
-        const krchImage = document.querySelector('#krch-image');
-        const ww2Image = document.querySelector('#ww2-image');
-        const revImage = document.querySelector('#rev-image');
-        const krchHiddenButton = document.querySelector('#krch-move-button');
-        const mainCamera = document.querySelector('a-entity[camera]');
+        <script>
+            // Get references to the image planes and hidden button
+            const krchImage = document.querySelector('#krch-image');
+            const ww2Image = document.querySelector('#ww2-image');
+            const revImage = document.querySelector('#rev-image');
+            const krchHiddenButton = document.querySelector('#krch-move-button');
+            const mainCamera = document.querySelector('a-entity[camera]');
 
-        // Function to handle image click (up and down)
-        function handleImageClick(image) {
-            const currentPosition = image.getAttribute('position');
-            
-            if (currentPosition.y <= 1.5) {
-                // Move up
-                image.emit('click-up');
+            // Function to handle image click (up and down)
+            function handleImageClick(image) {
+                const currentPosition = image.getAttribute('position');
                 
-                // Show hidden button only for krch image
-                if (image.id === 'krch-image') {
-                    document.querySelector('#krch-hidden-button').setAttribute('visible', true);
+                if (currentPosition.y <= 1.5) {
+                    // Move up
+                    image.emit('click-up');
+                    
+                    // Show hidden button only for krch image
+                    if (image.id === 'krch-image') {
+                        document.querySelector('#krch-hidden-button').setAttribute('visible', true);
+                    }
+                } else {
+                    // Move down
+                    image.emit('click-down');
+                    
+                    // Hide hidden button
+                    document.querySelector('#krch-hidden-button').setAttribute('visible', false);
                 }
-            } else {
-                // Move down
-                image.emit('click-down');
-                
-                // Hide hidden button
-                document.querySelector('#krch-hidden-button').setAttribute('visible', false);
             }
-        }
 
-        // Add click event listeners to images
-        krchImage.addEventListener('click', () => handleImageClick(krchImage));
-        ww2Image.addEventListener('click', () => handleImageClick(ww2Image));
-        revImage.addEventListener('click', () => handleImageClick(revImage));
+            // Add click event listeners to images
+            krchImage.addEventListener('click', () => handleImageClick(krchImage));
+            ww2Image.addEventListener('click', () => handleImageClick(ww2Image));
+            revImage.addEventListener('click', () => handleImageClick(revImage));
 
-        // Add click event listener to hidden button
-        krchHiddenButton.addEventListener('click', () => {
-            // Rotate camera 180 degrees
-            const currentRotation = mainCamera.getAttribute('rotation');
-            mainCamera.setAttribute('rotation', {
-                x: currentRotation.x, 
-                y: currentRotation.y + 180, 
-                z: currentRotation.z
+            // Add click event listener to hidden button
+            krchHiddenButton.addEventListener('click', () => {
+                // Rotate camera 180 degrees
+                const currentRotation = mainCamera.getAttribute('rotation');
+                mainCamera.setAttribute('rotation', {
+                    x: currentRotation.x, 
+                    y: currentRotation.y + 180, 
+                    z: currentRotation.z
+                });
             });
-        });
-    </script>
+        </script>
+
 </body>
 </html>
