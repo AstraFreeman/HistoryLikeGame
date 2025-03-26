@@ -1,9 +1,9 @@
+<!DOCTYPE html>
 <html>
-  <head>
-  <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-  <!-- we import arjs version without NFT but with marker + location based support -->
-  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-      <script>
+<head>
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <script>
         // Function to restart the page
         function restartPage() {
             location.reload();
@@ -18,147 +18,170 @@
         document.addEventListener('DOMContentLoaded', function() {
             AFRAME.registerComponent('button-handler', {
                 init: function() {
+                    // Add click event listener for mouse/touch interactions
                     this.el.addEventListener('click', function() {
-                        // Get the button's ID to determine its action
-                        switch(this.id) {
-                            case 'restart-button-1':
-                            case 'restart-button-2':
-                                restartPage();
-                                break;
-                            case 'no-result-button':
-                                alert('No action assigned to this button.');
-                                break;
-                            case 'kvebek-button':
-                                openKvebek3();
-                                break;
-                        }
+                        handleButtonClick(this.id);
+                    });
+
+                    // Add raycaster-intersected event for cursor interactions
+                    this.el.addEventListener('raycaster-intersected', function() {
+                        this.setAttribute('material', 'opacity', 0.7);
+                    });
+
+                    // Add raycaster-intersected-cleared event for cursor interactions
+                    this.el.addEventListener('raycaster-intersected-cleared', function() {
+                        this.setAttribute('material', 'opacity', 1);
                     });
                 }
             });
+
+            // Centralized button click handler
+            function handleButtonClick(buttonId) {
+                switch(buttonId) {
+                    case 'restart-button-1':
+                    case 'restart-button-2':
+                        restartPage();
+                        break;
+                    case 'no-result-button':
+                        alert('No action assigned to this button.');
+                        break;
+                    case 'kvebek-button':
+                        openKvebek3();
+                        break;
+                }
+            }
         });
     </script>
 </head>
 <body>
-    <a-assets>
-        <img id="rev" src="image/22_1.jpg">
-        <img id="ww2" src="image/29_1.jpg">
-        <img id="krch" src="image/30_1.jpg">
-    </a-assets>
+    <a-scene embedded arjs>
+        <a-assets>
+            <img id="rev" src="image/22_1.jpg">
+            <img id="ww2" src="image/29_1.jpg">
+            <img id="krch" src="image/30_1.jpg">
+        </a-assets>
 
-    <a-scene embedded arjs> 
-    <a-marker preset="hiro">
+        <a-marker preset="hiro">
+            <!-- Title Plane -->
+            <a-text 
+                value="Choose a Poster of the «Thaw»" 
+                align="center" 
+                position="0 0 -0.6" 
+                rotation="0 180 0" 
+                color="black"
+                scale="0.8 0.8 0.8">
+            </a-text>
 
-        <!-- Title Plane -->
-        <a-text 
-            value="Choose a Poster of the «Thaw»" 
-            align="center" 
-            position="0 0 -0.6" 
-            rotation="0 180 0" 
-            color="black"
-            scale="0.8 0.8 0.8">
-        </a-text>
+            <!-- First Image Plane (KRCH) -->
+            <a-plane 
+                id="krch-image"
+                position="0.6 0 0" 
+                rotation="0 90 0" 
+                width="1.5" 
+                height="2" 
+                scale="0.5 0.5 0.5"
+                color="white" 
+                src="#krch">
+            </a-plane>
 
-        <!-- First Image Plane (KRCH) -->
-        <a-plane 
-            id="krch-image"
-            position="0.6 0 0" 
-            rotation="0 90 0" 
-            width="1.5" 
-            height="2" 
-            scale="0.5 0.5 0.5"
-            color="white" 
-            src="#krch">
-        </a-plane>
+            <!-- Kvebek Button (Green) -->
+            <a-entity 
+                id="kvebek-button" 
+                position="0.6 0.6 0" 
+                rotation="90 0 0" 
+                button-handler
+                class="clickable">
+                <a-box 
+                    color="#00FF00" 
+                    depth="0.2" 
+                    height="0.4" 
+                    width="0.4"
+                    material="opacity: 1">
+                </a-box>
+            </a-entity>
 
+            <!-- Second Image Plane (WW2) -->
+            <a-plane 
+                id="ww2-image"
+                position="-0.6 0 0" 
+                rotation="0 -90 0" 
+                width="1.5" 
+                height="2" 
+                color="white" 
+                scale="0.5 0.5 0.5"
+                src="#ww2">
+            </a-plane>
 
-        <!-- Kvebek Button (Green) -->
-        <a-entity 
-            id="kvebek-button" 
-            position="0.6 0.6 0" 
-            rotation="90 0 0" 
-            button-handler>
-            <a-box 
-                color="#00FF00" 
-                depth="0.2" 
-                height="0.4" 
-                width="0.4">
-            </a-box>
-        </a-entity>
+            <!-- First Restart Button (Blue) -->
+            <a-entity 
+                id="restart-button-1" 
+                position="-0.6 0.6 0" 
+                rotation="90 0 0" 
+                button-handler
+                class="clickable">
+                <a-box 
+                    color="#4CC3D9" 
+                    depth="0.2" 
+                    height="0.4" 
+                    width="0.4"
+                    material="opacity: 1">
+                </a-box>
+            </a-entity>
 
+            <!-- Third Image Plane (Revolution) -->
+            <a-plane 
+                id="rev-image"
+                position="0 0 0.6"
+                rotation="0 0 0" 
+                width="1.5" 
+                height="2" 
+                scale="0.5 0.5 0.5"
+                color="white" 
+                src="#rev"
+                data-image="true">
+            </a-plane>
 
-        <!-- Second Image Plane (WW2) -->
-        <a-plane 
-            id="ww2-image"
-            position="-0.6 0 0" 
-            rotation="0 -90 0" 
-            width="1.5" 
-            height="2" 
-            color="white" 
-            scale="0.5 0.5 0.5"
-            src="#ww2">
-        </a-plane>
+            <!-- No Result Button (Red) -->
+            <a-entity 
+                id="no-result-button" 
+                position="-0.6 0.6 0" 
+                rotation="90 0 0" 
+                button-handler
+                class="clickable">
+                <a-box 
+                    color="#FF0000" 
+                    depth="0.2" 
+                    height="0.4" 
+                    width="0.4"
+                    material="opacity: 1">
+                </a-box>
+            </a-entity>
 
-        <!-- First Restart Button (Blue) -->
-        <a-entity 
-            id="restart-button-1" 
-            position="-0.6 0.6 0" 
-            rotation="90 0 0" 
-            button-handler>
-            <a-box 
-                color="#4CC3D9" 
-                depth="0.2" 
-                height="0.4" 
-                width="0.4">
-            </a-box>
-        </a-entity>
+            <!-- Second Restart Button (Purple) -->
+            <a-entity 
+                id="restart-button-2" 
+                position="0 0.6 -0.6" 
+                rotation="90 0 0" 
+                button-handler
+                class="clickable">
+                <a-box 
+                    color="#800080" 
+                    depth="0.2" 
+                    height="0.4" 
+                    width="0.4"
+                    material="opacity: 1">
+                </a-box>
+            </a-entity>
 
+            <!-- Cursor -->
+            <a-entity 
+                cursor="rayOrigin: mouse" 
+                raycaster="objects: .clickable"
+                position="0 0 0">
+            </a-entity>
+        </a-marker>
 
-        <!-- Third Image Plane (Revolution) -->
-        <a-plane 
-            id="rev-image"
-            position="0 0 0.6"
-            rotation="0 0 0" 
-            width="1.5" 
-            height="2" 
-            scale="0.5 0.5 0.5"
-            color="white" 
-            src="#rev"
-            data-image="true">
-        </a-plane>
-
-        <!-- No Result Button (Red) -->
-        <a-entity 
-            id="no-result-button" 
-            position="-0.6 0.6 0" 
-            rotation="90 0 0" 
-            button-handler>
-            <a-box 
-                color="#FF0000" 
-                depth="0.2" 
-                height="0.4" 
-                width="0.4">
-            </a-box>
-        </a-entity>
-
-        <!-- Second Restart Button (Purple) -->
-        <a-entity 
-            id="restart-button-2" 
-            position="0 0.6 -0.6" 
-            rotation="90 0 0" 
-            button-handler>
-            <a-box 
-                color="#800080" 
-                depth="0.2" 
-                height="0.4" 
-                width="0.4">
-            </a-box>
-        </a-entity>
-
-    </a-marker>
-    <a-entity camera></a-entity>
-</a-scene>
-
-
-
+        <a-entity camera></a-entity>
+    </a-scene>
 </body>
 </html>
