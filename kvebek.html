@@ -34,7 +34,7 @@
         position="2 4 -3" 
         font="ADVENTURE.TTF-msdf.json"
         color="black"
-        negate="true"
+        negate="false"
         scale="0.8 0.8 0.8">
     </a-text>
 
@@ -190,16 +190,11 @@
             ww2Image.addEventListener('click', () => handleImageClick(ww2Image));
             revImage.addEventListener('click', () => handleImageClick(revImage));
 
-            // Add click event listener to hidden button
-            krchHiddenButton.addEventListener('click', () => {
-                // Rotate camera 180 degrees
-                const currentRotation = mainCamera.getAttribute('rotation');
-                mainCamera.setAttribute('rotation', {
-                    x: currentRotation.x, 
-                    y: currentRotation.y + 180, 
-                    z: currentRotation.z
-                });
-            });
+        // Replace the existing click event listener with this:
+        krchHiddenButton.addEventListener('click', () => {
+            // Redirect to index.html
+            window.location.href = 'index.html';
+        });
         </script>
     </a-scene>
 </body>
