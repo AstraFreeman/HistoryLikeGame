@@ -1,7 +1,43 @@
 <html>
+  <head>
   <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
   <!-- we import arjs version without NFT but with marker + location based support -->
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+      <script>
+        // Function to restart the page
+        function restartPage() {
+            location.reload();
+        }
+
+        // Function to open Kvebek3.html
+        function openKvebek3() {
+            window.location.href = 'Kvebek3.html';
+        }
+
+        // Add event listeners after the scene is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            AFRAME.registerComponent('button-handler', {
+                init: function() {
+                    this.el.addEventListener('click', function() {
+                        // Get the button's ID to determine its action
+                        switch(this.id) {
+                            case 'restart-button-1':
+                            case 'restart-button-2':
+                                restartPage();
+                                break;
+                            case 'no-result-button':
+                                alert('No action assigned to this button.');
+                                break;
+                            case 'kvebek-button':
+                                openKvebek3();
+                                break;
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</head>
 <body>
     <a-assets>
         <img id="rev" src="image/22_1.jpg">
@@ -122,56 +158,7 @@
     <a-entity camera></a-entity>
 </a-scene>
 
-        <!-- Updated Camera with Specified Attributes -->
-        <a-entity camera look-controls wasd-controls="acceleration: 25" position="0 1.3 1">
-            <a-entity id="mouseCursor" cursor="rayOrigin: mouse"></a-entity>
-        </a-entity>
 
-        <script>
-            // Get references to the image planes and hidden button
-            const krchImage = document.querySelector('#krch-image');
-            const ww2Image = document.querySelector('#ww2-image');
-            const revImage = document.querySelector('#rev-image');
-            const krchHiddenButton = document.querySelector('#krch-move-button');
-            const mainCamera = document.querySelector('a-entity[camera]');
-
-            // Function to handle image click (up and down)
-            function handleImageClick(image) {
-                const currentPosition = image.getAttribute('position');
-                
-                if (currentPosition.y <= 1.5) {
-                    // Move up
-                    image.emit('click-up');
-                    
-                    // Show hidden button only for krch image
-                    if (image.id === 'krch-image') {
-                        document.querySelector('#krch-hidden-button').setAttribute('visible', true);
-                    }
-                } else {
-                    // Move down
-                    image.emit('click-down');
-                    
-                    // Hide hidden button
-                    document.querySelector('#krch-hidden-button').setAttribute('visible', false);
-                }
-            }
-
-            // Add click event listeners to images
-            krchImage.addEventListener('click', () => handleImageClick(krchImage));
-            ww2Image.addEventListener('click', () => handleImageClick(ww2Image));
-            revImage.addEventListener('click', () => handleImageClick(revImage));
-
-            // Add click event listener to hidden button
-            krchHiddenButton.addEventListener('click', () => {
-                // Rotate camera 180 degrees
-                const currentRotation = mainCamera.getAttribute('rotation');
-                mainCamera.setAttribute('rotation', {
-                    x: currentRotation.x, 
-                    y: currentRotation.y + 180, 
-                    z: currentRotation.z
-                });
-            });
-        </script>
 
 </body>
 </html>
