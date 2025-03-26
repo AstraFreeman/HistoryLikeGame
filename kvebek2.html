@@ -12,146 +12,112 @@
     <a-scene embedded arjs> 
     <a-marker preset="hiro">
 
-<a-box color= "red" ></a-box>
-
-
-        <!-- Light green base plane -->
-        <a-plane 
-            position="0 0 -4" 
-            rotation="-90 0 0" 
-            width="10" 
-            height="10" 
-            color="#90EE90">
-        </a-plane>
-
+    <a-scene>
         <!-- Title Plane -->
         <a-text 
-        value="Choose a Poster of the «Thaw»" 
-        align="center" 
-        position="2 4 -3" 
-        color="black"
-        scale="0.8 0.8 0.8">
-    </a-text>
+            value="Choose a Poster of the «Thaw»" 
+            align="center" 
+            position="0 0 -0.6" 
+            rotation="0 180 0" 
+            color="black"
+            scale="0.8 0.8 0.8">
+        </a-text>
 
-        <!-- First Image Plane -->
+        <!-- First Image Plane (KRCH) -->
         <a-plane 
             id="krch-image"
-            position="-1 1 -2" 
+            position="0.6 0 0" 
             rotation="0 90 0" 
             width="1.5" 
             height="2" 
+            scale="0.5 0.5 0.5"
             color="white" 
-            src="#krch"
-            data-image="true"
-            animation__cursor-enter="property: scale; 
-                                     from: 1 1 1; 
-                                     to: 1.1 1.1 1.1; 
-                                     dur: 200; 
-                                     startEvents: mouseenter"
-            animation__cursor-leave="property: scale; 
-                                     from: 1.1 1.1 1.1; 
-                                     to: 1 1 1; 
-                                     dur: 200; 
-                                     startEvents: mouseleave"
-            animation__click-up="property: position; 
-                             from: 0 1 -3; 
-                             to: 0 2.5 -3; 
-                             dur: 500; 
-                             easing: easeOutQuad; 
-                             startEvents: click-up"
-            animation__click-down="property: position; 
-                             from: 0 2.5 -3; 
-                             to: 0 1 -3; 
-                             dur: 500; 
-                             easing: easeOutQuad; 
-                             startEvents: click-down">
+            src="#krch">
         </a-plane>
 
-        <!-- Hidden Button for KRCH Image -->
-        <a-entity 
-            id="krch-hidden-button" 
-            position="2 3 -3" 
-            visible="false">
-            <a-box 
-                color="#4CC3D9" 
-                depth="0.2" 
-                height="0.5" 
-                width="1"
-                id="krch-move-button">
-                
-            </a-box>
 
+        <!-- Kvebek Button (Green) -->
+        <a-entity 
+            id="kvebek-button" 
+            position="0.6 0.6 0" 
+            rotation="90 0 0" 
+            button-handler>
+            <a-box 
+                color="#00FF00" 
+                depth="0.2" 
+                height="0.4" 
+                width="0.4">
+            </a-box>
         </a-entity>
 
 
-
-        <!-- Second Image Plane -->
+        <!-- Second Image Plane (WW2) -->
         <a-plane 
             id="ww2-image"
-            position="-2 1 -3" 
+            position="-0.6 0 0" 
             rotation="0 -90 0" 
             width="1.5" 
             height="2" 
             color="white" 
-            src="#ww2"
-            data-image="true"
-            animation__cursor-enter="property: scale; 
-                                     from: 1 1 1; 
-                                     to: 1.1 1.1 1.1; 
-                                     dur: 200; 
-                                     startEvents: mouseenter"
-            animation__cursor-leave="property: scale; 
-                                     from: 1.1 1.1 1.1; 
-                                     to: 1 1 1; 
-                                     dur: 200; 
-                                     startEvents: mouseleave"
-            animation__click-up="property: position; 
-                             from: -2 1 -3; 
-                             to: -2 2.5 -3; 
-                             dur: 500; 
-                             easing: easeOutQuad; 
-                             startEvents: click-up"
-            animation__click-down="property: position; 
-                             from: -2 2.5 -3; 
-                             to: -2 1 -3; 
-                             dur: 500; 
-                             easing: easeOutQuad; 
-                             startEvents: click-down">
+            scale="0.5 0.5 0.5"
+            src="#ww2">
         </a-plane>
 
-        <!-- Third Image Plane -->
+        <!-- First Restart Button (Blue) -->
+        <a-entity 
+            id="restart-button-1" 
+            position="-0.6 0.6 0" 
+            rotation="90 0 0" 
+            button-handler>
+            <a-box 
+                color="#4CC3D9" 
+                depth="0.2" 
+                height="0.4" 
+                width="0.4">
+            </a-box>
+        </a-entity>
+
+
+        <!-- Third Image Plane (Revolution) -->
         <a-plane 
             id="rev-image"
-            position="2 1 -3" 
+            position="0 0 0.6"
             rotation="0 0 0" 
             width="1.5" 
             height="2" 
+            scale="0.5 0.5 0.5"
             color="white" 
             src="#rev"
-            data-image="true"
-            animation__cursor-enter="property: scale; 
-                                     from: 1 1 1; 
-                                     to: 1.1 1.1 1.1; 
-                                     dur: 200; 
-                                     startEvents: mouseenter"
-            animation__cursor-leave="property: scale; 
-                                     from: 1.1 1.1 1.1; 
-                                     to: 1 1 1; 
-                                     dur: 200; 
-                                     startEvents: mouseleave"
-            animation__click-up="property: position; 
-                             from: 2 1 -3; 
-                             to: 2 2.5 -3; 
-                             dur: 500; 
-                             easing: easeOutQuad; 
-                             startEvents: click-up"
-            animation__click-down="property: position; 
-                             from: 2 2.5 -3; 
-                             to: 2 1 -3; 
-                             dur: 500; 
-                             easing: easeOutQuad; 
-                             startEvents: click-down">
+            data-image="true">
         </a-plane>
+
+        <!-- No Result Button (Red) -->
+        <a-entity 
+            id="no-result-button" 
+            position="-0.6 0.6 0" 
+            rotation="90 0 0" 
+            button-handler>
+            <a-box 
+                color="#FF0000" 
+                depth="0.2" 
+                height="0.4" 
+                width="0.4">
+            </a-box>
+        </a-entity>
+
+        <!-- Second Restart Button (Purple) -->
+        <a-entity 
+            id="restart-button-2" 
+            position="0 0.6 -0.6" 
+            rotation="90 0 0" 
+            button-handler>
+            <a-box 
+                color="#800080" 
+                depth="0.2" 
+                height="0.4" 
+                width="0.4">
+            </a-box>
+        </a-entity>
 
     </a-marker>
     <a-entity camera></a-entity>
