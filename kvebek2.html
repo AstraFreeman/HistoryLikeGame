@@ -1,7 +1,7 @@
-<!DOCTYPE html>
 <html>
-<head>
+  <head>
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <!-- AR.js library -->
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <script>
         // Function to restart the page
@@ -14,52 +14,74 @@
             window.location.href = 'Kvebek3.html';
         }
 
-        // Add event listeners after the scene is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            AFRAME.registerComponent('button-handler', {
-                init: function() {
-                    // Add click event listener for mouse/touch interactions
-                    this.el.addEventListener('click', function() {
-                        handleButtonClick(this.id);
-                    });
+        // Register custom component for button interactions
+        AFRAME.registerComponent('interactive-button', {
+            schema: {
+                action: {type: 'string', default: ''}
+            },
+            init: function() {
+                const data = this.data;
+                const el = this.el;
 
-                    // Add raycaster-intersected event for cursor interactions
-                    this.el.addEventListener('raycaster-intersected', function() {
-                        this.setAttribute('material', 'opacity', 0.7);
-                    });
+                // Add hover/touch effect
+                el.addEventListener('mouseenter', function() {
+                    el.setAttribute('scale', '1.2 1.2 1.2');
+                });
 
-                    // Add raycaster-intersected-cleared event for cursor interactions
-                    this.el.addEventListener('raycaster-intersected-cleared', function() {
-                        this.setAttribute('material', 'opacity', 1);
-                    });
-                }
-            });
+                el.addEventListener('mouseleave', function() {
+                    el.setAttribute('scale', '1 1 1');
+                });
 
-            // Centralized button click handler
-            function handleButtonClick(buttonId) {
-                switch(buttonId) {
-                    case 'restart-button-1':
-                    case 'restart-button-2':
-                        restartPage();
-                        break;
-                    case 'no-result-button':
-                        alert('No action assigned to this button.');
-                        break;
-                    case 'kvebek-button':
-                        openKvebek3();
-                        break;
-                }
+                // Support both mouse and touch events
+                ['click', 'touchstart'].forEach(eventType => {
+                    el.addEventListener(eventType, function(evt) {
+                        // Prevent default touch behavior
+                        evt.preventDefault();
+
+                        // Stop propagation to avoid multiple triggers
+                        evt.stopPropagation();
+
+                        switch(data.action) {
+                            case 'restart':
+                                restartPage();
+                                break;
+                            case 'no-result':
+                                alert('No action assigned to this button.');
+                                break;
+                            case 'kvebek':
+                                openKvebek3();
+                                break;
+                        }
+                    });
+                });
             }
         });
     </script>
-</head>
-<body>
-    <a-scene embedded arjs>
-        <a-assets>
-            <img id="rev" src="image/22_1.jpg">
-            <img id="ww2" src="image/29_1.jpg">
-            <img id="krch" src="image/30_1.jpg">
-        </a-assets>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <style>
+        body { margin: 0; overflow: hidden; }
+    </style>
+  </head>
+  <body>
+    <a-assets>
+        <img id="rev" src="image/22_1.jpg">
+        <img id="ww2" src="image/29_1.jpg">
+        <img id="krch" src="image/30_1.jpg">
+    </a-assets>
+
+    <a-scene 
+        embedded 
+        arjs 
+        renderer="logarithmicDepthBuffer: true"
+        vr-mode-ui="enabled: false"
+        gesture-detector
+    >
+        <!-- Add touch-based cursor for interaction -->
+        <a-entity 
+            cursor="rayOrigin: mouse" 
+            raycaster="objects: .interactive"
+            touch-controls>
+        </a-entity>
 
         <a-marker preset="hiro">
             <!-- Title Plane -->
@@ -85,20 +107,17 @@
             </a-plane>
 
             <!-- Kvebek Button (Green) -->
-            <a-entity 
-                id="kvebek-button" 
+            <a-box 
+                id="kvebek-button"
+                class="interactive"
+                interactive-button="action: kvebek"
                 position="0.6 0.6 0" 
                 rotation="90 0 0" 
-                button-handler
-                class="clickable">
-                <a-box 
-                    color="#00FF00" 
-                    depth="0.2" 
-                    height="0.4" 
-                    width="0.4"
-                    material="opacity: 1">
-                </a-box>
-            </a-entity>
+                color="#00FF00" 
+                depth="0.2" 
+                height="0.4" 
+                width="0.4">
+            </a-box>
 
             <!-- Second Image Plane (WW2) -->
             <a-plane 
@@ -113,20 +132,17 @@
             </a-plane>
 
             <!-- First Restart Button (Blue) -->
-            <a-entity 
-                id="restart-button-1" 
+            <a-box 
+                id="restart-button-1"
+                class="interactive"
+                interactive-button="action: restart"
                 position="-0.6 0.6 0" 
                 rotation="90 0 0" 
-                button-handler
-                class="clickable">
-                <a-box 
-                    color="#4CC3D9" 
-                    depth="0.2" 
-                    height="0.4" 
-                    width="0.4"
-                    material="opacity: 1">
-                </a-box>
-            </a-entity>
+                color="#4CC3D9" 
+                depth="0.2" 
+                height="0.4" 
+                width="0.4">
+            </a-box>
 
             <!-- Third Image Plane (Revolution) -->
             <a-plane 
@@ -142,46 +158,33 @@
             </a-plane>
 
             <!-- No Result Button (Red) -->
-            <a-entity 
-                id="no-result-button" 
+            <a-box 
+                id="no-result-button"
+                class="interactive"
+                interactive-button="action: no-result"
                 position="-0.6 0.6 0" 
                 rotation="90 0 0" 
-                button-handler
-                class="clickable">
-                <a-box 
-                    color="#FF0000" 
-                    depth="0.2" 
-                    height="0.4" 
-                    width="0.4"
-                    material="opacity: 1">
-                </a-box>
-            </a-entity>
+                color="#FF0000" 
+                depth="0.2" 
+                height="0.4" 
+                width="0.4">
+            </a-box>
 
             <!-- Second Restart Button (Purple) -->
-            <a-entity 
-                id="restart-button-2" 
+            <a-box 
+                id="restart-button-2"
+                class="interactive"
+                interactive-button="action: restart"
                 position="0 0.6 -0.6" 
                 rotation="90 0 0" 
-                button-handler
-                class="clickable">
-                <a-box 
-                    color="#800080" 
-                    depth="0.2" 
-                    height="0.4" 
-                    width="0.4"
-                    material="opacity: 1">
-                </a-box>
-            </a-entity>
-
-            <!-- Cursor -->
-            <a-entity 
-                cursor="rayOrigin: mouse" 
-                raycaster="objects: .clickable"
-                position="0 0 0">
-            </a-entity>
+                color="#800080" 
+                depth="0.2" 
+                height="0.4" 
+                width="0.4">
+            </a-box>
         </a-marker>
 
         <a-entity camera></a-entity>
     </a-scene>
-</body>
+  </body>
 </html>
