@@ -1,129 +1,95 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="UTF-8">
-    <title>AR Опитування: Вікінги на Русі</title>
+    <title>AR Моделі: Вікінги</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- A-Frame та AR.js бібліотеки -->
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
     <script>
-        // Глобальний об'єкт для зберігання відповідей користувача
-        let userAnswers = { q1: null, q2: null, q3: null };
-
-        // Функція для переходу на наступну сторінку
-        function openNextPage() {
-            window.location.href = 'totoronto2.html';
-        }
-
-        // Реєструємо A-Frame компонент для керування логікою опитування
-        document.addEventListener('DOMContentLoaded', function() {
-            AFRAME.registerComponent('quiz-handler', {
-                init: function() {
-                    const el = this.el; // <a-marker>
-                    const questionsContainer = el.querySelector('#questions-container');
-                    const resultsContainer = el.querySelector('#results-container');
-                    const scoreText = el.querySelector('#score-text');
-                    const answerPlanes = el.querySelectorAll('.answer');
-
-                    // Обробник кліків для варіантів відповідей
-                    answerPlanes.forEach(plane => {
-                        plane.addEventListener('click', function() {
-                            const question = this.getAttribute('data-question'); // q1, q2, or q3
-                            const value = this.getAttribute('data-value'); // a, b, or c
-
-                            // Зберігаємо відповідь
-                            userAnswers[question] = value;
-
-                            // Візуальний відгук: підсвічуємо обраний варіант
-                            // Спочатку знімаємо підсвітку з інших варіантів у цій групі
-                            el.querySelectorAll(`.answer[data-question="${question}"]`).forEach(p => {
-                                p.setAttribute('material', 'color', '#F0F2F5');
-                            });
-                            // Підсвічуємо натиснутий
-                            this.setAttribute('material', 'color', '#4CC3D9');
-                        });
-                    });
-                    
-                    // Обробник для кнопки "Перевірити"
-                    const checkButton = el.querySelector('#check-button');
-                    checkButton.addEventListener('click', function() {
-                        const correctAnswers = { q1: 'b', q2: 'c', q3: 'a' };
-                        let score = 0;
-                        const totalQuestions = Object.keys(correctAnswers).length;
-
-                        for (const question in correctAnswers) {
-                            if (userAnswers[question] === correctAnswers[question]) {
-                                score++;
-                            }
-                        }
-
-                        // Показуємо результат
-                        scoreText.setAttribute('value', `Ваш результат: ${score} з ${totalQuestions}!`);
-                        questionsContainer.setAttribute('visible', 'false');
-                        resultsContainer.setAttribute('visible', 'true');
-                    });
-
-                    // Обробник для кнопки-посилання
-                    const linkButton = el.querySelector('#link-button');
-                    linkButton.addEventListener('click', function() {
-                        openNextPage();
-                    });
-                }
-            });
+        // Простий компонент для обробки кліку по кнопці-посиланню
+        AFRAME.registerComponent('link-button', {
+            init: function () {
+                // Додаємо "слухача" події кліку до нашої кнопки
+                this.el.addEventListener('click', () => {
+                    // При кліку перенаправляємо користувача на вказану сторінку
+                    window.location.href = 'totoronto3.html';
+                });
+            }
         });
     </script>
 </head>
+
 <body style='margin: 0px; overflow: hidden;'>
+    <a-assets>
+        <!-- Моделі, що будуть завантажуватись -->
+        <a-asset-item id="drakkar-glb" src="models/drakar.glb"></a-asset-item>
+        <a-asset-item id="viking-inter-glb" src="models/viking_inter.glb"></a-asset-item>
+
+        <!-- Файли маркерів. Замініть на ваші власні .patt файли -->
+        <a-asset-item id="drakkar-patt" src="https://raw.githack.com/AR-js-org/AR.js/master/data/patt.hiro"></a-asset-item>
+        <a-asset-item id="pobut-patt" src="https://raw.githack.com/AR-js-org/AR.js/master/data/patt.kanji"></a-asset-item>
+    </a-assets>
+
     <a-scene embedded arjs='sourceType: webcam; debugUIEnabled: false;'>
-        <a-marker preset="hiro" quiz-handler>
 
-            <!-- ======================= КОНТЕЙНЕР З ПИТАННЯМИ ======================= -->
-            <a-entity id="questions-container">
-                <!-- Заголовок -->
-                <a-text value="Опитування: Вікінги та Русь-Україна" align="center" position="0 1.6 0" width="4"></a-text>
-
-                <!-- Питання 1 -->
-                <a-entity position="0 0.8 0">
-                    <a-text value="1. Як на Русі називали скандинавських воїнів-мореплавців?" align="center" width="3.5"></a-text>
-                    <a-plane class="answer clickable" data-question="q1" data-value="a" position="-1.2 -0.4 0" width="1" height="0.4" color="#F0F2F5"><a-text value="а) Гуни" color="black" align="center" width="2"></a-text></a-plane>
-                    <a-plane class="answer clickable" data-question="q1" data-value="b" position="0 -0.4 0" width="1" height="0.4" color="#F0F2F5"><a-text value="б) Варяги" color="black" align="center" width="2"></a-text></a-plane>
-                    <a-plane class="answer clickable" data-question="q1" data-value="c" position="1.2 -0.4 0" width="1" height="0.4" color="#F0F2F5"><a-text value="в) Половці" color="black" align="center" width="2"></a-text></a-plane>
-                </a-entity>
-
-                <!-- Питання 2 -->
-                <a-entity position="0 0 0">
-                    <a-text value="2. Який торгівельний шлях контролювали варяги?" align="center" width="3.5"></a-text>
-                    <a-plane class="answer clickable" data-question="q2" data-value="a" position="-1.2 -0.4 0" width="1" height="0.4" color="#F0F2F5"><a-text value="а) Шовковий" color="black" align="center" width="2"></a-text></a-plane>
-                    <a-plane class="answer clickable" data-question="q2" data-value="b" position="0 -0.4 0" width="1" height="0.4" color="#F0F2F5"><a-text value="б) Бурштиновий" color="black" align="center" width="2"></a-text></a-plane>
-                    <a-plane class="answer clickable" data-question="q2" data-value="c" position="1.2 -0.4 0" width="1" height="0.4" color="#F0F2F5"><a-text value="в) Із варягів у греки" color="black" align="center" width="2"></a-text></a-plane>
-                </a-entity>
-
-                <!-- Питання 3 -->
-                <a-entity position="0 -0.8 0">
-                    <a-text value="3. Якого варязького князя було запрошено правити?" align="center" width="3.5"></a-text>
-                    <a-plane class="answer clickable" data-question="q3" data-value="a" position="-1.2 -0.4 0" width="1" height="0.4" color="#F0F2F5"><a-text value="а) Рюрика" color="black" align="center" width="2"></a-text></a-plane>
-                    <a-plane class="answer clickable" data-question="q3" data-value="b" position="0 -0.4 0" width="1" height="0.4" color="#F0F2F5"><a-text value="б) Аскольда" color="black" align="center" width="2"></a-text></a-plane>
-                    <a-plane class="answer clickable" data-question="q3" data-value="c" position="1.2 -0.4 0" width="1" height="0.4" color="#F0F2F5"><a-text value="в) Олега" color="black" align="center" width="2"></a-text></a-plane>
-                </a-entity>
-
-                <!-- Кнопка "Перевірити" -->
-                <a-entity id="check-button" class="clickable" position="0 -1.5 0">
-                    <a-plane width="1.8" height="0.5" color="#007BFF"></a-plane>
-                    <a-text value="Перевірити результати" align="center" width="3"></a-text>
-                </a-entity>
-            </a-entity>
+        <!-- ================================================================= -->
+        <!-- МАРКЕР 1: ДРАКАР ТА КНОПКА                                        -->
+        <!-- ================================================================= -->
+        <a-marker type='pattern' url='#drakkar-patt'>
             
-            <!-- ======================= КОНТЕЙНЕР З РЕЗУЛЬТАТАМИ ======================= -->
-            <a-entity id="results-container" visible="false">
-                <a-text id="score-text" value="Ваш результат: 0 з 3!" align="center" position="0 0.5 0" width="4"></a-text>
-                <a-entity id="link-button" class="clickable" position="0 -0.2 0">
-                    <a-plane width="2" height="0.5" color="#28A745"></a-plane>
-                    <a-text value="Перейти на наступну сторінку" align="center" width="3.5"></a-text>
-                </a-entity>
+            <!-- 3D-модель Дракара -->
+            <a-entity 
+                gltf-model="#drakkar-glb" 
+                scale="0.1 0.1 0.1" 
+                position="0 0 0" 
+                rotation="-90 0 0">
+            </a-entity>
+
+            <!-- Кнопка "Опитування 2" -->
+            <a-entity class="clickable" link-button position="0 1.2 0">
+                <a-plane 
+                    width="1.5" 
+                    height="0.5" 
+                    color="#28A745">
+                </a-plane>
+                <a-text 
+                    value="Опитування 2" 
+                    align="center" 
+                    width="2.5">
+                </a-text>
             </a-entity>
 
         </a-marker>
+
+        <!-- ================================================================= -->
+        <!-- МАРКЕР 2: ПОБУТ ВІКІНГІВ                                          -->
+        <!-- ================================================================= -->
+        <a-marker type='pattern' url='#pobut-patt'>
+            
+            <!-- 3D-модель предметів побуту -->
+            <a-entity 
+                gltf-model="#viking-inter-glb" 
+                scale="0.5 0.5 0.5" 
+                position="0 0.5 0" 
+                rotation="0 0 0">
+            </a-entity>
+
+            <!-- Текстова панель з описом -->
+            <a-plane width="2.5" height="1.2" color="#333" position="0 -0.8 0" rotation="-90 0 0">
+                <a-text 
+                    value="Побут вікінгів: Вікінги були не лише воїнами, а й вправними ремісниками, фермерами та торговцями. Їхні інструменти, як-от сокира, були універсальними: для будівництва, рубки лісу та як зброя в бою."
+                    align="center"
+                    width="2.3"
+                    color="#FFFFFF">
+                </a-text>
+            </a-plane>
+
+        </a-marker>
+        
+        <!-- Камера з курсором для можливості кліку -->
         <a-entity camera><a-cursor></a-cursor></a-entity>
     </a-scene>
 </body>
