@@ -40,16 +40,16 @@
         <a-asset-item id="viking-inter-glb" src="models/viking_inter.glb"></a-asset-item>
 
         <!-- Файли маркерів. Замініть на ваші власні .patt файли -->
-        <a-asset-item id="drakkar-patt" src="https://raw.githack.com/AR-js-org/AR.js/master/data/patt.hiro"></a-asset-item>
-        <a-asset-item id="pobut-patt" src="https://raw.githack.com/AR-js-org/AR.js/master/data/patt.kanji"></a-asset-item>
+      <!--  <a-asset-item id="drakkar-patt" src="https://raw.githack.com/AR-js-org/AR.js/master/data/patt.hiro"></a-asset-item>
+        <a-asset-item id="pobut-patt" src="https://raw.githack.com/AR-js-org/AR.js/master/data/patt.kanji"></a-asset-item>-->
     </a-assets>
 
-    <a-scene embedded arjs='sourceType: webcam; debugUIEnabled: false;'>
+    <a-scene embedded arjs>
 
         <!-- ================================================================= -->
         <!-- МАРКЕР 1: ДРАКАР ТА КНОПКА                                        -->
         <!-- ================================================================= -->
-        <a-marker type='pattern' url='#drakkar-patt'>
+        <a-marker type='pattern'>
             
             <!-- 3D-модель Дракара -->
             <a-entity 
@@ -84,7 +84,7 @@
         <!-- ================================================================= -->
         <!-- МАРКЕР 2: ПОБУТ ВІКІНГІВ                                          -->
         <!-- ================================================================= -->
-        <a-marker type='pattern' url='#pobut-patt'>
+        <a-marker type='hiro'>
             
             <!-- 3D-модель предметів побуту -->
             <a-entity 
@@ -107,8 +107,9 @@
         </a-marker>
         
         <!-- Камера з курсором для можливості кліку -->
-        <a-entity camera><a-cursor></a-cursor></a-entity>
+        <a-entity camera></a-entity>
     </a-scene>
 </body>
 </html>
+
 
