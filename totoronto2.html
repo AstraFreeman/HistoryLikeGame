@@ -8,6 +8,15 @@
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
     <style>
         body { margin: 0; overflow: hidden; }
+        .loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 20px;
+            z-index: 1000;
+        }
     </style>
     <script>
         // Function to restart the page
@@ -22,12 +31,17 @@
 
         // Add event listeners after the scene is loaded
         window.addEventListener('DOMContentLoaded', function() {
+            // Log when model is loaded
+            const scene = document.querySelector('a-scene');
+            scene.addEventListener('loaded', function() {
+                console.log('Scene loaded');
+            });
+
             AFRAME.registerComponent('button-handler', {
                 init: function() {
                     var el = this.el;
                     el.addEventListener('click', function() {
                         console.log('Button clicked:', this.id);
-                        // Get the button's ID to determine its action
                         switch(this.id) {
                             case 'restart-button-1':
                             case 'restart-button-2':
@@ -43,19 +57,37 @@
                     });
                 }
             });
+
+            // Component to handle model loading
+            AFRAME.registerComponent('model-handler', {
+                init: function() {
+                    this.el.addEventListener('model-loaded', function() {
+                        console.log('3D Model loaded successfully!');
+                    });
+                    this.el.addEventListener('model-error', function(error) {
+                        console.error('Error loading 3D model:', error);
+                    });
+                }
+            });
         });
     </script>
 </head>
 <body>
-    <a-scene embedded arjs>
-        <a-assets>
-            <img id="rev" src="image/22_1.jpg">
-            <img id="ww2" src="image/29_1.jpg">
-            <img id="krch" src="image/30_1.jpg">
-            <a-asset-item id="drakkar-glb" src="models/drakar.glb"></a-asset-item>
+    <div class="loading" id="loading">Loading AR...</div>
+
+    <a-scene 
+        embedded 
+        arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+        vr-mode-ui="enabled: false">
+        
+        <a-assets timeout="10000">
+            <img id="rev" src="image/22_1.jpg" crossorigin="anonymous">
+            <img id="ww2" src="image/29_1.jpg" crossorigin="anonymous">
+            <img id="krch" src="image/30_1.jpg" crossorigin="anonymous">
+            <a-asset-item id="drakkar-glb" src="models/drakar.glb" crossorigin="anonymous"></a-asset-item>
         </a-assets>
 
-        <a-marker preset="hiro">
+        <a-marker preset="hiro" id="hiro-marker">
             <!-- Title Plane -->
             <a-text 
                 value="Choose a Poster of the «Thaw»" 
@@ -66,6 +98,17 @@
                 scale="0.5 0.5 0.5">
             </a-text>
 
+            <!-- 3D Model (Drakkar) - Center, visible -->
+            <a-entity 
+                id="drakkar-model"
+                gltf-model="#drakkar-glb"
+                model-handler
+                position="0 -0.3 0"
+                rotation="0 0 0"
+                scale="0.05 0.05 0.05"
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 10000; easing: linear">
+            </a-entity>
+
             <!-- First Image Plane (KRCH) - Right -->
             <a-plane 
                 id="krch-image"
@@ -75,14 +118,10 @@
                 height="2" 
                 scale="0.5 0.5 0.5"
                 color="white" 
-                src="#krch">
+                src="#krch"
+                material="shader: flat">
             </a-plane>
-         <a-entity 
-                gltf-model="#drakkar-glb" 
-                scale="0.1 0.1 0.1" 
-                position="0 0 0" 
-                rotation="-90 0 0">
-            </a-entity>
+
             <!-- Kvebek Button (Green) - Above KRCH -->
             <a-entity 
                 id="kvebek-button" 
@@ -106,7 +145,8 @@
                 height="2" 
                 color="white" 
                 scale="0.5 0.5 0.5"
-                src="#ww2">
+                src="#ww2"
+                material="shader: flat">
             </a-plane>
 
             <!-- First Restart Button (Blue) - Above WW2 -->
@@ -133,6 +173,7 @@
                 scale="0.5 0.5 0.5"
                 color="white" 
                 src="#rev"
+                material="shader: flat"
                 data-image="true">
             </a-plane>
 
@@ -167,6 +208,12 @@
 
         <a-entity camera></a-entity>
     </a-scene>
+
+    <script>
+        // Hide loading message when scene is ready
+        document.querySelector('a-scene').addEventListener('loaded', function() {
+            document.getElementById('loading').style.display = 'none';
+        });
+    </script>
 </body>
 </html>
-
