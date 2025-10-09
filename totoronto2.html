@@ -9,15 +9,26 @@
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
     <script>
-        // Простий компонент для обробки кліку по кнопці-посиланню
-        AFRAME.registerComponent('link-button', {
-            init: function () {
-                // Додаємо "слухача" події кліку до нашої кнопки
-                this.el.addEventListener('click', () => {
-                    // При кліку перенаправляємо користувача на вказану сторінку
-                    window.location.href = 'totoronto3.html';
-                });
-            }
+        // Функція для відкриття сторінки опитування
+        function openQuizPage() {
+            window.location.href = 'totoronto3.html';
+        }
+
+        // Додаємо обробники подій після завантаження сцени
+        document.addEventListener('DOMContentLoaded', function() {
+            AFRAME.registerComponent('button-handler', {
+                init: function() {
+                    this.el.addEventListener('click', function() {
+                        // Визначаємо дію за ID кнопки
+                        switch(this.id) {
+                            case 'quiz-button':
+                                openQuizPage();
+                                break;
+                            // Можна додати інші кейси для інших кнопок у майбутньому
+                        }
+                    });
+                }
+            });
         });
     </script>
 </head>
@@ -48,8 +59,13 @@
                 rotation="-90 0 0">
             </a-entity>
 
-            <!-- Кнопка "Опитування 2" -->
-            <a-entity class="clickable" link-button position="0 1.2 0">
+            <!-- Кнопка "Опитування 2" з новою логікою -->
+            <a-entity 
+                id="quiz-button"
+                class="clickable" 
+                button-handler 
+                position="0 1.2 0"
+                rotation="-90 0 0">
                 <a-plane 
                     width="1.5" 
                     height="0.5" 
@@ -58,7 +74,8 @@
                 <a-text 
                     value="Опитування 2" 
                     align="center" 
-                    width="2.5">
+                    width="2.5"
+                    position="0 0 0.01">
                 </a-text>
             </a-entity>
 
@@ -94,3 +111,4 @@
     </a-scene>
 </body>
 </html>
+
