@@ -3,7 +3,7 @@
 <head>
     <title>AR Моделі: Вікінги</title>
     <meta charset="utf-8">
-     <!-- A-Frame та AR.js бібліотеки -->
+    <!-- A-Frame та AR.js бібліотеки -->
     <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
@@ -13,7 +13,7 @@
             window.location.href = 'totoronto3.html';
         }
 
-        // Додаємо обробники подій після завантаження сцени
+        // Додаємо обробники подій після завантаження сцени, як у вашому прикладі
         document.addEventListener('DOMContentLoaded', function() {
             AFRAME.registerComponent('button-handler', {
                 init: function() {
@@ -38,17 +38,25 @@
         <a-asset-item id="drakkar-glb" src="models/drakar.glb"></a-asset-item>
         <a-asset-item id="viking-inter-glb" src="models/viking_inter.glb"></a-asset-item>
 
-        <!-- Файли маркерів. Замініть на ваші власні .patt файли -->
-      <!--  <a-asset-item id="drakkar-patt" src="https://raw.githack.com/AR-js-org/AR.js/master/data/patt.hiro"></a-asset-item>
-        <a-asset-item id="pobut-patt" src="https://raw.githack.com/AR-js-org/AR.js/master/data/patt.kanji"></a-asset-item>-->
+        <!-- 
+            ВАЖЛИВО: Замініть посилання на ваші власні .patt файли маркерів.
+            Генератор: https://jeromeetienne.github.io/AR.js/three.js/examples/marker-training/examples/generator.html
+            Поки що тут стоять стандартні маркери Hiro та Kanji для тестування.
+        -->
+        <a-asset-item id="drakkar-patt" src="https://raw.githack.com/AR-js-org/AR.js/master/data/patt.hiro"></a-asset-item>
+        <a-asset-item id="pobut-patt" src="https://raw.githack.com/AR-js-org/AR.js/master/data/patt.kanji"></a-asset-item>
     </a-assets>
 
-    <a-scene embedded arjs>
+    <!-- 
+        Оновлені параметри сцени для кращої продуктивності та виправлення масштабу.
+        trackingMethod: best; - покращує відстежування.
+    -->
+    <a-scene embedded arjs='sourceType: webcam; trackingMethod: best; debugUIEnabled: false;'>
 
         <!-- ================================================================= -->
         <!-- МАРКЕР 1: ДРАКАР ТА КНОПКА                                        -->
         <!-- ================================================================= -->
-        <a-marker type='pattern'>
+        <a-marker type='pattern' url='#drakkar-patt'>
             
             <!-- 3D-модель Дракара -->
             <a-entity 
@@ -58,7 +66,7 @@
                 rotation="-90 0 0">
             </a-entity>
 
-            <!-- Кнопка "Опитування 2" з новою логікою -->
+            <!-- Кнопка "Опитування 2" -->
             <a-entity 
                 id="quiz-button"
                 class="clickable" 
@@ -68,7 +76,8 @@
                 <a-plane 
                     width="1.5" 
                     height="0.5" 
-                    color="#28A745">
+                    color="#28A745"
+                    material="opacity: 0.8;">
                 </a-plane>
                 <a-text 
                     value="Опитування 2" 
@@ -83,7 +92,7 @@
         <!-- ================================================================= -->
         <!-- МАРКЕР 2: ПОБУТ ВІКІНГІВ                                          -->
         <!-- ================================================================= -->
-        <a-marker type='hiro'>
+        <a-marker type='pattern' url='#pobut-patt'>
             
             <!-- 3D-модель предметів побуту -->
             <a-entity 
@@ -94,9 +103,9 @@
             </a-entity>
 
             <!-- Текстова панель з описом -->
-            <a-plane width="2.5" height="1.2" color="#333" position="0 -0.8 0" rotation="-90 0 0">
+            <a-plane width="2.5" height="1.2" color="#333" position="0 -0.8 0" rotation="-90 0 0" material="opacity: 0.8;">
                 <a-text 
-                    value="Побут вікінгів: Вікінги були не лише воїнами, а й вправними ремісниками, фермерами та торговцями. Їхні інструменти, як-от сокира, були універсальними: для будівництва, рубки лісу та як зброя в бою."
+                    value="Побут вікінгів: Вікінги були не лише воїнами, а й вправними ремісниками, фермерами та торговцями. Їхні інструменти, як-от сокира, були універсальними..."
                     align="center"
                     width="2.3"
                     color="#FFFFFF">
@@ -106,8 +115,7 @@
         </a-marker>
         
         <!-- Камера з курсором для можливості кліку -->
-        <a-entity camera></a-entity>
+        <a-entity camera><a-cursor></a-cursor></a-entity>
     </a-scene>
 </body>
 </html>
-
