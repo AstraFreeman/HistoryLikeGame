@@ -1,152 +1,164 @@
-<!DOCTYPE html>
 <html>
-<head>
-    <title>AR Урок: Дракар</title>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-
-    <script>
-    //========================================================================
-    // JAVASCRIPT LOGIC FOR THE LESSON
-    //========================================================================
-    AFRAME.registerComponent('lesson-manager', {
-        init: function () {
-            const sceneEl = this.el;
-            const initialQuiz = sceneEl.querySelector('#initial-quiz');
-            const drakkarModel = sceneEl.querySelector('#drakkar-model');
-            const layer2Info = sceneEl.querySelector('#layer-2-info');
-            const secondQuiz = sceneEl.querySelector('#second-quiz');
-            const layer3Info = sceneEl.querySelector('#layer-3-info');
-            const resetButton = sceneEl.querySelector('#reset-button');
-
-            this.hideAllLayers = function() {
-                initialQuiz.setAttribute('visible', false);
-                drakkarModel.setAttribute('visible', false);
-                layer2Info.setAttribute('visible', false);
-                secondQuiz.setAttribute('visible', false);
-                layer3Info.setAttribute('visible', false);
-            }
-
-            this.hideAllLayers();
-            initialQuiz.setAttribute('visible', true);
-
-            initialQuiz.addEventListener('click', (event) => {
-                const isCorrect = event.target.getAttribute('data-correct') === 'true';
-                if (isCorrect) {
-                    this.hideAllLayers();
-                    drakkarModel.setAttribute('visible', true);
-                    layer2Info.setAttribute('visible', true);
-                } else {
-                    event.target.setAttribute('color', '#FF5555');
-                    setTimeout(() => event.target.setAttribute('color', '#FFFFFF'), 500);
-                }
-            });
-
-            secondQuiz.addEventListener('click', (event) => {
-                const isCorrect = event.target.getAttribute('data-correct') === 'true';
-                if (isCorrect) {
-                    this.hideAllLayers();
-                    drakkarModel.setAttribute('visible', true);
-                    layer3Info.setAttribute('visible', true);
-                } else {
-                    event.target.setAttribute('color', '#FF5555');
-                    setTimeout(() => event.target.setAttribute('color', '#FFFFFF'), 500);
-                }
-            });
-            
-            layer2Info.querySelector('#show-second-quiz-button').addEventListener('click', () => {
-                layer2Info.setAttribute('visible', false);
-                secondQuiz.setAttribute('visible', true);
-            });
-
-            resetButton.addEventListener('click', () => {
-                this.hideAllLayers();
-                initialQuiz.setAttribute('visible', true);
-                initialQuiz.querySelectorAll('[data-correct]').forEach(btn => btn.setAttribute('color', '#FFFFFF'));
-                secondQuiz.querySelectorAll('[data-correct]').forEach(btn => btn.setAttribute('color', '#FFFFFF'));
-            });
+  <head>
+  <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+  <!-- we import arjs version without NFT but with marker + location based support -->
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+      <script>
+        // Function to restart the page
+        function restartPage() {
+            location.reload();
         }
-    });
+
+        // Function to open Kvebek3.html
+        function openKvebek3() {
+            window.location.href = 'Kvebek3.html';
+        }
+
+        // Add event listeners after the scene is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            AFRAME.registerComponent('button-handler', {
+                init: function() {
+                    this.el.addEventListener('click', function() {
+                        // Get the button's ID to determine its action
+                        switch(this.id) {
+                            case 'restart-button-1':
+                            case 'restart-button-2':
+                                restartPage();
+                                break;
+                            case 'no-result-button':
+                                alert('No action assigned to this button.');
+                                break;
+                            case 'kvebek-button':
+                                openKvebek3();
+                                break;
+                        }
+                    });
+                }
+            });
+        });
     </script>
 </head>
-
-<body style='margin: 0px; overflow: hidden;'>
+<body>
     <a-assets>
-        <a-asset-item id="drakkar-glb" src="models/drakar.glb"></a-asset-item>
-        <a-asset-item id="viking-inter-glb" src="models/viking_inter.glb"></a-asset-item>
-
-        <a-asset-item id="drakkar-patt" src="https://raw.githack.com/AR-js-org/AR.js/master/data/patt.hiro"></a-asset-item>
-        <a-asset-item id="pobut-patt" src="https://raw.githack.com/AR-js-org/AR.js/master/data/patt.kanji"></a-asset-item>
+        <img id="rev" src="image/22_1.jpg">
+        <img id="ww2" src="image/29_1.jpg">
+        <img id="krch" src="image/30_1.jpg">
     </a-assets>
 
-    <a-scene embedded arjs='sourceType: webcam; debugUIEnabled: false;'>
+    <a-scene embedded arjs> 
+    <a-marker preset="hiro">
 
-        <a-marker type='pattern' url='#drakkar-patt'>
-            <a-entity id="drakkar-lesson-container" lesson-manager>
+        <!-- Title Plane -->
+        <a-text 
+            value="Choose a Poster of the «Thaw»" 
+            align="center" 
+            position="0 0 -0.6" 
+            rotation="0 180 0" 
+            color="black"
+            scale="0.8 0.8 0.8">
+        </a-text>
 
-                <a-entity id="initial-quiz" position="0 0.5 0" visible="true">
-                    <a-plane width="2.5" height="1.5" color="#333" position="0 0 -0.01"></a-plane>
-                    <a-text value="Стартовий тест: Дракар використовували переважно для..." align="center" width="2.2" position="0 0.5 0"></a-text>
-                    <a-plane class="clickable" data-correct="false" position="-0.7 -0.25 0" width="1.2" height="0.5" color="#FFFFFF"><a-text value="а) Мирної торгівлі" align="center" color="black" width="1.1"></a-text></a-plane>
-                    <a-plane class="clickable" data-correct="true" position="0.7 -0.25 0" width="1.2" height="0.5" color="#FFFFFF"><a-text value="б) Рейдів та подорожей" align="center" color="black" width="1.1"></a-text></a-plane>
-                </a-entity>
+        <!-- First Image Plane (KRCH) -->
+        <a-plane 
+            id="krch-image"
+            position="0.6 0 0" 
+            rotation="0 90 0" 
+            width="1.5" 
+            height="2" 
+            scale="0.5 0.5 0.5"
+            color="white" 
+            src="#krch">
+        </a-plane>
 
-                <a-entity id="drakkar-model" gltf-model="#drakkar-glb" scale="0.1 0.1 0.1" position="0 0 0" rotation="-90 0 0" visible="false"></a-entity>
 
-                <a-entity id="layer-2-info" visible="false">
-                    <a-entity position="-1.2 0.5 0">
-                        <a-plane width="1.2" height="1" color="#333"></a-plane>
-                        <a-text value="Голова дракона: Символ статусу та елемент психологічної війни для залякування ворогів." align="left" width="1.1" position="-0.55 0.25 0.01"></a-text>
-                    </a-entity>
-                    <a-entity position="1.2 0.5 0">
-                        <a-plane width="1.2" height="1" color="#333"></a-plane>
-                        <a-text value="Мілка осадка (до 1м): Ключ до успіху! Дозволяла ходити річками та атакувати міста далеко від моря." align="left" width="1.1" position="-0.55 0.25 0.01"></a-text>
-                    </a-entity>
-                    <a-entity position="0 -1.1 0">
-                        <a-plane width="2.2" height="1" color="#333"></a-plane>
-                         <a-text value="Карта: Мілка осадка дозволяла варягам долати 'шлях із варягів у греки', перетягуючи човни суходолом ('волоки')." align="center" width="2" position="0 0.2 0.01"></a-text>
-                    </a-entity>
-                    <a-plane id="show-second-quiz-button" class="clickable" position="0 1.3 0" width="1.5" height="0.4" color="#4CC3D9"><a-text value="Перейти до аналізу" align="center" color="black" width="1.4"></a-text></a-plane>
-                </a-entity>
+        <!-- Kvebek Button (Green) -->
+        <a-entity 
+            id="kvebek-button" 
+            position="0.6 0.6 0" 
+            rotation="90 0 0" 
+            button-handler>
+            <a-box 
+                color="#00FF00" 
+                depth="0.2" 
+                height="0.4" 
+                width="0.4">
+            </a-box>
+        </a-entity>
 
-                <a-entity id="second-quiz" position="0 0.5 0" visible="false">
-                    <a-plane width="2.8" height="1.5" color="#333" position="0 0 -0.01"></a-plane>
-                    <a-text value="Перевірка: Яка риса дракара була ВИРІШАЛЬНОЮ для 'шляху із варягів у греки'?" align="center" width="2.6" position="0 0.5 0"></a-text>
-                    <a-plane class="clickable" data-correct="false" position="-0.8 -0.25 0" width="1.4" height="0.5" color="#FFFFFF"><a-text value="а) Голова дракона" align="center" color="black" width="1.3"></a-text></a-plane>
-                    <a-plane class="clickable" data-correct="true" position="0.8 -0.25 0" width="1.4" height="0.5" color="#FFFFFF"><a-text value="б) Мілка осадка" align="center" color="black" width="1.3"></a-text></a-plane>
-                </a-entity>
 
-                <a-entity id="layer-3-info" visible="false">
-                    <a-text value="Проблема: Варяги для слов'ян: завойовники чи організатори?" align="center" width="3.5" position="0 1.6 0"></a-text>
-                    <a-entity position="-1.5 0 0">
-                        <a-plane width="1.8" height="2.2" color="#544231"></a-plane>
-                        <a-text value="Джерело 1 (Повість временних літ): 'Земля наша велика і багата, а порядку в ній немає. Ідіть-но княжити і володіти нами.'" align="left" width="1.6" position="-0.8 0.6 0.01" color="#FFF"></a-text>
-                    </a-entity>
-                    <a-entity position="1.5 0 0">
-                        <a-plane width="1.8" height="2.2" color="#544231"></a-plane>
-                        <a-text value="Джерело 2 (Погляд істориків): 'Легенда про 'запрошення' могла бути виправданням влади. Насправді, варяги силою підкорювали племена і накладали важку данину.'" align="left" width="1.6" position="-0.8 0.6 0.01" color="#FFF"></a-text>
-                    </a-entity>
-                    <a-plane id="reset-button" class="clickable" position="0 -1.5 0" width="1.2" height="0.4" color="#FFC300"><a-text value="Почати знову" align="center" color="black" width="1.1"></a-text></a-plane>
-                </a-entity>
+        <!-- Second Image Plane (WW2) -->
+        <a-plane 
+            id="ww2-image"
+            position="-0.6 0 0" 
+            rotation="0 -90 0" 
+            width="1.5" 
+            height="2" 
+            color="white" 
+            scale="0.5 0.5 0.5"
+            src="#ww2">
+        </a-plane>
 
-            </a-entity>
-        </a-marker>
+        <!-- First Restart Button (Blue) -->
+        <a-entity 
+            id="restart-button-1" 
+            position="-0.6 0.6 0" 
+            rotation="90 0 0" 
+            button-handler>
+            <a-box 
+                color="#4CC3D9" 
+                depth="0.2" 
+                height="0.4" 
+                width="0.4">
+            </a-box>
+        </a-entity>
 
-        <a-marker type='pattern' url='#pobut-patt'>
-            <a-entity id="viking-inter-model" gltf-model="#viking-inter-glb" scale="0.5 0.5 0.5" position="0 0.5 0" rotation="0 0 0"></a-entity>
-            <a-plane width="2.5" height="1.2" color="#333" position="0 -0.8 0" rotation="-90 0 0">
-                <a-text 
-                    value="Побут вікінгів: Вікінги були не лише воїнами, а й вправними ремісниками, фермерами та торговцями. Їхні інструменти, як-от сокира, були універсальними: для будівництва, рубки лісу та як зброя в бою."
-                    align="center"
-                    width="2.3"
-                    color="#FFFFFF">
-                </a-text>
-            </a-plane>
-        </a-marker>
-        
-        <a-entity camera><a-cursor></a-cursor></a-entity>
-    </a-scene>
+
+        <!-- Third Image Plane (Revolution) -->
+        <a-plane 
+            id="rev-image"
+            position="0 0 0.6"
+            rotation="0 0 0" 
+            width="1.5" 
+            height="2" 
+            scale="0.5 0.5 0.5"
+            color="white" 
+            src="#rev"
+            data-image="true">
+        </a-plane>
+
+        <!-- No Result Button (Red) -->
+        <a-entity 
+            id="no-result-button" 
+            position="-0.6 0.6 0" 
+            rotation="90 0 0" 
+            button-handler>
+            <a-box 
+                color="#FF0000" 
+                depth="0.2" 
+                height="0.4" 
+                width="0.4">
+            </a-box>
+        </a-entity>
+
+        <!-- Second Restart Button (Purple) -->
+        <a-entity 
+            id="restart-button-2" 
+            position="0 0.6 -0.6" 
+            rotation="90 0 0" 
+            button-handler>
+            <a-box 
+                color="#800080" 
+                depth="0.2" 
+                height="0.4" 
+                width="0.4">
+            </a-box>
+        </a-entity>
+
+    </a-marker>
+    <a-entity camera></a-entity>
+</a-scene>
+
+
+
 </body>
 </html>
