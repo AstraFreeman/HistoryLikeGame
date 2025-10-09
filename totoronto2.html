@@ -1,29 +1,36 @@
-<!DOCTYPE html>
 <html>
-<head>
-    <title>AR Моделі: Вікінги</title>
-    <meta charset="utf-8">
-    <!-- A-Frame та AR.js бібліотеки -->
-    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
-    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-
-    <script>
-        // Функція для відкриття сторінки опитування
-        function openQuizPage() {
-            window.location.href = 'totoronto3.html';
+  <head>
+  <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+  <!-- we import arjs version without NFT but with marker + location based support -->
+  <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+      <script>
+        // Function to restart the page
+        function restartPage() {
+            location.reload();
         }
 
-        // Додаємо обробники подій після завантаження сцени, як у вашому прикладі
+        // Function to open Kvebek3.html
+        function openKvebek3() {
+            window.location.href = 'Kvebek3.html';
+        }
+
+        // Add event listeners after the scene is loaded
         document.addEventListener('DOMContentLoaded', function() {
             AFRAME.registerComponent('button-handler', {
                 init: function() {
                     this.el.addEventListener('click', function() {
-                        // Визначаємо дію за ID кнопки
+                        // Get the button's ID to determine its action
                         switch(this.id) {
-                            case 'quiz-button':
-                                openQuizPage();
+                            case 'restart-button-1':
+                            case 'restart-button-2':
+                                restartPage();
                                 break;
-                            // Можна додати інші кейси для інших кнопок у майбутньому
+                            case 'no-result-button':
+                                alert('No action assigned to this button.');
+                                break;
+                            case 'kvebek-button':
+                                openKvebek3();
+                                break;
                         }
                     });
                 }
@@ -31,34 +38,26 @@
         });
     </script>
 </head>
-
-<body style='margin: 0px; overflow: hidden;'>
+<body>
     <a-assets>
-        <!-- Моделі, що будуть завантажуватись -->
         <a-asset-item id="drakkar-glb" src="models/drakar.glb"></a-asset-item>
         <a-asset-item id="viking-inter-glb" src="models/viking_inter.glb"></a-asset-item>
-
-        <!-- 
-            ВАЖЛИВО: Замініть посилання на ваші власні .patt файли маркерів.
-            Генератор: https://jeromeetienne.github.io/AR.js/three.js/examples/marker-training/examples/generator.html
-            Поки що тут стоять стандартні маркери Hiro та Kanji для тестування.
-        -->
-        <a-asset-item id="drakkar-patt" src="https://raw.githack.com/AR-js-org/AR.js/master/data/patt.hiro"></a-asset-item>
-        <a-asset-item id="pobut-patt" src="https://raw.githack.com/AR-js-org/AR.js/master/data/patt.kanji"></a-asset-item>
     </a-assets>
 
-    <!-- 
-        Оновлені параметри сцени для кращої продуктивності та виправлення масштабу.
-        trackingMethod: best; - покращує відстежування.
-    -->
-    <a-scene embedded arjs='sourceType: webcam; trackingMethod: best; debugUIEnabled: false;'>
+    <a-scene embedded arjs> 
+    <a-marker preset="hiro">
 
-        <!-- ================================================================= -->
-        <!-- МАРКЕР 1: ДРАКАР ТА КНОПКА                                        -->
-        <!-- ================================================================= -->
-        <a-marker type='pattern' url='#drakkar-patt'>
-            
-            <!-- 3D-модель Дракара -->
+        <!-- Title Plane -->
+        <a-text 
+            value="Drakar it's viking's long boat" 
+            align="center" 
+            position="0 0 -0.6" 
+            rotation="0 180 0" 
+            color="black"
+            scale="0.8 0.8 0.8">
+        </a-text>
+
+        <!-- First Image Plane (KRCH) -->
             <a-entity 
                 gltf-model="#drakkar-glb" 
                 scale="0.1 0.1 0.1" 
@@ -66,56 +65,13 @@
                 rotation="-90 0 0">
             </a-entity>
 
-            <!-- Кнопка "Опитування 2" -->
-            <a-entity 
-                id="quiz-button"
-                class="clickable" 
-                button-handler 
-                position="0 1.2 0"
-                rotation="-90 0 0">
-                <a-plane 
-                    width="1.5" 
-                    height="0.5" 
-                    color="#28A745"
-                    material="opacity: 0.8;">
-                </a-plane>
-                <a-text 
-                    value="Опитування 2" 
-                    align="center" 
-                    width="2.5"
-                    position="0 0 0.01">
-                </a-text>
-            </a-entity>
 
-        </a-marker>
 
-        <!-- ================================================================= -->
-        <!-- МАРКЕР 2: ПОБУТ ВІКІНГІВ                                          -->
-        <!-- ================================================================= -->
-        <a-marker type='pattern' url='#pobut-patt'>
-            
-            <!-- 3D-модель предметів побуту -->
-            <a-entity 
-                gltf-model="#viking-inter-glb" 
-                scale="0.5 0.5 0.5" 
-                position="0 0.5 0" 
-                rotation="0 0 0">
-            </a-entity>
+    </a-marker>
+    <a-entity camera></a-entity>
+</a-scene>
 
-            <!-- Текстова панель з описом -->
-            <a-plane width="2.5" height="1.2" color="#333" position="0 -0.8 0" rotation="-90 0 0" material="opacity: 0.8;">
-                <a-text 
-                    value="Побут вікінгів: Вікінги були не лише воїнами, а й вправними ремісниками, фермерами та торговцями. Їхні інструменти, як-от сокира, були універсальними..."
-                    align="center"
-                    width="2.3"
-                    color="#FFFFFF">
-                </a-text>
-            </a-plane>
 
-        </a-marker>
-        
-        <!-- Камера з курсором для можливості кліку -->
-        <a-entity camera><a-cursor></a-cursor></a-entity>
-    </a-scene>
+
 </body>
 </html>
