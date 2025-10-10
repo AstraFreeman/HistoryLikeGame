@@ -6,77 +6,91 @@
     <title>Історична Вікторина</title>
     <style>
         /* Основний стиль сторінки */
+        * {
+            box-sizing: border-box;
+        }
+        
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
-            overflow: hidden;
+            padding: 20px;
             background: linear-gradient(to bottom, #74b9ff, #0984e3);
             color: white;
             text-align: center;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            min-height: 100vh;
+            overflow-y: auto;
         }
+        
         #pauseMenu {
             display: none;
-            position: absolute;
+            position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.9);
             color: white;
-            padding: 20px;
+            padding: 30px;
             border-radius: 10px;
             text-align: center;
-            z-index: 10;
+            z-index: 1000;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
         }
 
         #pauseMenu button {
-            margin-top: 10px;
+            margin-top: 15px;
+            padding: 12px 25px;
         }
 
         h1 {
-            margin: 20px 0;
-            font-size: 2.5em;
+            margin: 10px 0 20px;
+            font-size: clamp(1.5em, 5vw, 2.5em);
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
 
         #gameContainer {
             display: flex;
+            flex-wrap: wrap;
             gap: 20px;
             align-items: flex-start;
             justify-content: center;
-            width: 90%;
-            max-width: 1000px;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto 20px;
         }
 
         #gameArea {
             position: relative;
-            width: 600px;
-            height: 70vh;
+            width: 100%;
+            max-width: 600px;
+            height: 50vh;
+            min-height: 400px;
             border: 3px solid #ffffff;
             border-radius: 15px;
             background: linear-gradient(to bottom, #dfe6e9, #b2bec3);
             overflow: hidden;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            flex: 1 1 300px;
         }
 
         #answersPanel {
-            width: 300px;
-            height: 70vh;
+            width: 100%;
+            max-width: 350px;
+            height: 50vh;
+            min-height: 400px;
             background: rgba(255, 255, 255, 0.2);
             border: 3px solid #ffffff;
             border-radius: 15px;
             padding: 15px;
             overflow-y: auto;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            flex: 1 1 250px;
         }
 
         #answersPanel h3 {
             margin-top: 0;
             color: #ffffff;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            font-size: clamp(1em, 3vw, 1.3em);
         }
 
         .answer-item {
@@ -87,6 +101,7 @@
             text-align: left;
             font-size: 0.9em;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            word-wrap: break-word;
         }
 
         .answer-item strong {
@@ -102,7 +117,7 @@
 
         .question {
             position: absolute;
-            font-size: 1em;
+            font-size: clamp(0.8em, 2vw, 1em);
             background: #ff7675;
             padding: 10px 15px;
             border-radius: 10px;
@@ -110,17 +125,37 @@
             font-weight: bold;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
             animation: fadeIn 1s ease-in;
+            max-width: 90%;
+        }
+
+        #input {
+            width: 90%;
+            max-width: 500px;
+            padding: 12px;
+            font-size: 1em;
+            border: 2px solid #ffffff;
+            border-radius: 8px;
+            margin: 15px auto;
+            display: block;
         }
 
         #stats {
-            margin-top: 10px;
-            font-size: 1em;
+            margin: 15px 0;
+            font-size: clamp(0.9em, 2.5vw, 1em);
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
         }
 
+        #stats p {
+            margin: 8px 0;
+        }
+
+        #controls {
+            margin: 20px 0;
+        }
+
         button {
-            padding: 10px 15px;
-            font-size: 1em;
+            padding: 12px 20px;
+            font-size: clamp(0.9em, 2.5vw, 1em);
             cursor: pointer;
             border: none;
             border-radius: 5px;
@@ -128,28 +163,37 @@
             color: white;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
             transition: transform 0.2s ease-in-out;
+            margin: 5px;
         }
 
         button:hover {
             background: #0984e3;
-            transform: scale(1.1);
+            transform: scale(1.05);
         }
 
         button:disabled {
             background: #cccccc;
             cursor: not-allowed;
             box-shadow: none;
+            transform: none;
         }
 
         #winMessage, #loseMessage {
             display: none;
-            margin-top: 20px;
-            font-size: 1.5em;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(1.2em, 4vw, 1.8em);
             background: #55efc4;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
         }
 
         #loseMessage {
@@ -157,10 +201,37 @@
         }
 
         #winMessage img {
-            max-width: 300px;
-            margin-top: 15px;
+            max-width: 100%;
+            width: 300px;
+            height: auto;
+            margin-top: 20px;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Overlay для повідомлень */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1500;
+        }
+
+        @media (max-width: 768px) {
+            #gameContainer {
+                flex-direction: column;
+            }
+            
+            #gameArea, #answersPanel {
+                max-width: 100%;
+            }
         }
     </style>
 </head>
@@ -189,21 +260,28 @@
         <button id="restartButton" disabled>Перезапустити</button>
         <button id="exitButton">Вийти</button>
     </div>
+    
+    <div class="overlay" id="winOverlay"></div>
     <div id="winMessage">
         Вітаємо! Ви виграли!
         <br>
-        <img src="image/Cossack.jpg" alt="Козак">
+        <img src="image/Cossack.jpg" alt="Козак" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+        <p style="display:none; color: #fff; margin-top: 10px;">🏆 Переможець! 🏆</p>
     </div>
+    
+    <div class="overlay" id="loseOverlay"></div>
     <div id="loseMessage">Гру завершено! У вас закінчилися життя.</div>
 
     <script>
         const questions = [
-            { question: "Укладення ченцем Нестором першої редакції «Повісті минулих літ", answer: "1113" },
+            { question: "Укладення ченцем Нестором першої редакції «Повісті минулих літ»", answer: "1113" },
             { question: "Утворення Галицько-Волинського князівства", answer: "1199" },
             { question: "Рік хрещення Русі", answer: "988" },
             { question: "Коли була заснована Київська Русь?", answer: "882" },
             { question: "Битва біля річки Альта", answer: "1068" },
-            { question: "Перша літописна згадка назви «Україна»", answer: "1187" }            
+            { question: "Перша літописна згадка назви «Україна»", answer: "1187" },
+            { question: "Походи Олега на Константинополь у 907 р. та *пропуск*", answer: "911" },
+            { question: "Повстання древлян проти Ігоря", answer: "945" }
         ];
 
         const gameArea = document.getElementById("gameArea");
@@ -216,6 +294,8 @@
         const pauseMenu = document.getElementById("pauseMenu");
         const winMessage = document.getElementById("winMessage");
         const loseMessage = document.getElementById("loseMessage");
+        const winOverlay = document.getElementById("winOverlay");
+        const loseOverlay = document.getElementById("loseOverlay");
         const answersList = document.getElementById("answersList");
 
         let activeQuestions = [];
@@ -249,6 +329,8 @@
             inputElement.value = "";
             winMessage.style.display = "none";
             loseMessage.style.display = "none";
+            winOverlay.style.display = "none";
+            loseOverlay.style.display = "none";
         }
 
         function addQuestion() {
@@ -345,8 +427,10 @@
             inputElement.disabled = true;
 
             if (isWin) {
+                winOverlay.style.display = "block";
                 winMessage.style.display = "block";
             } else {
+                loseOverlay.style.display = "block";
                 loseMessage.style.display = "block";
             }
 
@@ -362,6 +446,17 @@
         exitButton.addEventListener("click", () => {
             resetGame();
             alert("Ви вийшли з гри. До зустрічі!");
+        });
+        
+        // Закриття повідомлень по кліку на overlay
+        winOverlay.addEventListener("click", () => {
+            winMessage.style.display = "none";
+            winOverlay.style.display = "none";
+        });
+        
+        loseOverlay.addEventListener("click", () => {
+            loseMessage.style.display = "none";
+            loseOverlay.style.display = "none";
         });
     </script>
 </body>
