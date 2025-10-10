@@ -42,16 +42,62 @@
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
         }
 
+        #gameContainer {
+            display: flex;
+            gap: 20px;
+            align-items: flex-start;
+            justify-content: center;
+            width: 90%;
+            max-width: 1000px;
+        }
+
         #gameArea {
             position: relative;
-            width: 90%;
-            max-width: 600px;
+            width: 600px;
             height: 70vh;
             border: 3px solid #ffffff;
             border-radius: 15px;
             background: linear-gradient(to bottom, #dfe6e9, #b2bec3);
             overflow: hidden;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        #answersPanel {
+            width: 300px;
+            height: 70vh;
+            background: rgba(255, 255, 255, 0.2);
+            border: 3px solid #ffffff;
+            border-radius: 15px;
+            padding: 15px;
+            overflow-y: auto;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        #answersPanel h3 {
+            margin-top: 0;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .answer-item {
+            background: rgba(255, 118, 117, 0.9);
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 0.9em;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .answer-item strong {
+            display: block;
+            margin-bottom: 5px;
+            color: #fff;
+        }
+
+        .answer-item span {
+            color: #ffeb3b;
+            font-weight: bold;
         }
 
         .question {
@@ -109,11 +155,24 @@
         #loseMessage {
             background: #ff7675;
         }
+
+        #winMessage img {
+            max-width: 300px;
+            margin-top: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+        }
     </style>
 </head>
 <body>
     <h1>Історична Вікторина</h1>
-    <div id="gameArea"></div>
+    <div id="gameContainer">
+        <div id="gameArea"></div>
+        <div id="answersPanel">
+            <h3>Пропущені питання</h3>
+            <div id="answersList"></div>
+        </div>
+    </div>
     <input type="text" id="input" placeholder="Введіть відповідь..." disabled>
     <div id="stats">
         <p>Рахунок: <span id="score">0</span></p>
@@ -130,7 +189,11 @@
         <button id="restartButton" disabled>Перезапустити</button>
         <button id="exitButton">Вийти</button>
     </div>
-    <div id="winMessage">Вітаємо! Ви виграли!</div>
+    <div id="winMessage">
+        Вітаємо! Ви виграли!
+        <br>
+        <img src="image/Cossack.jpg" alt="Козак">
+    </div>
     <div id="loseMessage">Гру завершено! У вас закінчилися життя.</div>
 
     <script>
@@ -153,6 +216,7 @@
         const pauseMenu = document.getElementById("pauseMenu");
         const winMessage = document.getElementById("winMessage");
         const loseMessage = document.getElementById("loseMessage");
+        const answersList = document.getElementById("answersList");
 
         let activeQuestions = [];
         let score = 0;
@@ -167,7 +231,7 @@
             startButton.disabled = true;
             restartButton.disabled = false;
 
-            addQuestion(); // Перше запитання одразу
+            addQuestion();
             gameInterval = setInterval(addQuestion, 5000);
             dropInterval = setInterval(moveQuestions, 50);
         }
@@ -179,6 +243,7 @@
             lives = 3;
             scoreElement.textContent = score;
             livesElement.textContent = lives;
+            answersList.innerHTML = "";
             clearInterval(gameInterval);
             clearInterval(dropInterval);
             inputElement.value = "";
@@ -217,9 +282,18 @@
                 if (q.top > gameArea.offsetHeight) {
                     q.element.remove();
                     activeQuestions.splice(index, 1);
+                    addMissedAnswer(q.question, q.answer);
                     loseLife();
                 }
             });
+        }
+
+        function addMissedAnswer(question, answer) {
+            const answerItem = document.createElement("div");
+            answerItem.classList.add("answer-item");
+            answerItem.innerHTML = `<strong>${question}</strong><span>Відповідь: ${answer}</span>`;
+            answersList.appendChild(answerItem);
+            answersList.scrollTop = answersList.scrollHeight;
         }
 
         function loseLife() {
@@ -243,7 +317,7 @@
                 scoreElement.textContent = score;
                 inputElement.value = "";
 
-                if (score >= 10) {
+                if (score >= 15) {
                     endGame(true);
                 }
             }
@@ -262,7 +336,6 @@
             gameInterval = setInterval(addQuestion, 5000);
             dropInterval = setInterval(moveQuestions, 50);
         }
-
 
         function endGame(isWin) {
             clearInterval(gameInterval);
