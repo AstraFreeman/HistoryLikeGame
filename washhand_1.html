@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Хронобій: Історична битва</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            overflow: hidden;
+        }
+        
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        
+        #ui-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            pointer-events: none;
+        }
+        
+        .ui-element {
+            pointer-events: auto;
+        }
+        
+        #game-title {
+            text-align: center;
+            padding: 20px;
+            font-size: 32px;
+            font-weight: bold;
+            text-shadow: 0 0 20px rgba(255, 107, 107, 0.8), 0 0 40px rgba(255, 217, 61, 0.5);
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        #score-panel {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px 25px;
+            border-radius: 10px;
+            border: 2px solid #ff6b6b;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.4);
+        }
+        
+        #score-panel h3 {
+            margin-bottom: 10px;
+            color: #ffd93d;
+            text-shadow: 0 0 10px rgba(255, 217, 61, 0.6);
+        }
+        
+        #accuracy-bar {
+            width: 200px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        #accuracy-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #ff6b6b 0%, #ffd93d 50%, #6bcf7f 100%);
+            transition: width 0.5s ease;
+            border-radius: 15px;
+        }
+        
+        #events-container {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 1000px;
+        }
+        
+        #collapsible-content {
+            transition: all 0.3s ease;
+            max-height: 500px;
+            overflow: hidden;
+        }
+        
+        #collapsible-content.collapsed {
+            max-height: 0;
+        }
+        
+        #toggle-panel {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            border-radius: 10px 10px 0 0;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid #4ecdc4;
+            border-bottom: none;
+            margin-bottom: -2px;
+            transition: all 0.3s ease;
+        }
+        
+        #toggle-panel:hover {
+            background: rgba(0, 0, 0, 0.9);
+            box-shadow: 0 0 15px rgba(78, 205, 196, 0.5);
+        }
+        
+        #events-pool {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #4ecdc4;
+            box-shadow: 0 0 20px rgba(78, 205, 196, 0.3);
+            margin-bottom: 15px;
+        }
+        
+        #events-pool h4 {
+            margin-bottom: 15px;
+            color: #4ecdc4;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(78, 205, 196, 0.5);
+        }
+        
+        #available-events {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            min-height: 60px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        
+        #available-events::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        #available-events::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        #available-events::-webkit-scrollbar-thumb {
+            background: #4ecdc4;
+            border-radius: 10px;
+        }
+        
+        #available-events::-webkit-scrollbar-thumb:hover {
+            background: #44a08d;
+        }
+        
+        .event-card {
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: grab;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            user-select: none;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+        }
+        
+        .event-card.set-1 {
+            background: linear-gradient(135deg, #3366ff 0%, #5580ff 100%);
+            box-shadow: 0 0 15px rgba(51, 102, 255, 0.4);
+        }
+        
+        .event-card.set-1:hover {
+            box-shadow: 0 0 25px rgba(51, 102, 255, 0.6);
+        }
+        
+        .event-card.set-2 {
+            background: linear-gradient(135deg, #ffdd00 0%, #ffeb3b 100%);
+            box-shadow: 0 0 15px rgba(255, 221, 0, 0.4);
+            color: #333;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+        
+        .event-card.set-2:hover {
+            box-shadow: 0 0 25px rgba(255, 221, 0, 0.6);
+        }
+        
+        .event-card.set-3 {
+            background: linear-gradient(135deg, #ff3333 0%, #ff5555 100%);
+            box-shadow: 0 0 15px rgba(255, 51, 51, 0.4);
+        }
+        
+        .event-card.set-3:hover {
+            box-shadow: 0 0 25px rgba(255, 51, 51, 0.6);
+        }
+        
+        .event-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .event-card.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+        
+        .event-card.in-sequence {
+            box-shadow: 0 0 15px rgba(240, 147, 251, 0.4);
+        }
+        
+        #sequence-area {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #ffd93d;
+            box-shadow: 0 0 20px rgba(255, 217, 61, 0.3);
+            margin-bottom: 15px;
+        }
+        
+        #sequence-area h4 {
+            margin-bottom: 15px;
+            color: #ffd93d;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 217, 61, 0.5);
+        }
+        
+        #sequence-slots {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            min-height: 80px;
+            align-items: center;
+        }
+        
+        .sequence-slot {
+            width: 200px;
+            min-height: 70px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(255, 217, 61, 0.5);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        .sequence-slot.drag-over {
+            background: rgba(255, 217, 61, 0.2);
+            border-color: #ffd93d;
+            box-shadow: 0 0 15px rgba(255, 217, 61, 0.5);
+        }
+        
+        .sequence-slot.filled {
+            border-style: solid;
+            border-color: #ffd93d;
+            box-shadow: 0 0 10px rgba(255, 217, 61, 0.4);
+        }
+        
+        #controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .btn {
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        #charge-btn {
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            color: white;
+        }
+        
+        #fire-btn {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+        }
+        
+        #reset-btn {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+            color: white;
+        }
+        
+        #feedback {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            padding: 30px 50px;
+            border-radius: 20px;
+            border: 3px solid #ffd93d;
+            display: none;
+            max-width: 600px;
+            text-align: center;
+            animation: fadeIn 0.3s ease;
+            z-index: 1000;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.8); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+        
+        #feedback h2 {
+            margin-bottom: 15px;
+            color: #ffd93d;
+        }
+        
+        #feedback p {
+            margin-bottom: 20px;
+            line-height: 1.6;
+            white-space: pre-line;
+        }
+        
+        #feedback button {
+            padding: 12px 30px;
+            background: #4ecdc4;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        #feedback button:hover {
+            background: #44a08d;
+            transform: scale(1.05);
+        }
+        
+        .accuracy-stars {
+            font-size: 36px;
+            margin: 20px 0;
+            color: #ffd93d;
+        }
+
+        #feedback.error {
+            border-color: #ff3333;
+        }
+
+        #feedback.error h2 {
+            color: #ff3333;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    
+    <div id="ui-overlay">
+        <div id="game-title" class="ui-element">
+            ⚔️ ХРОНОБІЙ: Історична битва за послідовність
+        </div>
+        
+        <div id="score-panel" class="ui-element">
+            <h3>Рівень: <span id="level">1</span></h3>
+            <div>Перемоги: <span id="wins">0</span></div>
+            <div>Спроби: <span id="attempts">0</span></div>
+            <div id="accuracy-bar">
+                <div id="accuracy-fill"></div>
+            </div>
+        </div>
+        
+        <div id="events-container" class="ui-element">
+            <div id="toggle-panel">
+                <span id="toggle-text">🔽 Згорнути панель</span>
+            </div>
+            
+            <div id="collapsible-content">
+                <div id="sequence-area">
+                    <h4>📋 ЗАРЯДИТИ ЗБРОЮ (розташуйте події від найдавнішої до найновішої)</h4>
+                    <div id="sequence-slots"></div>
+                </div>
+                
+                <div id="events-pool">
+                    <h4>📜 ДОСТУПНІ ПОДІЇ</h4>
+                    <div id="available-events"></div>
+                </div>
+            </div>
+            
+            <div id="controls">
+                <button id="charge-btn" class="btn">⚡ ЗАРЯДИТИ</button>
+                <button id="fire-btn" class="btn" disabled>🎯 ВІДСТРІЛИТИ</button>
+                <button id="reset-btn" class="btn">🔄 СКИНУТИ</button>
+            </div>
+        </div>
+        
+        <div id="feedback" class="ui-element">
+            <h2 id="feedback-title"></h2>
+            <div class="accuracy-stars" id="stars"></div>
+            <p id="feedback-text"></p>
+            <button id="continue-btn">Продовжити</button>
+        </div>
+    </div>
+
+    <script>
+        // Three.js сцена
+        let scene, camera, renderer, enemies = [], weapon, particles = [];
+        let enemyDistance = 10;
+        let gameState = {
+            level: 1,
+            wins: 0,
+            attempts: 0,
+            charged: false,
+            chargedSetId: null
+        };
+
+        // Звукові ефекти
+        const sounds = {
+            shoot: new Audio('music/shoot.mp3'),
+            reload: new Audio('music/reload.mp3'),
+            enemyDefeat: new Audio('music/enemy_defeat.mp3')
+        };
+
+        // Налаштування гучності
+        Object.values(sounds).forEach(sound => {
+            sound.volume = 0.5;
+        });
+
+        // Функція для відтворення звуку
+        function playSound(soundName) {
+            try {
+                const sound = sounds[soundName];
+                if (sound) {
+                    sound.currentTime = 0;
+                    sound.play().catch(err => console.log('Audio play prevented:', err));
+                }
+            } catch (err) {
+                console.log('Audio error:', err);
+            }
+        }
+
+        // Ігрові дані - 3 набори (розширені)
+        const scenarios = [
+            {
+                name: "Київська Русь",
+                setId: 1,
+                color: 0x3366ff,
+                events: [
+                    { id: 1, text: "882 — Об'єднання північних і південних земель", year: 882, setId: 1 },
+                    { id: 2, text: "945 — Смерть князя Ігоря, початок правління Ольги", year: 945, setId: 1 },
+                    { id: 3, text: "988 — Хрещення Русі", year: 988, setId: 1 },
+                    { id: 4, text: "1019 — Початок правління Ярослава Мудрого", year: 1019, setId: 1 },
+                    { id: 5, text: "1037 — Закладення Софійського собору в Києві", year: 1037, setId: 1 },
+                    { id: 6, text: "1051 — Заснування Києво-Печерського монастиря", year: 1051, setId: 1 },
+                    { id: 7, text: "1054 — Смерть Ярослава Мудрого", year: 1054, setId: 1 },
+                    { id: 8, text: "1113 — Початок правління Володимира Мономаха", year: 1113, setId: 1 },
+                    { id: 9, text: "1169 — Розгром Києва Андрієм Боголюбським", year: 1169, setId: 1 },
+                    { id: 10, text: "1240 — Зруйнування Києва монголо-татарами", year: 1240, setId: 1 }
+                ],
+                explanation: "Київська Русь пройшла шлях від об'єднання земель (882) через хрещення (988), золотий вік Ярослава Мудрого (1019-1054), до монгольської навали (1240)."
+            },
+            {
+                name: "Козацька Україна",
+                setId: 2,
+                color: 0xffdd00,
+                events: [
+                    { id: 11, text: "1591 — Перша писемна згадка про запорізьке козацтво", year: 1591, setId: 2 },
+                    { id: 12, text: "1648 — Початок повстання Богдана Хмельницького", year: 1648, setId: 2 },
+                    { id: 13, text: "1649 — Зборівський мир", year: 1649, setId: 2 },
+                    { id: 14, text: "1654 — Переяславська рада", year: 1654, setId: 2 },
+                    { id: 15, text: "1657 — Смерть Богдана Хмельницького", year: 1657, setId: 2 },
+                    { id: 16, text: "1687 — Обрання Івана Мазепи гетьманом", year: 1687, setId: 2 },
+                    { id: 17, text: "1709 — Полтавська битва", year: 1709, setId: 2 },
+                    { id: 18, text: "1734 — Створення Нової Січі", year: 1734, setId: 2 },
+                    { id: 19, text: "1768 — Коліївщина (повстання Гайдамаків)", year: 1768, setId: 2 },
+                    { id: 20, text: "1775 — Ліквідація Запорізької Січі", year: 1775, setId: 2 }
+                ],
+                explanation: "Козацька доба розпочалася з формування Запорізької Січі (1591), досягла піку під час Хмельниччини (1648), пройшла через Полтавську битву (1709) і завершилася ліквідацією Січі (1775)."
+            },
+            {
+                name: "Українська революція",
+                setId: 3,
+                color: 0xff3333,
+                events: [
+                    { id: 21, text: "1917 бер. — Створення Центральної Ради", year: 1917.03, setId: 3 },
+                    { id: 22, text: "1917 черв. — Перший Універсал", year: 1917.06, setId: 3 },
+                    { id: 23, text: "1917 лип. — Другий Універсал", year: 1917.07, setId: 3 },
+                    { id: 24, text: "1917 лист. — Третій Універсал", year: 1917.11, setId: 3 },
+                    { id: 25, text: "1918 січ. — Четвертий Універсал (проголошення незалежності УНР)", year: 1918.01, setId: 3 },
+                    { id: 26, text: "1918 квіт. — Гетьманат Павла Скоропадського", year: 1918.04, setId: 3 },
+                    { id: 27, text: "1918 груд. — Повстання Директорії", year: 1918.12, setId: 3 },
+                    { id: 28, text: "1919 січ. — Об'єднання УНР і ЗУНР", year: 1919.01, setId: 3 },
+                    { id: 29, text: "1920 квіт. — Варшавський договір з Польщею", year: 1920.04, setId: 3 },
+                    { id: 30, text: "1921 бер. — Ризький мир", year: 1921.03, setId: 3 }
+                ],
+                explanation: "Українська революція 1917-1921 років пройшла від створення Центральної Ради (березень 1917) через проголошення незалежності (січень 1918), період Гетьманату та Директорії, до поразки національного руху (1921)."
+            }
+        ];
+
+        let allEvents = [];
+        scenarios.forEach(s => allEvents.push(...s.events));
+        
+        let availableEvents = [];
+        let sequenceSlots = [];
+        let draggedElement = null;
+        let draggedType = null;
+        let isPanelCollapsed = false;
+
+        // Ініціалізація Three.js
+        function initThree() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a1a2e);
+            
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.z = 15;
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+            
+            // Освітлення
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+            scene.add(ambientLight);
+            
+            const pointLight = new THREE.PointLight(0x00ff88, 1, 100);
+            pointLight.position.set(0, 5, 10);
+            scene.add(pointLight);
+            
+            // Створюємо 3 ворогів в шахматному порядку
+            scenarios.forEach((scenario, index) => {
+                const enemyGeometry = new THREE.BoxGeometry(2, 2, 2);
+                const enemyMaterial = new THREE.MeshPhongMaterial({ 
+                    color: scenario.color,
+                    emissive: scenario.color,
+                    emissiveIntensity: 0.3
+                });
+                const enemy = new THREE.Mesh(enemyGeometry, enemyMaterial);
+                
+                // Розташування в шахматному порядку
+                const xOffset = (index - 1) * 5;
+                const zOffset = (index % 2 === 0) ? -enemyDistance : -enemyDistance - 2;
+                enemy.position.set(xOffset, 3, zOffset);
+                enemy.userData.setId = scenario.setId;
+                enemy.userData.name = scenario.name;
+                enemy.visible = true;
+                
+                scene.add(enemy);
+                enemies.push(enemy);
+            });
+            
+            // Зброя (циліндр)
+            const weaponGeometry = new THREE.CylinderGeometry(0.3, 0.3, 3, 16);
+            const weaponMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0x444444,
+                emissive: 0x00ffff,
+                emissiveIntensity: 0.2
+            });
+            weapon = new THREE.Mesh(weaponGeometry, weaponMaterial);
+            weapon.position.set(0, -2, 5);
+            weapon.rotation.z = Math.PI / 2;
+            scene.add(weapon);
+            
+            animate();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            enemies.forEach(enemy => {
+                enemy.rotation.x += 0.01;
+                enemy.rotation.y += 0.01;
+            });
+            
+            particles.forEach((particle, index) => {
+                particle.position.z -= 0.5;
+                particle.scale.multiplyScalar(0.95);
+                
+                if (particle.scale.x < 0.01) {
+                    scene.remove(particle);
+                    particles.splice(index, 1);
+                }
+            });
+            
+            renderer.render(scene, camera);
+        }
+
+        // Ініціалізація гри
+        function initGame() {
+            availableEvents = [...allEvents];
+            shuffle(availableEvents);
+            renderEvents();
+            renderSequenceSlots();
+            updateUI();
+        }
+
+        function shuffle(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function renderEvents() {
+            const container = document.getElementById('available-events');
+            container.innerHTML = '';
+            
+            availableEvents.forEach(event => {
+                const card = document.createElement('div');
+                card.className = `event-card set-${event.setId}`;
+                card.textContent = event.text;
+                card.draggable = true;
+                card.dataset.eventId = event.id;
+                card.dataset.setId = event.setId;
+                card.dataset.type = 'event';
+                
+                card.addEventListener('dragstart', handleDragStart);
+                card.addEventListener('dragend', handleDragEnd);
+                
+                container.appendChild(card);
+            });
+        }
+        
+        function renderSequenceSlots() {
+            const container = document.getElementById('sequence-slots');
+            container.innerHTML = '';
+            sequenceSlots = [];
+            
+            for (let i = 0; i < 4; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'sequence-slot';
+                slot.dataset.slotIndex = i;
+                slot.dataset.slotType = 'event';
+                
+                slot.addEventListener('dragover', handleDragOver);
+                slot.addEventListener('drop', handleDrop);
+                slot.addEventListener('dragleave', handleDragLeave);
+                
+                container.appendChild(slot);
+                sequenceSlots.push(null);
+            }
+        }
+
+        function handleDragStart(e) {
+            draggedElement = e.target;
+            draggedType = e.target.dataset.type;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            const slotType = e.currentTarget.dataset.slotType;
+            
+            if (draggedType === slotType) {
+                e.currentTarget.classList.add('drag-over');
+                e.dataTransfer.dropEffect = 'move';
+            } else {
+                e.dataTransfer.dropEffect = 'none';
+            }
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            
+            if (!draggedElement) return;
+            
+            const slotType = e.currentTarget.dataset.slotType;
+            if (draggedType !== slotType) return;
+            
+            const slotIndex = parseInt(e.currentTarget.dataset.slotIndex);
+            const eventId = parseInt(draggedElement.dataset.eventId);
+            
+            if (sequenceSlots[slotIndex]) {
+                const oldEvent = allEvents.find(ev => ev.id === sequenceSlots[slotIndex]);
+                availableEvents.push(oldEvent);
+            }
+            
+            sequenceSlots[slotIndex] = eventId;
+            const event = allEvents.find(ev => ev.id === eventId);
+            availableEvents = availableEvents.filter(ev => ev.id !== eventId);
+            
+            e.currentTarget.innerHTML = '';
+            const card = draggedElement.cloneNode(true);
+            card.classList.add('in-sequence');
+            card.classList.add(`set-${event.setId}`);
+            card.draggable = false;
+            
+            const removeBtn = document.createElement('span');
+            removeBtn.textContent = ' ❌';
+            removeBtn.style.cursor = 'pointer';
+            removeBtn.style.marginLeft = '8px';
+            removeBtn.onclick = () => removeFromSequence(slotIndex);
+            card.appendChild(removeBtn);
+            
+            e.currentTarget.appendChild(card);
+            e.currentTarget.classList.add('filled');
+            
+            renderEvents();
+            draggedElement = null;
+        }
+
+        function removeFromSequence(slotIndex) {
+            const eventId = sequenceSlots[slotIndex];
+            if (!eventId) return;
+            
+            const event = allEvents.find(ev => ev.id === eventId);
+            availableEvents.push(event);
+            sequenceSlots[slotIndex] = null;
+            
+            const slots = document.querySelectorAll('.sequence-slot');
+            slots[slotIndex].innerHTML = '';
+            slots[slotIndex].classList.remove('filled');
+            
+            renderEvents();
+        }
+
+        function checkSequence() {
+            // Фільтруємо заповнені слоти
+            const filledSlots = sequenceSlots
+                .map((eventId, index) => ({ eventId, index }))
+                .filter(slot => slot.eventId !== null);
+            
+            if (filledSlots.length < 2) {
+                showFeedback(0, "ПОМИЛКА! ⚠️", "Необхідно розмістити щонайменше 2 події!", false);
+                return;
+            }
+            
+            // Перевірка на мішаний набір
+            const usedSetIds = new Set();
+            for (let slot of filledSlots) {
+                const event = allEvents.find(ev => ev.id === slot.eventId);
+                usedSetIds.add(event.setId);
+            }
+            
+            if (usedSetIds.size > 1) {
+                showFeedback(0, "ПОМИЛКА! МІШАНИЙ НАБІР! ⚠️", "Ви обрали події з різних історичних періодів! Використовуйте події тільки з одного набору:\n🔵 Київська Русь\n🟡 Козацька Україна\n🔴 Українська революція", true);
+                return;
+            }
+            
+            gameState.attempts++;
+            
+            // Визначаємо набір
+            const setId = Array.from(usedSetIds)[0];
+            const currentScenario = scenarios.find(s => s.setId === setId);
+            
+            // Перевіряємо хронологічну послідовність
+            const accuracy = calculateSequenceAccuracy(filledSlots, currentScenario);
+            
+            updateAccuracyBar(accuracy);
+            
+            if (accuracy === 5) {
+                playSound('reload');
+                gameState.charged = true;
+                gameState.chargedSetId = setId;
+                document.getElementById('charge-btn').disabled = true;
+                document.getElementById('fire-btn').disabled = false;
+                
+                animateCharging();
+                showFeedback(accuracy, "ЗБРОЮ ЗАРЯДЖЕНО! ✅", `Послідовність правильна!\nЗаряджено для знищення: ${currentScenario.name}\nНатисніть 'ВІДСТРІЛИТИ' для атаки!`, false);
+            } else {
+                const hint = getDetailedHint(filledSlots, currentScenario);
+                showFeedback(accuracy, "ПОМИЛКА В ПОСЛІДОВНОСТІ ⚠️", 
+                    `Точність: ${accuracy}/5\n\n${hint}\n\n${currentScenario.explanation}`, false);
+            }
+            
+            updateUI();
+        }
+
+        function calculateSequenceAccuracy(filledSlots, scenario) {
+            // Отримуємо події у порядку розташування
+            const userEvents = filledSlots.map(slot => {
+                return allEvents.find(ev => ev.id === slot.eventId);
+            });
+            
+            // Перевіряємо чи події йдуть у хронологічному порядку
+            let isChronological = true;
+            for (let i = 0; i < userEvents.length - 1; i++) {
+                if (userEvents[i].year > userEvents[i + 1].year) {
+                    isChronological = false;
+                    break;
+                }
+            }
+            
+            if (!isChronological) {
+                // Рахуємо скільки пар подій у правильному порядку
+                let correctPairs = 0;
+                let totalPairs = 0;
+                for (let i = 0; i < userEvents.length - 1; i++) {
+                    for (let j = i + 1; j < userEvents.length; j++) {
+                        totalPairs++;
+                        if (userEvents[i].year < userEvents[j].year) {
+                            correctPairs++;
+                        }
+                    }
+                }
+                
+                const pairAccuracy = totalPairs > 0 ? correctPairs / totalPairs : 0;
+                
+                if (pairAccuracy >= 0.9) return 4;
+                if (pairAccuracy >= 0.7) return 3;
+                if (pairAccuracy >= 0.5) return 2;
+                return 1;
+            }
+            
+            // Якщо хронологічно правильно - перевіряємо повноту та точність
+            const allScenarioEvents = [...scenario.events].sort((a, b) => a.year - b.year);
+            const userYears = userEvents.map(e => e.year);
+            
+            // Перевіряємо чи це підпослідовність правильної послідовності
+            let scenarioIndex = 0;
+            let matchedCount = 0;
+            
+            for (let userEvent of userEvents) {
+                while (scenarioIndex < allScenarioEvents.length) {
+                    if (allScenarioEvents[scenarioIndex].id === userEvent.id) {
+                        matchedCount++;
+                        scenarioIndex++;
+                        break;
+                    }
+                    scenarioIndex++;
+                }
+            }
+            
+            // Якщо всі події збігаються у правильному порядку
+            if (matchedCount === userEvents.length) {
+                // Перевірка на повноту (мінімум 4 події для повної зарядки)
+                if (userEvents.length >= 4) {
+                    return 5; // Повна зарядка
+                } else if (userEvents.length === 3) {
+                    return 4;
+                } else {
+                    return 3;
+                }
+            }
+            
+            return 2;
+        }
+
+        function getDetailedHint(filledSlots, scenario) {
+            const userEvents = filledSlots.map(slot => {
+                return allEvents.find(ev => ev.id === slot.eventId);
+            });
+            
+            // Знаходимо помилки в послідовності
+            const errors = [];
+            for (let i = 0; i < userEvents.length - 1; i++) {
+                if (userEvents[i].year > userEvents[i + 1].year) {
+                    errors.push(`"${userEvents[i].text}" (${Math.floor(userEvents[i].year)}) має бути ПІСЛЯ "${userEvents[i + 1].text}" (${Math.floor(userEvents[i + 1].year)})`);
+                }
+            }
+            
+            if (errors.length > 0) {
+                return "Помилки в хронології:\n" + errors.slice(0, 2).join("\n");
+            }
+            
+            if (userEvents.length < 4) {
+                return `Послідовність правильна, але додайте ще ${4 - userEvents.length} події для повної зарядки!`;
+            }
+            
+            return "Перевірте порядок подій уважніше.";
+        }
+
+        function animateCharging() {
+            let pulse = 0;
+            const interval = setInterval(() => {
+                weapon.material.emissive = new THREE.Color(0x00ff00);
+                weapon.material.emissiveIntensity = Math.sin(pulse) * 0.5 + 0.5;
+                pulse += 0.2;
+            }, 50);
+            
+            setTimeout(() => clearInterval(interval), 2000);
+        }
+
+        function fireWeapon() {
+            if (!gameState.charged) return;
+            
+            playSound('shoot');
+            
+            // Знаходимо ворога з правильним setId
+            const targetEnemy = enemies.find(e => e.userData.setId === gameState.chargedSetId && e.visible);
+            
+            if (!targetEnemy) {
+                showFeedback(0, "ПОМИЛКА! ⚠️", "Ворога для цього набору вже знищено!", false);
+                return;
+            }
+            
+            const beamGeometry = new THREE.CylinderGeometry(0.1, 0.1, 20, 16);
+            const beamMaterial = new THREE.MeshBasicMaterial({ 
+                color: 0x00ff00,
+                transparent: true,
+                opacity: 0.8
+            });
+            const beam = new THREE.Mesh(beamGeometry, beamMaterial);
+            beam.position.set(0, -2, -5);
+            beam.rotation.z = Math.PI / 2;
+            scene.add(beam);
+            
+            let beamPos = 5;
+            const shootInterval = setInterval(() => {
+                beamPos -= 1;
+                beam.position.z = beamPos;
+                beam.material.opacity -= 0.05;
+                
+                if (beamPos < targetEnemy.position.z + 2) {
+                    clearInterval(shootInterval);
+                    scene.remove(beam);
+                    destroyEnemy(targetEnemy);
+                    
+                    // Очищуємо панель та оновлюємо набір питань
+                    clearSequencePanel();
+                    initGame();
+                }
+            }, 30);
+        }
+
+        function destroyEnemy(targetEnemy) {
+            playSound('enemyDefeat');
+            
+            for (let i = 0; i < 30; i++) {
+                const geometry = new THREE.SphereGeometry(0.2, 8, 8);
+                const material = new THREE.MeshBasicMaterial({ 
+                    color: targetEnemy.material.color
+                });
+                const particle = new THREE.Mesh(geometry, material);
+                particle.position.copy(targetEnemy.position);
+                particle.velocity = new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.5,
+                    (Math.random() - 0.5) * 0.5,
+                    (Math.random() - 0.5) * 0.5
+                );
+                scene.add(particle);
+                particles.push(particle);
+                
+                setTimeout(() => {
+                    scene.remove(particle);
+                }, 2000);
+            }
+            
+            targetEnemy.visible = false;
+            
+            gameState.wins++;
+            gameState.charged = false;
+            gameState.chargedSetId = null;
+            
+            document.getElementById('charge-btn').disabled = false;
+            document.getElementById('fire-btn').disabled = true;
+            
+            weapon.material.emissive = new THREE.Color(0x00ffff);
+            weapon.material.emissiveIntensity = 0.2;
+            
+            // Перевіряємо чи всі вороги знищені
+            const allDestroyed = enemies.every(e => !e.visible);
+            
+            setTimeout(() => {
+                if (allDestroyed) {
+                    showFeedback(5, "ПЕРЕМОГА! 🎉", `Всіх ворогів знищено!\nВи пройшли рівень ${gameState.level}!\nГотуйтесь до наступного рівня!`, false);
+                } else {
+                    showFeedback(5, `ВОРОГА ЗНИЩЕНО! 🎯`, `Ви знищили ворога: ${targetEnemy.userData.name}\nПродовжуйте битву!`, false);
+                }
+            }, 500);
+        }
+
+        function showFeedback(accuracy, title, text, isError) {
+            const feedback = document.getElementById('feedback');
+            document.getElementById('feedback-title').textContent = title;
+            document.getElementById('feedback-text').textContent = text;
+            
+            if (isError) {
+                feedback.classList.add('error');
+                document.getElementById('stars').textContent = '❌';
+            } else {
+                feedback.classList.remove('error');
+                const stars = '⭐'.repeat(accuracy);
+                document.getElementById('stars').textContent = stars;
+            }
+            
+            feedback.style.display = 'block';
+        }
+
+        function hideFeedback() {
+            document.getElementById('feedback').style.display = 'none';
+        }
+
+        function nextLevel() {
+            hideFeedback();
+            
+            gameState.level++;
+            enemyDistance = 10;
+            
+            // Відновлюємо всіх ворогів
+            enemies.forEach((enemy, index) => {
+                enemy.visible = true;
+                const xOffset = (index - 1) * 5;
+                const zOffset = (index % 2 === 0) ? -enemyDistance : -enemyDistance - 2;
+                enemy.position.set(xOffset, 3, zOffset);
+            });
+            
+            weapon.material.emissive = new THREE.Color(0x00ffff);
+            weapon.material.emissiveIntensity = 0.2;
+            
+            document.getElementById('charge-btn').disabled = false;
+            document.getElementById('fire-btn').disabled = true;
+            
+            gameState.charged = false;
+            gameState.chargedSetId = null;
+            
+            initGame();
+        }
+
+        function resetGame() {
+            clearSequencePanel();
+            availableEvents = [...allEvents];
+            shuffle(availableEvents);
+            gameState.charged = false;
+            gameState.chargedSetId = null;
+            
+            document.getElementById('charge-btn').disabled = false;
+            document.getElementById('fire-btn').disabled = true;
+            
+            updateAccuracyBar(0);
+            renderEvents();
+            renderSequenceSlots();
+        }
+
+        function clearSequencePanel() {
+            // Повертаємо всі події з панелі назад у доступні
+            sequenceSlots.forEach(eventId => {
+                if (eventId !== null) {
+                    const event = allEvents.find(ev => ev.id === eventId);
+                    if (event && !availableEvents.find(e => e.id === eventId)) {
+                        availableEvents.push(event);
+                    }
+                }
+            });
+            
+            // Очищуємо слоти
+            sequenceSlots = [];
+            const slots = document.querySelectorAll('.sequence-slot');
+            slots.forEach(slot => {
+                slot.innerHTML = '';
+                slot.classList.remove('filled');
+            });
+        }
+
+        function updateAccuracyBar(accuracy) {
+            const fill = document.getElementById('accuracy-fill');
+            fill.style.width = (accuracy / 5 * 100) + '%';
+        }
+
+        function updateUI() {
+            document.getElementById('level').textContent = gameState.level;
+            document.getElementById('wins').textContent = gameState.wins;
+            document.getElementById('attempts').textContent = gameState.attempts;
+        }
+
+        function togglePanel() {
+            const content = document.getElementById('collapsible-content');
+            const toggleText = document.getElementById('toggle-text');
+            
+            isPanelCollapsed = !isPanelCollapsed;
+            
+            if (isPanelCollapsed) {
+                content.classList.add('collapsed');
+                toggleText.textContent = '🔼 Розгорнути панель';
+            } else {
+                content.classList.remove('collapsed');
+                toggleText.textContent = '🔽 Згорнути панель';
+            }
+        }
+
+        // Обробники подій
+        document.getElementById('charge-btn').addEventListener('click', checkSequence);
+        document.getElementById('fire-btn').addEventListener('click', fireWeapon);
+        document.getElementById('reset-btn').addEventListener('click', resetGame);
+        document.getElementById('toggle-panel').addEventListener('click', togglePanel);
+        document.getElementById('continue-btn').addEventListener('click', () => {
+            // Перевіряємо чи всі вороги знищені
+            const allDestroyed = enemies.every(e => !e.visible);
+            
+            if (allDestroyed) {
+                nextLevel();
+            } else {
+                hideFeedback();
+            }
+        });
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Запуск гри
+        initThree();
+        initGame();
+    </script>
+</body>
+</html>
