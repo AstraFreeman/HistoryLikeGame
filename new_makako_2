@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Навчальний Арканоїд</title>
+    <style>
+        /* General Page Styles */
+        body {
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(135deg, #0a0a1f 0%, #1a0a2e 50%, #0a0a1f 100%);
+            font-family: 'Arial', sans-serif;
+            color: #ffffff;
+            min-height: 100vh;
+        }
+
+        /* Main Game Container */
+        .game-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 1400px;
+            gap: 20px;
+        }
+
+        .game-content {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            width: 100%;
+            align-items: flex-start;
+        }
+
+        .game-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Canvas - Game Area */
+        canvas {
+            border: 3px solid #00ffff;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            box-shadow: 
+                0 0 20px rgba(0, 255, 255, 0.5),
+                0 0 40px rgba(0, 255, 255, 0.3),
+                inset 0 0 60px rgba(0, 255, 255, 0.1);
+            border-radius: 10px;
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Controls - Buttons */
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        button {
+            padding: 12px 24px;
+            font-size: 18px;
+            background: linear-gradient(135deg, #00d4ff 0%, #0095dd 100%);
+            color: white;
+            border: 2px solid #00ffff;
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 
+                0 0 10px rgba(0, 255, 255, 0.5),
+                0 0 20px rgba(0, 212, 255, 0.3);
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.8);
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #00ffff 0%, #00d4ff 100%);
+            transform: scale(1.05);
+            box-shadow: 
+                0 0 20px rgba(0, 255, 255, 0.8),
+                0 0 40px rgba(0, 212, 255, 0.5);
+        }
+
+        /* Sidebar for desktop */
+        .sidebar {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            width: 15%;
+            min-width: 200px;
+        }
+
+        /* Info Container */
+        .info-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+        }
+
+        /* Info Blocks */
+        .info {
+            padding: 15px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #00ffff;
+            font-size: 18px;
+            border: 2px solid #00ffff;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 
+                0 0 15px rgba(0, 255, 255, 0.4),
+                inset 0 0 20px rgba(0, 255, 255, 0.1);
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+        }
+
+        /* Images */
+        .question-image {
+            margin-top: 15px;
+            max-width: 100%;
+            border-radius: 8px;
+            display: none;
+            transition: transform 0.3s;
+            border: 3px solid #ff00ff;
+            box-shadow: 
+                0 0 20px rgba(255, 0, 255, 0.5),
+                0 0 40px rgba(255, 0, 255, 0.3);
+        }
+
+        .win-image {
+            margin-top: 15px;
+            max-width: 90%;
+            border-radius: 8px;
+            display: none;
+            transition: transform 0.3s;
+            border: 4px solid #ffd700;
+            box-shadow: 
+                0 0 30px rgba(255, 215, 0, 0.6),
+                0 0 60px rgba(255, 215, 0, 0.4);
+        }
+
+        .win-image:hover {
+            transform: scale(1.1);
+        }
+
+        /* Desktop Layout (комп'ютери) */
+        @media (min-width: 1024px) {
+            .game-content {
+                flex-direction: row;
+            }
+
+            .sidebar {
+                display: flex;
+            }
+
+            .info-container {
+                width: 100%;
+            }
+
+            canvas {
+                width: 800px;
+                height: 600px;
+            }
+        }
+
+        /* Mobile Layout (мобільні пристрої) */
+        @media (max-width: 1023px) {
+            .game-content {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .info-container {
+                width: 100%;
+                margin-top: 20px;
+            }
+
+            canvas {
+                width: 100%;
+                max-width: 600px;
+                height: auto;
+            }
+
+            button {
+                padding: 10px 20px;
+                font-size: 16px;
+            }
+
+            .info {
+                font-size: 16px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            canvas {
+                max-width: 100%;
+            }
+
+            button {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+
+            .info {
+                font-size: 14px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-wrapper">
+        <div class="game-content">
+            <div class="game-area">
+                <canvas id="gameCanvas"></canvas>
+                <div class="controls">
+                    <button id="startButton">Старт</button>
+                    <button id="stopButton">Стоп</button>
+                </div>
+                <img id="winImage" class="win-image" src="images/Cossack.jpg" alt="Зображення перемоги">
+            </div>
+            
+            <!-- Sidebar for desktop -->
+            <div class="sidebar">
+                <div class="info-container">
+                    <div class="info" id="questionField">Питання з'являться тут...</div>
+                    <img id="questionImage" class="question-image" style="display: none;" alt="Зображення питання">
+                    <div class="info" id="infoField">Гра готова до запуску</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile info (показується тільки на мобільних) -->
+        <div class="info-container" style="display: none;" id="mobileInfo">
+            <div class="info" id="questionFieldMobile">Питання з'являться тут...</div>
+            <img id="questionImageMobile" class="question-image" style="display: none;" alt="Зображення питання">
+            <div class="info" id="infoFieldMobile">Гра готова до запуску</div>
+        </div>
+    </div>
+
+    <script>
+        // questions.js
+        const questions = [
+            { text: "Церква в Суботові", answer: "Богдан Хмельницький", image: "images/new_mak_1.jpg" },
+            { text: "Собор в нововізантійському стилі", answer: "Володимирський собор", image: "images/new_mak_2.jpg" },
+            { text: "Собор Святого Юра", answer: "Львів", image: "images/new_mak_3.jpg" },
+            { text: "Харків", answer: "Покровський собор", image: "images/new_mak_4.jpg" },
+            { text: "Київ", answer: "Андріївська церква", image: "images/new_mak_5.jpg" },
+            { text: "Троїцька соборна церква", answer: "Новомосковськ", image: "images/new_mak_6.jpg" }
+        ];
+
+        let currentQuestionIndex = 0;
+
+        // Визначаємо, чи це мобільний пристрій
+        function isMobile() {
+            return window.innerWidth < 1024;
+        }
+
+        // Отримуємо правильні елементи залежно від розміру екрану
+        function getElements() {
+            if (isMobile()) {
+                document.getElementById('mobileInfo').style.display = 'flex';
+                return {
+                    questionField: document.getElementById('questionFieldMobile'),
+                    questionImage: document.getElementById('questionImageMobile'),
+                    infoField: document.getElementById('infoFieldMobile')
+                };
+            } else {
+                document.getElementById('mobileInfo').style.display = 'none';
+                return {
+                    questionField: document.getElementById('questionField'),
+                    questionImage: document.getElementById('questionImage'),
+                    infoField: document.getElementById('infoField')
+                };
+            }
+        }
+
+        function getNextQuestion() {
+            const question = questions[currentQuestionIndex];
+            const elements = getElements();
+            elements.questionField.textContent = question.text;
+            elements.questionImage.src = question.image;
+            elements.questionImage.style.display = "block";
+        }
+
+        // Оновлюємо елементи при зміні розміру вікна
+        window.addEventListener('resize', () => {
+            if (currentQuestionIndex > 0 || ball.isMoving) {
+                getNextQuestion();
+            }
+        });
+
+        // physics.js
+        function reflectBall(ball, paddle) {
+            // Визначаємо відносну позицію зіткнення (-1 до 1)
+            let relativeIntersect = (ball.x - (paddle.x + paddle.width / 2)) / (paddle.width / 2);
+            
+            // Обмежуємо значення для запобігання надто екстремальних кутів
+            relativeIntersect = Math.max(-0.9, Math.min(0.9, relativeIntersect));
+            
+            // Максимальний кут відбиття: 60 градусів
+            let bounceAngle = relativeIntersect * (Math.PI / 3);
+            
+            // Встановлюємо постійну швидкість м'яча (5 пікселів за кадр)
+            let speed = 5;
+            ball.dx = speed * Math.sin(bounceAngle);
+            ball.dy = -speed * Math.cos(bounceAngle);
+            
+            // Гарантуємо мінімальну вертикальну швидкість
+            if (Math.abs(ball.dy) < 2) {
+                ball.dy = ball.dy < 0 ? -2 : 2;
+            }
+        }
+
+        // game.js
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const winImage = document.getElementById('winImage');
+
+        canvas.width = 800;
+        canvas.height = 600;
+
+        const paddle = { x: canvas.width / 2 - 75, y: canvas.height - 30, width: 150, height: 20, dx: 7 };
+        const ball = { x: canvas.width / 2, y: paddle.y - 10, radius: 10, dx: 4, dy: -4, isMoving: false };
+
+        let gameInterval = null;
+        let gamePaused = false;
+
+        // Create Blocks
+        const blocks = [];
+        const rows = 3, cols = 7, blockWidth = 100, blockHeight = 40;
+        const colors = ["#FF0000", "#FFA500", "#FFFF00", "#008000", "#00FFFF", "#0000FF", "#800080"];
+
+        for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < cols; j++) {
+                blocks.push({
+                    x: j * (blockWidth + 10) + 35,
+                    y: i * (blockHeight + 10) + 30,
+                    width: blockWidth,
+                    height: blockHeight,
+                    color: colors[j % colors.length],
+                    questionIndex: (j + i * cols) % questions.length,
+                    isActive: true
+                });
+            }
+        }
+
+        // 🛠 Draw Game Objects
+        function drawPaddle() {
+            ctx.fillStyle = '#0095DD';
+            ctx.fillRect(paddle.x, paddle.y, paddle.width, paddle.height);
+        }
+
+        function drawBall() {
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fillStyle = '#f00';
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function drawBlocks() {
+            blocks.forEach(block => {
+                if (block.isActive) {
+                    ctx.fillStyle = block.color;
+                    ctx.fillRect(block.x, block.y, block.width, block.height);
+                    ctx.fillStyle = 'black';
+                    ctx.font = '10px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText(questions[block.questionIndex].answer, block.x + block.width / 2, block.y + block.height / 2 + 4);
+                }
+            });
+        }
+
+        // 🎯 Update Ball Movement
+        function updateBall() {
+            if (!ball.isMoving) return;
+            ball.x += ball.dx;
+            ball.y += ball.dy;
+
+            if (ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) ball.dx *= -1;
+            if (ball.y - ball.radius < 0) ball.dy *= -1;
+            if (ball.y + ball.radius > canvas.height) restartGame();
+
+            if (ball.x > paddle.x && ball.x < paddle.x + paddle.width && ball.y + ball.radius > paddle.y) reflectBall(ball, paddle);
+
+            blocks.forEach(block => {
+                if (block.isActive && ball.x > block.x && ball.x < block.x + block.width && ball.y - ball.radius < block.y + block.height && ball.y + ball.radius > block.y) {
+                    ball.dy *= -1;
+                    const elements = getElements();
+                    if (block.questionIndex === currentQuestionIndex) {
+                        block.isActive = false;
+                        elements.infoField.textContent = `Правильно: ${questions[currentQuestionIndex].answer}`;
+                        currentQuestionIndex = (currentQuestionIndex + 1) % questions.length;
+                        getNextQuestion();
+
+                        if (blocks.every(b => !b.isActive)) {
+                            winImage.style.display = 'block';
+                            elements.infoField.textContent = 'Вітаємо, ви перемогли!';
+                            clearInterval(gameInterval);
+                        }
+                    } else {
+                        elements.infoField.textContent = "Це не правильна відповідь!";
+                    }
+                }
+            });
+        }
+
+        // 🔄 Restart Game
+        function restartGame() {
+            alert('Гру завершено. Спробуйте знову!');
+            document.location.reload();
+        }
+
+        // 🕹 Game Loop
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawPaddle();
+            drawBall();
+            drawBlocks();
+        }
+
+        // 🎮 Start Button
+        document.getElementById('startButton').addEventListener('click', () => {
+            if (!gameInterval) {
+                ball.isMoving = true;
+                getNextQuestion();
+                const elements = getElements();
+                elements.infoField.textContent = 'Гра запущена!';
+                gameInterval = setInterval(() => { updateBall(); render(); }, 16);
+            }
+        });
+
+        // ⏸ Pause Button (Fix)
+        document.getElementById('stopButton').addEventListener('click', () => {
+            const elements = getElements();
+            if (gamePaused) {
+                gameInterval = setInterval(() => { updateBall(); render(); }, 16);
+                elements.infoField.textContent = 'Гра відновлена!';
+            } else {
+                clearInterval(gameInterval);
+                elements.infoField.textContent = 'Гру зупинено.';
+            }
+            gamePaused = !gamePaused;
+        });
+
+        // 🖱 Paddle Movement
+        canvas.addEventListener('mousemove', e => {
+            const rect = canvas.getBoundingClientRect();
+            paddle.x = Math.min(Math.max(e.clientX - rect.left - paddle.width / 2, 0), canvas.width - paddle.width);
+        });
+
+        // 🚀 Start Initial Render
+        render();
+    </script>
+</body>
+</html>
