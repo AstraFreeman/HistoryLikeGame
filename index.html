@@ -360,6 +360,11 @@
         // Функція переміщення асистента
         function moveAssistant() {
             if (isDancing || !isVisible) return;
+            
+            // Перевірка чи асистент не рухається клавіатурою
+            if (typeof isAssistantMoving === 'function' && isAssistantMoving()) {
+                return;
+            }
 
             isMoving = true;
             setAssistantGif('Sprut_Move.gif');
