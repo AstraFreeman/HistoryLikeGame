@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Історія  як гра</title>
+    <title>Історія як гра</title>
     <style>
         * {
             margin: 0;
@@ -164,7 +164,7 @@
             width: 100px;
             height: 100px;
             cursor: pointer;
-            transition: transform 0.3s ease;
+            transition: all 0.5s ease;
             filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
             z-index: 1000;
         }
@@ -195,6 +195,12 @@
                 opacity: 1;
                 transform: translateY(0);
             }
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg) scale(1); }
+            50% { transform: rotate(180deg) scale(1.2); }
+            100% { transform: rotate(360deg) scale(1); }
         }
 
         .hidden {
@@ -230,7 +236,7 @@
     <main>
         <h2 class="section-title">📚 Історичні періоди</h2>
         <section class="games">
-          <div class="game">
+            <div class="game">
                 <h2>0. Вступ</h2>
                 <p>Коротко про все</p>
                 <a href="washhand_1.html">Грати</a>
@@ -309,6 +315,7 @@
         <div id="factBox" class="hidden">📖 Цікава історія: У 1654 році відбулася Переяславська рада!</div>
     </main>
 
+    <script src="assistant.js"></script>
     <script>
         const octopus = document.getElementById('octopus');
         const factBox = document.getElementById('factBox');
@@ -325,10 +332,85 @@
             '📖 Битва під Берестечком 1651 року - одна з найбільших битв козацької доби.'
         ];
 
+        // Стан асистента
+        let isMoving = false;
+        let isDancing = false;
+        let isVisible = true;
+        let moveInterval = null;
+        let assistantLoaded = false;
+
+        // Перевірка завантаження assistant.js
+        if (typeof initAssistant === 'function') {
+            try {
+                initAssistant(octopus);
+                assistantLoaded = true;
+                console.log('Assistant.js успішно підключено');
+            } catch (error) {
+                console.warn('Помилка ініціалізації assistant.js:', error);
+            }
+        } else {
+            console.log('Assistant.js не знайдено, використовується вбудований функціонал');
+        }
+
+        // Функція зміни GIF
+        function setAssistantGif(gif) {
+            octopus.src = `image/${gif}`;
+        }
+
+        // Функція переміщення асистента
+        function moveAssistant() {
+            if (isDancing || !isVisible) return;
+
+            isMoving = true;
+            setAssistantGif('Sprut_Move.gif');
+
+            const currentBottom = parseInt(window.getComputedStyle(octopus).bottom) || 20;
+            const currentRight = parseInt(window.getComputedStyle(octopus).right) || 20;
+
+            const maxMoveX = window.innerWidth * 0.05;
+            const maxMoveY = window.innerHeight * 0.05;
+
+            const moveX = (Math.random() - 0.5) * 2 * maxMoveX;
+            const moveY = (Math.random() - 0.5) * 2 * maxMoveY;
+
+            const newRight = Math.max(20, Math.min(window.innerWidth - 120, currentRight + moveX));
+            const newBottom = Math.max(20, Math.min(window.innerHeight - 120, currentBottom + moveY));
+
+            octopus.style.right = newRight + 'px';
+            octopus.style.bottom = newBottom + 'px';
+
+            setTimeout(() => {
+                isMoving = false;
+                if (!isDancing) {
+                    setAssistantGif('Sprut_Idle.gif');
+                }
+            }, 1000);
+        }
+
+        // Періодичне переміщення асистента
+        function startRandomMovement() {
+            if (moveInterval) clearInterval(moveInterval);
+            
+            moveInterval = setInterval(() => {
+                if (Math.random() < 0.3) { // 30% шанс руху
+                    moveAssistant();
+                }
+            }, 5000); // Перевірка кожні 5 секунд
+        }
+
+        // Кнопка показати/сховати
         toggleBtn.addEventListener('click', () => {
+            isVisible = !isVisible;
             octopus.classList.toggle('hidden');
+            
+            if (isVisible) {
+                startRandomMovement();
+            } else {
+                if (moveInterval) clearInterval(moveInterval);
+            }
         });
 
+        // Кнопка цікавий факт
         factBtn.addEventListener('click', () => {
             const randomFact = facts[Math.floor(Math.random() * facts.length)];
             factBox.textContent = randomFact;
@@ -338,22 +420,52 @@
             }, 5000);
         });
 
+        // Кнопка танець
         danceBtn.addEventListener('click', () => {
+            if (isDancing || !isVisible) return;
+            
+            isDancing = true;
+            setAssistantGif('Sprut_Dance.gif');
             octopus.style.animation = 'spin 1s ease-in-out';
+            
             setTimeout(() => {
                 octopus.style.animation = '';
+                isDancing = false;
+                if (!isMoving) {
+                    setAssistantGif('Sprut_Idle.gif');
+                }
             }, 1000);
         });
 
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes spin {
-                0% { transform: rotate(0deg) scale(1); }
-                50% { transform: rotate(180deg) scale(1.2); }
-                100% { transform: rotate(360deg) scale(1); }
+        // Клік по асистенту
+        octopus.addEventListener('click', () => {
+            if (assistantLoaded && typeof onAssistantClick === 'function') {
+                onAssistantClick();
+            } else {
+                // Альтернативна поведінка
+                const messages = [
+                    'Привіт! Я тут, щоб допомогти тобі вивчати історію! 📚',
+                    'Обери гру та починай свою подорож у минуле! 🎮',
+                    'Не забудь натиснути "Цікавий факт" для нових знань! 🔍',
+                    'Готовий до пригод? Вперед! 🚀'
+                ];
+                factBox.textContent = messages[Math.floor(Math.random() * messages.length)];
+                factBox.classList.remove('hidden');
+                setTimeout(() => {
+                    factBox.classList.add('hidden');
+                }, 3000);
             }
-        `;
-        document.head.appendChild(style);
+        });
+
+        // Запуск періодичного руху
+        startRandomMovement();
+
+        // Обробка помилок завантаження GIF
+        octopus.addEventListener('error', () => {
+            console.warn('Не вдалося завантажити GIF, використовується emoji');
+            octopus.style.fontSize = '80px';
+            octopus.innerHTML = '🐙';
+        });
     </script>
 </body>
 </html>
