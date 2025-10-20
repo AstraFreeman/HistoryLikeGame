@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Тест про права людини</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a1f5c 0%, #1a4fff 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .question-block {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .question-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #fff;
+        }
+        
+        .option {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 12px 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .option:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(5px);
+        }
+        
+        .option input[type="radio"],
+        .option input[type="checkbox"] {
+            margin-right: 10px;
+            cursor: pointer;
+            width: 18px;
+            height: 18px;
+        }
+        
+        .option label {
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .option.correct {
+            background: rgba(76, 175, 80, 0.4);
+            border-color: #4CAF50;
+        }
+        
+        .option.incorrect {
+            background: rgba(244, 67, 54, 0.4);
+            border-color: #f44336;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+        }
+        
+        textarea::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #1a4fff;
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        .button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        button {
+            background: #1a4fff;
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(26, 79, 255, 0.4);
+        }
+        
+        button:hover {
+            background: #0d3acc;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(26, 79, 255, 0.6);
+        }
+        
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        
+        .result {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 18px;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+        }
+        
+        .hint {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 10px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Тест про права людини</h1>
+        
+        <form id="testForm">
+            <!-- Питання 1 -->
+            <div class="question-block">
+                <div class="question-title">1. Хто є основним носієм прав людини?</div>
+                <div class="option">
+                    <input type="radio" id="q1a" name="q1" value="A">
+                    <label for="q1a">А) Держава</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="q1b" name="q1" value="B">
+                    <label for="q1b">Б) Людина</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="q1c" name="q1" value="C">
+                    <label for="q1c">В) Суспільство</label>
+                </div>
+                <div class="option">
+                    <input type="radio" id="q1d" name="q1" value="D">
+                    <label for="q1d">Г) Органи влади</label>
+                </div>
+            </div>
+            
+            <!-- Питання 2 -->
+            <div class="question-block">
+                <div class="question-title">2. Які з наведених належать до основних прав людини?</div>
+                <div class="hint">(Оберіть усі правильні варіанти)</div>
+                <div class="option">
+                    <input type="checkbox" id="q2a" name="q2" value="life">
+                    <label for="q2a">Право на життя</label>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="q2b" name="q2" value="education">
+                    <label for="q2b">Право на освіту</label>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="q2c" name="q2" value="taxes">
+                    <label for="q2c">Обов'язок платити податки</label>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="q2d" name="q2" value="speech">
+                    <label for="q2d">Право на свободу слова</label>
+                </div>
+                <div class="option">
+                    <input type="checkbox" id="q2e" name="q2" value="trial">
+                    <label for="q2e">Право на справедливий суд</label>
+                </div>
+            </div>
+            
+            <!-- Питання 3 -->
+            <div class="question-block">
+                <div class="question-title">3. Поясни, чому знання своїх прав допомагає бути вільною людиною.</div>
+                <textarea id="q3" name="q3" placeholder="Напишіть свою відповідь тут..." required></textarea>
+            </div>
+            
+            <!-- Питання 4 -->
+            <div class="question-block">
+                <div class="question-title">4. Уяви, що у школі несправедливо покарали твого однокласника. Що б ти зробив, щоб захистити його право на справедливість?</div>
+                <textarea id="q4" name="q4" placeholder="Напишіть свою відповідь тут..." required></textarea>
+            </div>
+            
+            <div class="button-container">
+                <button type="submit">Перевірити відповіді</button>
+            </div>
+        </form>
+        
+        <div id="result" class="result"></div>
+    </div>
+    
+    <script>
+        document.getElementById('testForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            let score = 0;
+            let totalQuestions = 4;
+            
+            // Перевірка питання 1
+            const q1 = document.querySelector('input[name="q1"]:checked');
+            const q1Options = document.querySelectorAll('input[name="q1"]');
+            q1Options.forEach(option => {
+                const parent = option.parentElement;
+                parent.classList.remove('correct', 'incorrect');
+                if (option.value === 'B') {
+                    parent.classList.add('correct');
+                } else if (option.checked) {
+                    parent.classList.add('incorrect');
+                }
+            });
+            if (q1 && q1.value === 'B') {
+                score++;
+            }
+            
+            // Перевірка питання 2
+            const q2Checked = document.querySelectorAll('input[name="q2"]:checked');
+            const q2Correct = ['life', 'education', 'speech', 'trial'];
+            const q2Values = Array.from(q2Checked).map(cb => cb.value);
+            
+            const q2Options = document.querySelectorAll('input[name="q2"]');
+            q2Options.forEach(option => {
+                const parent = option.parentElement;
+                parent.classList.remove('correct', 'incorrect');
+                if (q2Correct.includes(option.value)) {
+                    parent.classList.add('correct');
+                } else if (option.checked) {
+                    parent.classList.add('incorrect');
+                }
+            });
+            
+            const q2CorrectCount = q2Values.filter(v => q2Correct.includes(v)).length;
+            const q2IncorrectCount = q2Values.filter(v => !q2Correct.includes(v)).length;
+            if (q2CorrectCount === 4 && q2IncorrectCount === 0) {
+                score++;
+            }
+            
+            // Перевірка текстових відповідей
+            const q3 = document.getElementById('q3').value.trim();
+            const q4 = document.getElementById('q4').value.trim();
+            
+            if (q3.length >= 20) score++;
+            if (q4.length >= 20) score++;
+            
+            // Показати результат
+            const resultDiv = document.getElementById('result');
+            const percentage = (score / totalQuestions) * 100;
+            
+            resultDiv.innerHTML = `
+                <h2>Результат: ${score} з ${totalQuestions}</h2>
+                <p style="font-size: 24px; margin: 15px 0;">${percentage}%</p>
+                <p>${percentage >= 75 ? '🎉 Чудовий результат!' : percentage >= 50 ? '👍 Непоганий результат!' : '💪 Продовжуй вчитися!'}</p>
+            `;
+            resultDiv.classList.add('show');
+            
+            // Перенаправлення при успішному результаті
+            if (percentage >= 75) {
+                setTimeout(() => {
+                    window.location.href = 'usin_blue_2.html';
+                }, 3000);
+            }
+            
+            // Прокрутка до результату
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    </script>
+</body>
+</html>

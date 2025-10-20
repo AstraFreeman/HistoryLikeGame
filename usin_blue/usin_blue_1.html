@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>AR Human Scene</title>
+    <meta name="description" content="AR Scene with Human Model and UI">
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+</head>
+<body style="margin : 0px; overflow: hidden;">
+
+    <a-scene embedded arjs>
+
+        <a-entity cursor="rayOrigin: mouse" raycaster="objects: .clickable"></a-entity>
+
+        <a-marker preset="hiro">
+
+            <a-gltf-model 
+                src="models/human.glb" 
+                position="0 0 0" 
+                rotation="0 0 0" 
+                scale="1 1 1" 
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 20000">
+            </a-gltf-model>
+
+            <a-sphere 
+                id="toggle-button"
+                class="clickable"
+                position="0 1.8 0" 
+                radius="0.12" 
+                color="#1a4fff"
+                event-set__show="_event: click; target: #info-panel; property: visible; value: true">
+            </a-sphere>
+
+            <a-entity id="info-panel" position="0 1.5 0.3" visible="false">
+
+                <a-image 
+                    src="prava_1.jpg" 
+                    position="-0.6 0 0" 
+                    width="0.5" 
+                    height="0.5">
+                </a-image>
+
+                <a-image 
+                    src="dmhspd_1.jpg" 
+                    position="0.6 0 0" 
+                    width="0.5" 
+                    height="0.5">
+                </a-image>
+
+                <a-link 
+                    href="usin_test.html" 
+                    position="0 -0.4 0" 
+                    scale="0.6 0.6 0.6"
+                    title="Тест"
+                    look-at="[camera]">
+                    <a-plane 
+                        class="clickable" 
+                        color="#007BFF" 
+                        width="1" 
+                        height="0.5"></a-plane>
+                    <a-text 
+                        value="Тест" 
+                        align="center" 
+                        color="#FFFFFF" 
+                        position="0 0 0.02"></a-text>
+                </a-link>
+
+                <a-plane
+                    class="clickable"
+                    position="0 -0.8 0"
+                    width="0.8"
+                    height="0.3"
+                    color="#DC3545"
+                    event-set__hide="_event: click; target: #info-panel; property: visible; value: false">
+                    <a-text 
+                        value="Закрити" 
+                        align="center" 
+                        color="#FFFFFF" 
+                        position="0 0 0.02"></a-text>
+                </a-plane>
+
+            </a-entity>
+
+        </a-marker>
+
+        <a-entity camera></a-entity>
+        
+    </a-scene>
+</body>
+</html>

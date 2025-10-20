@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #FFE5D9 0%, #FFDAB9 50%, #FFCBA4 100%);
+            color: #5C3D2E;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 25px;
+            background-color: #FFF8F3;
+            border-radius: 15px;
+            box-shadow: 0 8px 24px rgba(255, 188, 143, 0.3);
+        }
+        h1 {
+            color: #D2691E;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .question-block {
+            margin-bottom: 25px;
+            padding: 20px;
+            background-color: #FFF;
+            border-radius: 10px;
+            border-left: 4px solid #FFDAB9;
+            box-shadow: 0 2px 8px rgba(255, 188, 143, 0.15);
+        }
+        .question-block p {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #8B4513;
+            margin-bottom: 15px;
+        }
+        .question-block div {
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-left: 5px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 5px;
+            transition: background-color 0.2s ease;
+        }
+        label:hover {
+            background-color: #FFE5D9;
+        }
+        input[type="radio"], input[type="checkbox"] {
+            margin-right: 10px;
+            accent-color: #FF9966;
+        }
+        textarea {
+            width: 98%;
+            min-height: 80px;
+            font-family: inherit;
+            font-size: 1em;
+            padding: 12px;
+            border: 2px solid #FFDAB9;
+            border-radius: 8px;
+            margin-top: 10px;
+            background-color: #FFFAF7;
+            transition: border-color 0.3s ease;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #FF9966;
+        }
+        button {
+            display: inline-block;
+            font-size: 1em;
+            padding: 12px 24px;
+            margin-top: 10px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        .submit-btn {
+            background-color: #FF9966;
+            color: white;
+        }
+        .submit-btn:hover {
+            background-color: #FF7F50;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 127, 80, 0.3);
+        }
+        .clear-btn {
+            background-color: #DDA15E;
+            color: white;
+        }
+        .clear-btn:hover {
+            background-color: #BC6C25;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .correct {
+            background-color: #D4EDDA;
+            color: #155724;
+            border: 2px solid #C3E6CB;
+        }
+        .incorrect {
+            background-color: #F8D7DA;
+            color: #721C24;
+            border: 2px solid #F5C6CB;
+        }
+        
+        .next-btn {
+            background-color: #FF9966;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+            padding: 12px 28px;
+            margin-top: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .next-btn:hover {
+            background-color: #FF7F50;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 127, 80, 0.3);
+        }
+        hr {
+            border: none;
+            height: 2px;
+            background: linear-gradient(to right, transparent, #FFDAB9, transparent);
+            margin: 30px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Тестування</h1>
+
+        <div id="results"></div>
+
+        <form id="quiz-form">
+
+            <div class="question-block">
+                <p>1. Яка з наведених функцій мас-медіа є ключовою в демократичній державі?</p>
+                <div>
+                    <label>
+                        <input type="radio" name="q1" value="wrong"> Поширення чуток і неперевіреної інформації
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="radio" name="q1" value="correct"> Правдиве інформування громадян про події
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="radio" name="q1" value="wrong"> Маніпуляція свідомістю людей
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="radio" name="q1" value="wrong"> Ігнорування важливих тем
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <p>2. Які дії громадянина допомагають критично оцінювати інформацію з мас-медіа?</p>
+                <div>
+                    <label>
+                        <input type="checkbox" name="q2" class="correct-q2"> Перевіряти джерела інформації
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="checkbox" name="q2" class="correct-q2"> Обговорювати новини з друзями
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="checkbox" name="q2"> Сліпо довіряти будь-яким публікаціям
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="checkbox" name="q2"> Поширювати інформацію без перевірки
+                    </label>
+                </div>
+            </div>
+
+            <button type="button" class="submit-btn" onclick="checkTest()">Перевірити Питання 1 і 2</button>
+        
+        </form>
+        <hr>
+
+        <div class="question-block">
+            <p>3. Чому важливо перевіряти інформацію перед тим, як ділитися нею в соціальних мережах?</p>
+            <textarea id="q3-answer" placeholder="Ваша відповідь (1-2 речення)"></textarea>
+            <button type="button" class="clear-btn" onclick="clearText('q3-answer')">Надіслати (Очистити)</button>
+        </div>
+
+        <div class="question-block">
+            <p>4. Ти побачив у соцмережі сенсаційне повідомлення про новий закон, але воно не має джерела. Що ти зробиш?</p>
+            <textarea id="q4-answer" placeholder="Опишіть ваші дії..."></textarea>
+            <button type="button" class="clear-btn" onclick="clearText('q4-answer')">Надіслати (Очистити)</button>
+        </div>
+
+    </div>
+
+    <script>
+        function checkTest() {
+            let score = 0;
+            const total = 2;
+            let resultsHTML = "";
+
+            const q1Answer = document.querySelector('input[name="q1"]:checked');
+            if (q1Answer && q1Answer.value === 'correct') {
+                score++;
+                resultsHTML += '<p style="color: green;">Питання 1: Правильно!</p>';
+            } else {
+                resultsHTML += '<p style="color: red;">Питання 1: Неправильно.</p>';
+            }
+
+            const q2Checkboxes = document.querySelectorAll('input[name="q2"]');
+            let q2Correct = true;
+
+            q2Checkboxes.forEach(checkbox => {
+                if (checkbox.classList.contains('correct-q2') && !checkbox.checked) {
+                    q2Correct = false;
+                } else if (!checkbox.classList.contains('correct-q2') && checkbox.checked) {
+                    q2Correct = false;
+                }
+            });
+
+            if (q2Correct) {
+                score++;
+                resultsHTML += '<p style="color: green;">Питання 2: Правильно!</p>';
+            } else {
+                resultsHTML += '<p style="color: red;">Питання 2: Неправильно.</p>';
+            }
+
+            const resultsDiv = document.getElementById('results');
+            resultsHTML += `<strong>Ваш результат (з перших 2 питань): ${score} з ${total}</strong>`;
+            
+            if (score === total) {
+                resultsDiv.className = 'correct';
+                resultsHTML += '<br><a href="usin_prsk_2.html" class="next-btn">Далі &rarr;</a>';
+            } else {
+                resultsDiv.className = 'incorrect';
+            }
+            
+            resultsDiv.innerHTML = resultsHTML;
+        }
+
+        function clearText(textareaId) {
+            const textarea = document.getElementById(textareaId);
+            if (textarea) {
+                textarea.value = '';
+                alert('Відповідь "надіслано" (поле очищено).');
+            }
+        }
+    </script>
+
+</body>
+</html>

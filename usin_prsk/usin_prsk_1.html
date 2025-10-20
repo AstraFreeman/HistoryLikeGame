@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>AR Hologram Scene</title>
+    <meta name="description" content="AR Scene with Hologram Model and UI">
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+</head>
+<body style="margin : 0px; overflow: hidden;">
+
+     <a-assets>
+        <img id="info" src="s_m_inf.jpg">
+    </a-assets>   
+
+    <a-scene embedded arjs>
+
+        <a-entity cursor="rayOrigin: mouse" raycaster="objects: .clickable"></a-entity>
+
+        <a-marker preset="hiro">
+
+            <a-gltf-model 
+                src="models/s_m_hologram.glb" 
+                position="0 0.5 0" 
+                rotation="0 90 0" 
+                scale="0.3 0.3 0.3" 
+                animation="property: rotation; to: 0 360 0; loop: true; dur: 20000">
+            </a-gltf-model>
+
+            <a-sphere 
+                id="toggle-button"
+                class="clickable"
+                position="0 2 0" 
+                radius="0.15" 
+                color="#FFDAB9"
+                event-set__show="_event: click; target: #info-panel; property: visible; value: true">
+            </a-sphere>
+     
+            <a-plane 
+                id="info-plane-1"
+                position="1 2 0" 
+                rotation="0 -90 0" 
+                width="1.5" 
+                height="2" 
+                scale="1 1 1"
+                color="white" 
+                src="#info">
+            </a-plane>
+
+            <a-plane 
+                id="info-plane-2"
+                position="-1 2 0" 
+                rotation="0 90 0" 
+                width="1.5" 
+                height="2" 
+                scale="1 1 1"
+                color="white" 
+                src="#info">
+            </a-plane>
+
+            <a-entity id="info-panel" position="0 2 0" visible="false">
+
+                <a-image 
+                    src="s_m_inf.jpg" 
+                    position="-1 0 0" 
+                    width="1" 
+                    height="1">
+                </a-image>
+
+                <a-image 
+                    src="s_m_inf.jpg" 
+                    position="1 0 0" 
+                    width="1" 
+                    height="1">
+                </a-image>
+
+                <a-link 
+                    href="usin_test.html" 
+                    position="0 0 1.5" 
+                    scale="0.8 0.8 0.8"
+                    title="Тест"
+                    look-at="[camera]">
+                    <a-plane 
+                        class="clickable" 
+                        color="#007BFF" 
+                        width="1" 
+                        height="0.5"></a-plane>
+                    <a-text 
+                        value="Тест" 
+                        align="center" 
+                        color="#FFFFFF" 
+                        position="0 0 0.02"></a-text>
+                </a-link>
+
+                <a-plane
+                    class="clickable"
+                    position="0 -1.2 0"
+                    width="1"
+                    height="0.4"
+                    color="#DC3545"
+                    event-set__hide="_event: click; target: #info-panel; property: visible; value: false">
+                    <a-text 
+                        value="Закрити" 
+                        align="center" 
+                        color="#FFFFFF" 
+                        position="0 0 0.02"></a-text>
+                </a-plane>
+
+            </a-entity>
+
+        </a-marker>
+
+        <a-entity camera></a-entity>
+        
+    </a-scene>
+</body>
+</html>

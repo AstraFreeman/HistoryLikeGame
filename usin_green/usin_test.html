@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            color: #1b5e20;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 25px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(27, 94, 32, 0.15);
+            border: 2px solid #a5d6a7;
+        }
+        h1 {
+            color: #2e7d32;
+        }
+        .question-block {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #c8e6c9;
+        }
+        .question-block:last-of-type {
+            border-bottom: none;
+        }
+        .question-block p {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2e7d32;
+        }
+        .question-block div {
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-left: 5px;
+            cursor: pointer;
+            padding: 5px;
+            transition: background-color 0.2s;
+        }
+        label:hover {
+            background-color: #f1f8e9;
+            border-radius: 5px;
+        }
+        input[type="radio"], input[type="checkbox"] {
+            margin-right: 10px;
+            accent-color: #4caf50;
+        }
+        textarea {
+            width: 98%;
+            min-height: 80px;
+            font-family: inherit;
+            font-size: 1em;
+            padding: 10px;
+            border: 2px solid #81c784;
+            border-radius: 5px;
+            margin-top: 10px;
+            transition: border-color 0.3s;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #4caf50;
+        }
+        button {
+            display: inline-block;
+            font-size: 1em;
+            padding: 10px 20px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .submit-btn {
+            background-color: #4caf50;
+            color: white;
+        }
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+        .clear-btn {
+            background-color: #66bb6a;
+            color: white;
+        }
+        .clear-btn:hover {
+            background-color: #57a55a;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .correct {
+            background-color: #c8e6c9;
+            color: #1b5e20;
+            border: 2px solid #81c784;
+        }
+        .incorrect {
+            background-color: #ffccbc;
+            color: #bf360c;
+            border: 2px solid #ff8a65;
+        }
+        
+        .next-btn {
+            background-color: #4caf50;
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .next-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Тестування</h1>
+
+        <div id="results"></div>
+
+        <form id="quiz-form">
+
+            <div class="question-block">
+                <p>1. Що є головною причиною конфліктів між людьми?</p>
+                <div>
+                    <label>
+                        <input type="radio" name="q1" value="wrong"> Відмінність поглядів
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="radio" name="q1" value="correct"> Небажання слухати одне одного
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="radio" name="q1" value="wrong"> Випадковість
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="radio" name="q1" value="wrong"> Зовнішні обставини
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <p>2. Які способи допомагають розв'язати конфлікт?</p>
+                <div>
+                    <label>
+                        <input type="checkbox" name="q2" class="correct-q2"> Діалог
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="checkbox" name="q2" class="correct-q2"> Вміння слухати
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="checkbox" name="q2" class="correct-q2"> Компроміс
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="checkbox" name="q2"> Ігнорування проблеми
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="checkbox" name="q2"> Агресія
+                    </label>
+                </div>
+            </div>
+
+            <button type="button" class="submit-btn" onclick="checkTest()">Перевірити Питання 1 і 2</button>
+        
+        </form>
+        <hr style="margin: 30px 0; border: none; border-top: 2px solid #a5d6a7;">
+
+        <div class="question-block">
+            <p>3. Чому краще обговорювати проблеми, ніж робити вигляд, що їх немає?</p>
+            <textarea id="q3-answer" placeholder="Ваша відповідь (1-2 речення)"></textarea>
+            <button type="button" class="clear-btn" onclick="clearText('q3-answer')">Надіслати (Очистити)</button>
+        </div>
+
+        <div class="question-block">
+            <p>4. Уяви, що ти посварився з другом через непорозуміння. Що б ти зробив(-ла), щоб відновити спілкування?</p>
+            <textarea id="q4-answer" placeholder="Опишіть вашу відповідь..."></textarea>
+            <button type="button" class="clear-btn" onclick="clearText('q4-answer')">Надіслати (Очистити)</button>
+        </div>
+
+    </div>
+
+    <script>
+        function checkTest() {
+            let score = 0;
+            const total = 2;
+            let resultsHTML = "";
+
+            // --- Перевірка Питання 1 ---
+            const q1Answer = document.querySelector('input[name="q1"]:checked');
+            if (q1Answer && q1Answer.value === 'correct') {
+                score++;
+                resultsHTML += '<p style="color: #2e7d32;">Питання 1: Правильно!</p>';
+            } else {
+                resultsHTML += '<p style="color: #d32f2f;">Питання 1: Неправильно.</p>';
+            }
+
+            // --- Перевірка Питання 2 ---
+            const q2Checkboxes = document.querySelectorAll('input[name="q2"]');
+            let q2Correct = true;
+
+            q2Checkboxes.forEach(checkbox => {
+                if (checkbox.classList.contains('correct-q2') && !checkbox.checked) {
+                    q2Correct = false;
+                } else if (!checkbox.classList.contains('correct-q2') && checkbox.checked) {
+                    q2Correct = false;
+                }
+            });
+
+            if (q2Correct) {
+                score++;
+                resultsHTML += '<p style="color: #2e7d32;">Питання 2: Правильно!</p>';
+            } else {
+                resultsHTML += '<p style="color: #d32f2f;">Питання 2: Неправильно.</p>';
+            }
+
+            // --- Відображення результату ---
+            const resultsDiv = document.getElementById('results');
+            resultsHTML += `<strong>Ваш результат (з перших 2 питань): ${score} з ${total}</strong>`;
+            
+            if (score === total) {
+                resultsDiv.className = 'correct';
+                resultsHTML += '<br><a href="usin_green_2.html" class="next-btn">Далі &rarr;</a>';
+            } else {
+                resultsDiv.className = 'incorrect';
+            }
+            
+            resultsDiv.innerHTML = resultsHTML;
+        }
+
+        function clearText(textareaId) {
+            const textarea = document.getElementById(textareaId);
+            if (textarea) {
+                textarea.value = '';
+                alert('Відповідь "надіслано" (поле очищено).');
+            }
+        }
+    </script>
+
+</body>
+</html>
