@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 25px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        .question-block {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .question-block:last-of-type {
+            border-bottom: none;
+        }
+        .question-block p {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .question-block div {
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-left: 5px;
+            cursor: pointer;
+            padding: 5px;
+        }
+        input[type="radio"], input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        textarea {
+            width: 98%;
+            min-height: 80px;
+            font-family: inherit;
+            font-size: 1em;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        button {
+            display: inline-block;
+            font-size: 1em;
+            padding: 10px 20px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .submit-btn {
+            background-color: #007bff;
+            color: white;
+        }
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+        .clear-btn {
+            background-color: #6c757d;
+            color: white;
+        }
+        .clear-btn:hover {
+            background-color: #5a6268;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .correct {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        /* Стиль для нової кнопки "Далі" */
+        .next-btn {
+            background-color: #28a745; /* Зелений */
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+            padding: 10px 20px;
+            margin-top: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .next-btn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Тестування</h1>
+
+        <div id="results"></div>
+
+        <form id="quiz-form">
+
+            <div class="question-block">
+                <p>1. Для члена домогосподарства характерним є частіше ___ товарів та послуг</p>
+                <div>
+                    <label>
+                        <input type="radio" name="q1" value="correct"> Споживання
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="radio" name="q1" value="wrong"> Виробництво
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="radio" name="q1" value="wrong"> Передача
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="radio" name="q1" value="wrong"> Зберігання
+                    </label>
+                </div>
+            </div>
+
+            <div class="question-block">
+                <p>2. Існують права споживача</p>
+                <div>
+                    <label>
+                        <input type="checkbox" name="q2" class="correct-q2"> На товари належної якості
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="checkbox" name="q2"> На судовий поєдинок
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="checkbox" name="q2" class="correct-q2"> На інформацію про товар
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="checkbox" name="q2" class="correct-q2"> На безпеку
+                    </label>
+                </div>
+                <div>
+                    <label>
+                        <input type="checkbox" name="q2"> На життя
+                    </label>
+                </div>
+            </div>
+
+            <button type="button" class="submit-btn" onclick="checkTest()">Перевірити Питання 1 і 2</button>
+        
+        </form>
+        <hr style="margin: 30px 0;">
+
+        <div class="question-block">
+            <p>3. Якщо домогосподарство це сім’я з 3 людей. І мати вчителька. Які ресурси це домогосподарство постачає школі?</p>
+            <textarea id="q3-answer" placeholder="Ваша відповідь (1-2 речення)"></textarea>
+            <button type="button" class="clear-btn" onclick="clearText('q3-answer')">Надіслати (Очистити)</button>
+        </div>
+
+        <div class="question-block">
+            <p>4. Ви вирішили відкрити кав’ярню і стати ФОП. Ви (домогосподарство) «постачаєте» ринку свій особливий ресурс — підприємницький хист. Опишіть як співвідноситься прибуток домогосподарства та ФОПа</p>
+            <textarea id="q4-answer" placeholder="Опишіть співвідношення..."></textarea>
+            <button type="button" class="clear-btn" onclick="clearText('q4-answer')">Надіслати (Очистити)</button>
+        </div>
+
+    </div>
+
+    <script>
+        // Функція для перевірки Питань 1 і 2
+        function checkTest() {
+            let score = 0;
+            const total = 2;
+            let resultsHTML = "";
+
+            // --- Перевірка Питання 1 ---
+            const q1Answer = document.querySelector('input[name="q1"]:checked');
+            if (q1Answer && q1Answer.value === 'correct') {
+                score++;
+                resultsHTML += '<p style="color: green;">Питання 1: Правильно!</p>';
+            } else {
+                resultsHTML += '<p style="color: red;">Питання 1: Неправильно.</p>';
+            }
+
+            // --- Перевірка Питання 2 ---
+            const q2Checkboxes = document.querySelectorAll('input[name="q2"]');
+            let q2Correct = true;
+
+            q2Checkboxes.forEach(checkbox => {
+                if (checkbox.classList.contains('correct-q2') && !checkbox.checked) {
+                    q2Correct = false;
+                } else if (!checkbox.classList.contains('correct-q2') && checkbox.checked) {
+                    q2Correct = false;
+                }
+            });
+
+            if (q2Correct) {
+                score++;
+                resultsHTML += '<p style="color: green;">Питання 2: Правильно!</p>';
+            } else {
+                resultsHTML += '<p style="color: red;">Питання 2: Неправильно.</p>';
+            }
+
+            // --- Відображення результату ---
+            const resultsDiv = document.getElementById('results');
+            resultsHTML += `<strong>Ваш результат (з перших 2 питань): ${score} з ${total}</strong>`;
+            
+            // --- ОНОВЛЕНО: Додавання кнопки "Далі" при успіху ---
+            if (score === total) {
+                resultsDiv.className = 'correct';
+                // Додаємо кнопку "Далі", яка є посиланням
+                resultsHTML += '<br><a href="usin_2.html" class="next-btn">Далі &rarr;</a>';
+            } else {
+                resultsDiv.className = 'incorrect';
+            }
+            
+            resultsDiv.innerHTML = resultsHTML;
+        }
+
+        // Функція для очищення полів вводу для Питань 3 і 4
+        function clearText(textareaId) {
+            const textarea = document.getElementById(textareaId);
+            if (textarea) {
+                textarea.value = ''; // Стираємо вміст
+                alert('Відповідь "надіслано" (поле очищено).');
+            }
+        }
+    </script>
+
+</body>
+</html>
