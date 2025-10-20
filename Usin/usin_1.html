@@ -24,16 +24,17 @@
                 src="models/house.glb" 
                 position="0 0.5 0" 
                 rotation="0 90 0" 
-                scale="0.2 0.2 0.2">
+                scale="0.5 0.5 0.5" 
+                animation="property: rotation; to: 0 0 360; loop: true; dur: 10000">
                 
-                <a-animation 
+               <!--- <a-animation 
                     attribute="rotation"
                     dur="15000"
                     from="0 90 0"
                     to="0 450 0"
                     easing="linear"
                     repeat="indefinite">
-                </a-animation>
+                </a-animation> --->
             </a-gltf-model>
 
             <a-sphere 
@@ -44,10 +45,11 @@
                 color="#4CAF50"
                 event-set__show="_event: click; target: #info-panel; property: visible; value: true">
             </a-sphere>
-        <a-plane 
+     
+            <a-plane 
             id="right-info"
-            position="2 1 2" 
-            rotation="0 90 0" 
+            position="1 0 2" 
+            rotation="0 0 0" 
             width="1.5" 
             height="2" 
             scale="1 1 1"
@@ -55,6 +57,16 @@
             src="#right">
         </a-plane>
 
+            <a-plane 
+            id="right-info"
+            position="-1 0 2" 
+            rotation="0 90 0" 
+            width="1.5" 
+            height="2" 
+            scale="1 1 1"
+            color="white" 
+            src="#house">
+        </a-plane>
 
             <a-entity id="info-panel" position="0 0.5 0" visible="false">
 
