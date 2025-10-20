@@ -8,7 +8,12 @@
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 </head>
 <body style="margin : 0px; overflow: hidden;">
-    
+
+     <a-assets>
+        <img id="right" src="prava_1.jpg">
+        <img id="house" src="dmhspd_1.jpg">
+    </a-assets>   
+
     <a-scene embedded arjs>
 
         <a-entity cursor="rayOrigin: mouse" raycaster="objects: .clickable"></a-entity>
@@ -19,7 +24,7 @@
                 src="models/house.glb" 
                 position="0 0.5 0" 
                 rotation="0 90 0" 
-                scale="0.5 0.5 0.5">
+                scale="0.2 0.2 0.2">
                 
                 <a-animation 
                     attribute="rotation"
@@ -39,6 +44,17 @@
                 color="#4CAF50"
                 event-set__show="_event: click; target: #info-panel; property: visible; value: true">
             </a-sphere>
+        <a-plane 
+            id="right-info"
+            position="2 1 2" 
+            rotation="0 90 0" 
+            width="1.5" 
+            height="2" 
+            scale="1 1 1"
+            color="white" 
+            src="#right">
+        </a-plane>
+
 
             <a-entity id="info-panel" position="0 0.5 0" visible="false">
 
