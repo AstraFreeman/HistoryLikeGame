@@ -6,87 +6,94 @@
     <meta name="description" content="AR Scene with House Model and UI">
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    <script>
+        AFRAME.registerComponent('toggle-panel', {
+            init: function () {
+                this.el.addEventListener('click', () => {
+                    const panel = document.querySelector('#info-panel');
+                    const button = document.querySelector('#toggle-button');
+                    
+                    if (panel && button) {
+                        const isVisible = panel.getAttribute('visible');
+                        panel.setAttribute('visible', !isVisible);
+                        
+                        // Змінюємо колір кнопки залежно від стану
+                        button.setAttribute('color', isVisible ? '#4CAF50' : '#FF5722');
+                    }
+                });
+            }
+        });
+    </script>
 </head>
-<body style="margin : 0px; overflow: hidden;">
-
-     <a-assets>
-        <img id="right" src="prava_1.jpg">
-        <img id="house" src="dmhspd_1.jpg">
-    </a-assets>   
-
+<body style="margin: 0px; overflow: hidden;">
     <a-scene embedded arjs>
-
+        <a-assets>
+            <img id="right" src="prava_1.jpg">
+            <img id="house" src="dmhspd_1.jpg">
+        </a-assets>
+        
         <a-entity cursor="rayOrigin: mouse" raycaster="objects: .clickable"></a-entity>
-
+        
         <a-marker preset="hiro">
-
             <a-gltf-model 
                 src="models/house.glb" 
                 position="0 0.5 0" 
                 rotation="0 90 0" 
                 scale="0.3 0.3 0.3" 
                 animation="property: rotation; to: 0 360 0; loop: true; dur: 20000">
-                
-               <!--- <a-animation 
-                    attribute="rotation"
-                    dur="15000"
-                    from="0 90 0"
-                    to="0 450 0"
-                    easing="linear"
-                    repeat="indefinite">
-                </a-animation> --->
             </a-gltf-model>
-
+            
+            <!-- Кнопка перемикання - тепер з правильним компонентом -->
             <a-sphere 
                 id="toggle-button"
                 class="clickable"
                 position="0 2 0" 
                 radius="0.15" 
                 color="#4CAF50"
-                event-set__show="_event: click; target: #info-panel; property: visible; value: true">
+                toggle-panel>
             </a-sphere>
      
             <a-plane 
-            id="right-info"
-            position="1 0 2" 
-            rotation="0 90 0" 
-            width="1.5" 
-            height="2" 
-            scale="1 1 1"
-            color="white" 
-            src="#right">
-        </a-plane>
-
+                id="right-info"
+                position="1 0 2" 
+                rotation="0 90 0" 
+                width="1.5" 
+                height="2" 
+                scale="1 1 1"
+                color="white" 
+                src="#right">
+            </a-plane>
+            
             <a-plane 
-            id="right-info"
-            position="-1 1 -1" 
-            rotation="0 900 0" 
-            width="1.5" 
-            height="2" 
-            scale="1 1 1"
-            color="white" 
-            src="#house">
-        </a-plane>
-
+                id="house-info"
+                position="-1 1 -1" 
+                rotation="0 90 0" 
+                width="1.5" 
+                height="2" 
+                scale="1 1 1"
+                color="white" 
+                src="#house">
+            </a-plane>
+            
+            <!-- Панель інформації -->
             <a-entity id="info-panel" position="0 0.5 0" visible="false">
-
                 <a-image 
                     src="prava_1.jpg" 
                     position="-1.5 0 0" 
                     width="1" 
                     height="1">
                 </a-image>
-
                 <a-image 
                     src="dmhspd_1.jpg" 
                     position="1.5 0 0" 
                     width="1" 
                     height="1">
                 </a-image>
-
+                
+                <!-- Посилання на тест - змінена позиція -->
                 <a-link 
                     href="usin_test.html" 
-                    position="0 2 1.5" 
+                    position="0 1.5 0" 
                     scale="0.8 0.8 0.8"
                     title="Тест"
                     look-at="[camera]">
@@ -94,37 +101,35 @@
                         class="clickable" 
                         color="#007BFF" 
                         width="1" 
-                        height="0.5"></a-plane>
+                        height="0.5">
+                    </a-plane>
                     <a-text 
                         value="Тест" 
                         align="center" 
                         color="#FFFFFF" 
-                        position="0 0 0.02"></a-text>
+                        position="0 0 0.02">
+                    </a-text>
                 </a-link>
-
+                
+                <!-- Кнопка закриття - змінена позиція -->
                 <a-plane
                     class="clickable"
-                    position="0 2 0"
+                    position="0 -0.8 0"
                     width="1"
                     height="0.4"
                     color="#DC3545"
-                    event-set__hide="_event: click; target: #info-panel; property: visible; value: false">
+                    toggle-panel>
                     <a-text 
                         value="Закрити" 
                         align="center" 
                         color="#FFFFFF" 
-                        position="0 0 0.02"></a-text>
+                        position="0 0 0.02">
+                    </a-text>
                 </a-plane>
-
             </a-entity>
-
         </a-marker>
-
-        <a-entity camera></a-entity>
         
+        <a-entity camera></a-entity>
     </a-scene>
 </body>
 </html>
-
-
-
