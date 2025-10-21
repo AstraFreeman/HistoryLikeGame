@@ -43,14 +43,15 @@
                 animation="property: rotation; to: 0 360 0; loop: true; dur: 20000">
             </a-gltf-model>
             
-            <!-- Кнопка перемикання - тепер з правильним компонентом -->
             <a-sphere 
                 id="toggle-button"
                 class="clickable"
                 position="0 2 0" 
                 radius="0.15" 
                 color="#4CAF50"
-                toggle-panel>
+                open-link
+                animation__mouseenter="property: scale; to: 1.2 1.2 1.2; dur: 200; startEvents: mouseenter"
+                animation__mouseleave="property: scale; to: 1 1 1; dur: 200; startEvents: mouseleave">
             </a-sphere>
      
             <a-plane 
@@ -74,57 +75,6 @@
                 color="white" 
                 src="#house">
             </a-plane>
-            
-            <!-- Панель інформації -->
-            <a-entity id="info-panel" position="0 0.5 0" visible="false">
-                <a-image 
-                    src="prava_1.jpg" 
-                    position="-1.5 0 0" 
-                    width="1" 
-                    height="1">
-                </a-image>
-                <a-image 
-                    src="dmhspd_1.jpg" 
-                    position="1.5 0 0" 
-                    width="1" 
-                    height="1">
-                </a-image>
-                
-                <!-- Посилання на тест - змінена позиція -->
-                <a-link 
-                    href="usin_test.html" 
-                    position="0 1.5 0" 
-                    scale="0.8 0.8 0.8"
-                    title="Тест"
-                    look-at="[camera]">
-                    <a-plane 
-                        class="clickable" 
-                        color="#007BFF" 
-                        width="1" 
-                        height="0.5">
-                    </a-plane>
-                    <a-text 
-                        value="Тест" 
-                        align="center" 
-                        color="#FFFFFF" 
-                        position="0 0 0.02">
-                    </a-text>
-                </a-link>
-                
-                <!-- Кнопка закриття - змінена позиція -->
-                <a-plane
-                    class="clickable"
-                    position="0 -0.8 0"
-                    width="1"
-                    height="0.4"
-                    color="#DC3545"
-                    toggle-panel>
-                    <a-text 
-                        value="Закрити" 
-                        align="center" 
-                        color="#FFFFFF" 
-                        position="0 0 0.02">
-                    </a-text>
                 </a-plane>
             </a-entity>
         </a-marker>
@@ -133,3 +83,4 @@
     </a-scene>
 </body>
 </html>
+
