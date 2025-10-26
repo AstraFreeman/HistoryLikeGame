@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Стародавня історія України</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Trebuchet MS', sans-serif;
+            background: linear-gradient(180deg, #a8e6cf 0%, #dcedc8 50%, #ffd3b6 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            max-width: 700px;
+            width: 100%;
+            border: 3px solid #ffeb3b;
+        }
+
+        h1 {
+            text-align: center;
+            color: #ff6b6b;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            height: 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            overflow: hidden;
+            border: 2px solid #4ecdc4;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #4ecdc4, #44a08d);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .endpoint {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 0;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            border: 3px solid #fff;
+        }
+
+        .game-area {
+            position: relative;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 15px;
+            margin: 20px 0;
+            min-height: 450px;
+        }
+
+        .network {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(5, auto);
+            gap: 15px;
+            position: relative;
+        }
+
+        .node {
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            border: 3px solid #ff7675;
+            border-radius: 12px;
+            padding: 15px 10px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #2d3436;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .node:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(255, 118, 117, 0.4);
+        }
+
+        .node:active {
+            transform: translateY(-2px) scale(1.02);
+        }
+
+        .node.correct {
+            background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
+            border-color: #0984e3;
+            animation: pulse 0.5s ease;
+            color: white;
+        }
+
+        .node.wrong {
+            background: linear-gradient(135deg, #ff7675 0%, #d63031 100%);
+            border-color: #d63031;
+            animation: shake 0.5s ease;
+            color: white;
+        }
+
+        .node.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .connection {
+            stroke: #dfe6e9;
+            stroke-width: 3;
+            fill: none;
+            opacity: 0.5;
+            transition: all 0.3s ease;
+        }
+
+        .connection.active {
+            stroke: #0984e3;
+            stroke-width: 4;
+            opacity: 1;
+        }
+
+        .progress-path {
+            stroke: #0984e3;
+            stroke-width: 5;
+            fill: none;
+            stroke-dasharray: 10, 5;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .progress-path.visible {
+            opacity: 1;
+            animation: dash 20s linear infinite;
+        }
+
+        @keyframes dash {
+            to {
+                stroke-dashoffset: -1000;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        @keyframes confetti {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        .message {
+            text-align: center;
+            font-size: 20px;
+            margin: 15px 0;
+            color: #2d3436;
+            min-height: 30px;
+            font-weight: bold;
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+            box-shadow: 0 4px 15px rgba(232, 67, 147, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(232, 67, 147, 0.6);
+        }
+
+        .confetti-piece {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #ff6b6b;
+            pointer-events: none;
+            animation: confetti 3s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 id="title">🏺 Стародавня історія України 🏺</h1>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress">0/5</div>
+        </div>
+
+        <div class="endpoint" id="start">Стародавня історія України</div>
+
+        <div class="game-area">
+            <svg id="connections"></svg>
+            <div class="network" id="network"></div>
+        </div>
+
+        <div class="endpoint" id="finish">Залізна доба</div>
+
+        <div class="message" id="message"></div>
+
+        <button class="reset-btn" id="reset">🔄 Почати спочатку</button>
+    </div>
+
+    <script>
+        const scenarios = [
+            {
+                title: '🏺 Стародавня історія України 🏺',
+                start: 'Стародавня історія України',
+                finish: 'Залізна доба',
+                sequence: [
+                    { name: 'Палеоліт', row: 0 },
+                    { name: 'Мезоліт', row: 1 },
+                    { name: 'Неоліт', row: 2 },
+                    { name: 'Енеоліт', row: 3 },
+                    { name: 'Бронзовий вік', row: 4 }
+                ],
+                wrong: [
+                    'Скіфи',
+                    'Сармати',
+                    'Кімерійці',
+                    'Черняхівська культура',
+                    'Зарубинецька культура',
+                    'Ямна культура',
+                    'Катакомбна культура',
+                    'Срубна культура',
+                    'Київська Русь',
+                    'Антський союз'
+                ]
+            },
+            {
+                title: '⚔️ Етноси та племена ⚔️',
+                start: 'Етноси та племена',
+                finish: 'Східні слов\'яни',
+                sequence: [
+                    { name: 'Кімерійці', row: 0 },
+                    { name: 'Скіфи', row: 1 },
+                    { name: 'Сармати', row: 2 },
+                    { name: 'Греки', row: 3 },
+                    { name: 'Слов\'яни', row: 4 }
+                ],
+                wrong: [
+                    'Готи',
+                    'Гуни',
+                    'Авари',
+                    'Хозари',
+                    'Половці',
+                    'Печеніги',
+                    'Поляни',
+                    'Древляни',
+                    'Київська Русь',
+                    'Ольвія'
+                ]
+            },
+            {
+                title: '🔥 Винаходи людства 🔥',
+                start: 'Винаходи людства',
+                finish: 'Становлення перших держав',
+                sequence: [
+                    { name: 'Вогонь', row: 0 },
+                    { name: 'Релігія', row: 1 },
+                    { name: 'Лук', row: 2 },
+                    { name: 'Гончарство', row: 3 },
+                    { name: 'Метали', row: 4 }
+                ],
+                wrong: [
+                    'Колесо',
+                    'Письмо',
+                    'Землеробство',
+                    'Скотарство',
+                    'Ткацтво',
+                    'Архітектура',
+                    'Торгівля',
+                    'Мореплавство',
+                    'Математика',
+                    'Астрономія'
+                ]
+            }
+        ];
+
+        let currentScenario;
+        let currentStep = 0;
+        let nodePositions = [];
+        let connections = [];
+        let correctNodes = [];
+
+        function shuffle(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function initGame() {
+            currentScenario = scenarios[Math.floor(Math.random() * scenarios.length)];
+            currentStep = 0;
+            correctNodes = [];
+            
+            document.getElementById('title').textContent = currentScenario.title;
+            document.getElementById('start').textContent = currentScenario.start;
+            document.getElementById('finish').textContent = currentScenario.finish;
+            
+            updateProgress();
+            document.getElementById('message').textContent = '';
+            
+            const network = document.getElementById('network');
+            network.innerHTML = '';
+            nodePositions = [];
+            
+            const grid = Array(5).fill(null).map(() => []);
+            
+            currentScenario.sequence.forEach(item => {
+                const availableColumns = [0, 1, 2].filter(col => !grid[item.row][col]);
+                const randomCol = availableColumns[Math.floor(Math.random() * availableColumns.length)];
+                grid[item.row][randomCol] = item.name;
+            });
+            
+            const shuffledWrong = shuffle(currentScenario.wrong);
+            let wrongIndex = 0;
+            
+            for (let row = 0; row < 5; row++) {
+                for (let col = 0; col < 3; col++) {
+                    if (!grid[row][col] && wrongIndex < shuffledWrong.length) {
+                        grid[row][col] = shuffledWrong[wrongIndex++];
+                    }
+                }
+            }
+            
+            grid.forEach((row, rowIndex) => {
+                row.forEach((text, colIndex) => {
+                    if (text) {
+                        const node = document.createElement('div');
+                        node.className = 'node';
+                        node.textContent = text;
+                        node.onclick = () => handleClick(text, node);
+                        node.style.gridRow = rowIndex + 1;
+                        node.style.gridColumn = colIndex + 1;
+                        node.dataset.text = text;
+                        network.appendChild(node);
+                        nodePositions.push(node);
+                    }
+                });
+            });
+
+            setTimeout(drawConnections, 100);
+        }
+
+        function drawConnections() {
+            const svg = document.getElementById('connections');
+            svg.innerHTML = '';
+            connections = [];
+
+            const network = document.getElementById('network');
+            const networkRect = network.getBoundingClientRect();
+
+            nodePositions.forEach((node, i) => {
+                const rect1 = node.getBoundingClientRect();
+                const x1 = rect1.left - networkRect.left + rect1.width / 2;
+                const y1 = rect1.top - networkRect.top + rect1.height / 2;
+
+                nodePositions.forEach((otherNode, j) => {
+                    if (i >= j) return;
+                    
+                    const rect2 = otherNode.getBoundingClientRect();
+                    const x2 = rect2.left - networkRect.left + rect2.width / 2;
+                    const y2 = rect2.top - networkRect.top + rect2.height / 2;
+
+                    const distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+                    
+                    if (distance < 200) {
+                        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                        line.setAttribute('x1', x1);
+                        line.setAttribute('y1', y1);
+                        line.setAttribute('x2', x2);
+                        line.setAttribute('y2', y2);
+                        line.setAttribute('class', 'connection');
+                        line.setAttribute('stroke-dasharray', '5,5');
+                        svg.appendChild(line);
+                        connections.push({line, from: i, to: j});
+                    }
+                });
+            });
+        }
+
+        function drawProgressPath() {
+            if (correctNodes.length < 2) return;
+
+            const svg = document.getElementById('connections');
+            const network = document.getElementById('network');
+            const networkRect = network.getBoundingClientRect();
+
+            const existingPath = svg.querySelector('.progress-path');
+            if (existingPath) {
+                existingPath.remove();
+            }
+
+            let pathData = '';
+            correctNodes.forEach((node, index) => {
+                const rect = node.getBoundingClientRect();
+                const x = rect.left - networkRect.left + rect.width / 2;
+                const y = rect.top - networkRect.top + rect.height / 2;
+                
+                if (index === 0) {
+                    pathData += `M ${x} ${y}`;
+                } else {
+                    pathData += ` L ${x} ${y}`;
+                }
+            });
+
+            const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+            path.setAttribute('d', pathData);
+            path.setAttribute('class', 'progress-path visible');
+            svg.appendChild(path);
+        }
+
+        function handleClick(text, node) {
+            if (node.classList.contains('disabled')) return;
+
+            if (text === currentScenario.sequence[currentStep].name) {
+                node.classList.add('correct', 'disabled');
+                correctNodes.push(node);
+                currentStep++;
+                updateProgress();
+                drawProgressPath();
+                
+                if (currentStep === currentScenario.sequence.length) {
+                    document.getElementById('message').textContent = '🎉 Вітаємо! Ви пройшли гру! 🎉';
+                    disableAllNodes();
+                    createConfetti();
+                } else {
+                    document.getElementById('message').textContent = '✅ Правильно! Продовжуйте!';
+                }
+            } else {
+                node.classList.add('wrong');
+                document.getElementById('message').textContent = '❌ Помилка! Спробуйте ще раз';
+                
+                setTimeout(() => {
+                    resetGame();
+                }, 1500);
+            }
+        }
+
+        function updateProgress() {
+            const progress = document.getElementById('progress');
+            const percentage = (currentStep / currentScenario.sequence.length) * 100;
+            progress.style.width = percentage + '%';
+            progress.textContent = `${currentStep}/5`;
+        }
+
+        function disableAllNodes() {
+            document.querySelectorAll('.node').forEach(node => {
+                node.classList.add('disabled');
+            });
+        }
+
+        function resetGame() {
+            document.querySelectorAll('.node').forEach(node => {
+                node.classList.remove('correct', 'wrong', 'disabled');
+            });
+            const existingPath = document.querySelector('.progress-path');
+            if (existingPath) {
+                existingPath.remove();
+            }
+            correctNodes = [];
+            currentStep = 0;
+            updateProgress();
+            document.getElementById('message').textContent = '';
+        }
+
+        function createConfetti() {
+            const colors = ['#74b9ff', '#0984e3', '#ffd93d', '#6c5ce7', '#fd79a8', '#55efc4'];
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti-piece';
+                    confetti.style.left = Math.random() * 100 + '%';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 30);
+            }
+        }
+
+        document.getElementById('reset').addEventListener('click', initGame);
+        window.addEventListener('resize', () => {
+            setTimeout(() => {
+                drawConnections();
+                if (correctNodes.length > 1) {
+                    drawProgressPath();
+                }
+            }, 100);
+        });
+
+        initGame();
+    </script>
+</body>
+</html>
