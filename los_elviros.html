@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Пасянс: Історія України</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        h1 {
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 10px;
+        }
+        
+        #info-box {
+            background: white;
+            border-radius: 10px;
+            padding: 15px 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            max-width: 800px;
+            text-align: center;
+            font-size: 14px;
+            color: #333;
+        }
+        
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            width: 100%;
+            max-width: 1400px;
+        }
+        
+        #tableau {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 15px;
+            width: 100%;
+        }
+        
+        .tableau-column {
+            min-height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            transition: background 0.3s;
+        }
+        
+        .tableau-column.drag-over {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .card {
+            width: 100%;
+            min-height: 120px;
+            background: white;
+            border-radius: 8px;
+            padding: 12px;
+            cursor: grab;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            position: relative;
+            font-size: 13px;
+            line-height: 1.4;
+            transition: transform 0.2s, box-shadow 0.2s;
+            user-select: none;
+        }
+        
+        .card:active {
+            cursor: grabbing;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        
+        .card.dragging {
+            opacity: 0.5;
+        }
+        
+        .card.face-down {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: transparent;
+            cursor: default;
+        }
+        
+        .card.face-down:hover {
+            transform: none;
+        }
+        
+        .card.face-down::before {
+            content: '🇺🇦';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 40px;
+        }
+        
+        .theme-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .card-number {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .theme-kyivska-rus { background: linear-gradient(135deg, #FFD700, #FFA500); }
+        .theme-kozactvo { background: linear-gradient(135deg, #DC143C, #8B0000); }
+        .theme-revolyuciya { background: linear-gradient(135deg, #4169E1, #0000CD); }
+        .theme-xx-century { background: linear-gradient(135deg, #9370DB, #4B0082); }
+        
+        #foundation-area {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        .foundation-slot {
+            width: 140px;
+            height: 180px;
+            border: 3px dashed rgba(255, 255, 255, 0.4);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .foundation-slot.drag-over {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.8);
+            transform: scale(1.05);
+        }
+        
+        .foundation-slot .card {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+        
+        .foundation-label {
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 10px;
+        }
+        
+        #controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 12px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: white;
+            color: #667eea;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .card-count {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🇺🇦 Пасянс: Історія України 🇺🇦</h1>
+    <div id="info-box">
+        <strong>Правила:</strong> Перетягуйте картки між колонками. Картки можна класти лише на картки тієї ж теми з попереднім номером (наприклад, 3 на 2). 
+        У фундамент складайте картки за порядком від 1 до 6. Відкрийте всі картки та зберіть їх за темами у правильному хронологічному порядку!
+    </div>
+    
+    <div id="game-container">
+        <div id="foundation-area">
+            <div class="foundation-slot" data-theme="Київська Русь">
+                <div class="foundation-label">Київська Русь<br>(1-6)</div>
+            </div>
+            <div class="foundation-slot" data-theme="Козацтво">
+                <div class="foundation-label">Козацтво<br>(1-6)</div>
+            </div>
+            <div class="foundation-slot" data-theme="Українська революція 1917">
+                <div class="foundation-label">Революція 1917<br>(1-6)</div>
+            </div>
+            <div class="foundation-slot" data-theme="Україна в другій половині ХХ ст.">
+                <div class="foundation-label">ХХ століття<br>(1-6)</div>
+            </div>
+        </div>
+        
+        <div id="tableau"></div>
+    </div>
+    
+    <div id="controls">
+        <button id="reset-button">🔄 Нова гра</button>
+        <button id="hint-button">💡 Підказка</button>
+    </div>
+
+    <script>
+        const cards = [
+            { id: 1, theme: 'Київська Русь', order: 1, content: 'Заснування Києва, легенда про Кий, Щека та Хорива.' },
+            { id: 2, theme: 'Київська Русь', order: 2, content: 'Княгиня Ольга та її реформи.' },
+            { id: 3, theme: 'Київська Русь', order: 3, content: 'Хрещення Русі у 988 році.' },
+            { id: 16, theme: 'Київська Русь', order: 4, content: 'Князь Ярослав Мудрий та "Руська правда".' },
+            { id: 17, theme: 'Київська Русь', order: 5, content: 'Перша бібліотека Київської Русі.' },
+            { id: 18, theme: 'Київська Русь', order: 6, content: 'Битва на Калці 1223 року.' },
+            
+            { id: 4, theme: 'Козацтво', order: 1, content: 'Утворення Запорізької Січі у 1556 році.' },
+            { id: 19, theme: 'Козацтво', order: 2, content: 'Гетьман Петро Сагайдачний.' },
+            { id: 5, theme: 'Козацтво', order: 3, content: 'Богдан Хмельницький та Національно-визвольна війна.' },
+            { id: 20, theme: 'Козацтво', order: 4, content: 'Берестецька битва 1651 року.' },
+            { id: 6, theme: 'Козацтво', order: 5, content: 'Козацькі традиції та гетьманщина.' },
+            { id: 21, theme: 'Козацтво', order: 6, content: 'Козацька рада.' },
+            
+            { id: 10, theme: 'Українська революція 1917', order: 1, content: 'Утворення Центральної Ради.' },
+            { id: 22, theme: 'Українська революція 1917', order: 2, content: 'Перший Універсал Центральної Ради.' },
+            { id: 23, theme: 'Українська революція 1917', order: 3, content: 'Другий Універсал Центральної Ради.' },
+            { id: 11, theme: 'Українська революція 1917', order: 4, content: 'Проголошення УНР у 1918 році.' },
+            { id: 24, theme: 'Українська революція 1917', order: 5, content: 'Бій під Крутами 1918 року.' },
+            { id: 12, theme: 'Українська революція 1917', order: 6, content: 'Акт Злуки УНР та ЗУНР 1919 року.' },
+            
+            { id: 14, theme: 'Україна в другій половині ХХ ст.', order: 1, content: 'Чорнобильська катастрофа 1986 року.' },
+            { id: 25, theme: 'Україна в другій половині ХХ ст.', order: 2, content: 'Революція на граніті 1990 року.' },
+            { id: 15, theme: 'Україна в другій половині ХХ ст.', order: 3, content: 'Розпад Радянського Союзу.' },
+            { id: 13, theme: 'Україна в другій половині ХХ ст.', order: 4, content: 'Відновлення незалежності України у 1991 році.' },
+            { id: 26, theme: 'Україна в другій половині ХХ ст.', order: 5, content: 'Прийняття Конституції України у 1996 році.' },
+            { id: 27, theme: 'Україна в другій половині ХХ ст.', order: 6, content: 'Перша участь України в Олімпійських іграх.' }
+        ];
+
+        let tableau = [];
+        let foundation = {
+            'Київська Русь': [],
+            'Козацтво': [],
+            'Українська революція 1917': [],
+            'Україна в другій половині ХХ ст.': []
+        };
+        let draggedCard = null;
+        let draggedFrom = null;
+
+        function shuffle(array) {
+            const arr = [...array];
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        function initializeGame() {
+            const shuffled = shuffle(cards);
+            tableau = Array(7).fill(null).map(() => []);
+            foundation = {
+                'Київська Русь': [],
+                'Козацтво': [],
+                'Українська революція 1917': [],
+                'Україна в другій половині ХХ ст.': []
+            };
+
+            let cardIndex = 0;
+            for (let col = 0; col < 7; col++) {
+                const cardsInColumn = col + 1;
+                for (let row = 0; row < cardsInColumn && cardIndex < shuffled.length; row++) {
+                    tableau[col].push({
+                        ...shuffled[cardIndex],
+                        faceUp: row === cardsInColumn - 1
+                    });
+                    cardIndex++;
+                }
+            }
+
+            renderGame();
+            updateInfoBox('Гра розпочата! Відкрийте всі картки та зберіть їх за темами у хронологічному порядку.');
+        }
+
+        function canPlaceOnTableau(card, targetColumn) {
+            if (targetColumn.length === 0) return true;
+            
+            const topCard = targetColumn[targetColumn.length - 1];
+            if (!topCard.faceUp) return false;
+            
+            return card.theme === topCard.theme && card.order === topCard.order - 1;
+        }
+
+        function canPlaceOnFoundation(card, theme) {
+            if (card.theme !== theme) return false;
+            
+            const foundationPile = foundation[theme];
+            
+            if (foundationPile.length === 0) {
+                return card.order === 1;
+            }
+            
+            const topCard = foundationPile[foundationPile.length - 1];
+            return card.order === topCard.order + 1;
+        }
+
+        function handleDragStart(e, card, columnIndex) {
+            if (!card.faceUp) {
+                e.preventDefault();
+                return;
+            }
+            
+            draggedCard = card;
+            draggedFrom = { type: 'tableau', index: columnIndex };
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            document.querySelectorAll('.drag-over').forEach(el => {
+                el.classList.remove('drag-over');
+            });
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+        }
+
+        function handleDragEnter(e) {
+            if (e.currentTarget.classList.contains('tableau-column') || 
+                e.currentTarget.classList.contains('foundation-slot')) {
+                e.currentTarget.classList.add('drag-over');
+            }
+        }
+
+        function handleDragLeave(e) {
+            if (e.currentTarget.classList.contains('tableau-column') || 
+                e.currentTarget.classList.contains('foundation-slot')) {
+                e.currentTarget.classList.remove('drag-over');
+            }
+        }
+
+        function handleDropOnTableau(e, targetColumnIndex) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            
+            if (!draggedCard || draggedFrom.type !== 'tableau') return;
+            
+            const sourceColumn = tableau[draggedFrom.index];
+            const targetColumn = tableau[targetColumnIndex];
+            
+            if (canPlaceOnTableau(draggedCard, targetColumn)) {
+                const cardIndex = sourceColumn.findIndex(c => c.id === draggedCard.id);
+                const movedCards = sourceColumn.splice(cardIndex);
+                targetColumn.push(...movedCards);
+                
+                if (sourceColumn.length > 0) {
+                    sourceColumn[sourceColumn.length - 1].faceUp = true;
+                }
+                
+                updateInfoBox('Картку переміщено!');
+                renderGame();
+            } else {
+                if (targetColumn.length === 0) {
+                    updateInfoBox('Картку переміщено у порожню колонку!');
+                    const cardIndex = sourceColumn.findIndex(c => c.id === draggedCard.id);
+                    const movedCards = sourceColumn.splice(cardIndex);
+                    targetColumn.push(...movedCards);
+                    
+                    if (sourceColumn.length > 0) {
+                        sourceColumn[sourceColumn.length - 1].faceUp = true;
+                    }
+                    renderGame();
+                } else {
+                    const topCard = targetColumn[targetColumn.length - 1];
+                    updateInfoBox(`Неможливо! Картки повинні бути однієї теми та йти у зворотному порядку (${draggedCard.order} має йти на ${draggedCard.order + 1})`);
+                }
+            }
+            
+            draggedCard = null;
+            draggedFrom = null;
+        }
+
+        function handleDropOnFoundation(e, theme) {
+            e.preventDefault();
+            e.currentTarget.classList.remove('drag-over');
+            
+            if (!draggedCard || draggedFrom.type !== 'tableau') return;
+            
+            if (canPlaceOnFoundation(draggedCard, theme)) {
+                const sourceColumn = tableau[draggedFrom.index];
+                const cardIndex = sourceColumn.findIndex(c => c.id === draggedCard.id);
+                
+                if (cardIndex === sourceColumn.length - 1) {
+                    sourceColumn.splice(cardIndex, 1);
+                    foundation[theme].push(draggedCard);
+                    
+                    if (sourceColumn.length > 0) {
+                        sourceColumn[sourceColumn.length - 1].faceUp = true;
+                    }
+                    
+                    updateInfoBox(`Картку #${draggedCard.order} додано до фундаменту "${theme}"!`);
+                    renderGame();
+                    checkWin();
+                } else {
+                    updateInfoBox('У фундамент можна переносити тільки верхню картку колонки.');
+                }
+            } else {
+                const foundationPile = foundation[theme];
+                const expectedOrder = foundationPile.length + 1;
+                if (draggedCard.theme !== theme) {
+                    updateInfoBox(`Картка теми "${draggedCard.theme}" не підходить до фундаменту "${theme}".`);
+                } else {
+                    updateInfoBox(`Картка має бути під номером ${expectedOrder}, але ваша картка #${draggedCard.order}.`);
+                }
+            }
+            
+            draggedCard = null;
+            draggedFrom = null;
+        }
+
+        function renderGame() {
+            const tableauEl = document.getElementById('tableau');
+            tableauEl.innerHTML = '';
+
+            tableau.forEach((column, colIndex) => {
+                const colDiv = document.createElement('div');
+                colDiv.className = 'tableau-column';
+                colDiv.addEventListener('dragover', handleDragOver);
+                colDiv.addEventListener('dragenter', handleDragEnter);
+                colDiv.addEventListener('dragleave', handleDragLeave);
+                colDiv.addEventListener('drop', (e) => handleDropOnTableau(e, colIndex));
+
+                column.forEach((card, cardIndex) => {
+                    const cardDiv = document.createElement('div');
+                    cardDiv.className = 'card';
+                    cardDiv.draggable = card.faceUp;
+                    
+                    if (!card.faceUp) {
+                        cardDiv.classList.add('face-down');
+                        cardDiv.draggable = false;
+                    } else {
+                        cardDiv.textContent = card.content;
+                        
+                        const number = document.createElement('div');
+                        number.className = 'card-number';
+                        number.textContent = card.order;
+                        cardDiv.appendChild(number);
+                        
+                        const indicator = document.createElement('div');
+                        indicator.className = 'theme-indicator';
+                        
+                        if (card.theme === 'Київська Русь') indicator.classList.add('theme-kyivska-rus');
+                        else if (card.theme === 'Козацтво') indicator.classList.add('theme-kozactvo');
+                        else if (card.theme === 'Українська революція 1917') indicator.classList.add('theme-revolyuciya');
+                        else if (card.theme === 'Україна в другій половині ХХ ст.') indicator.classList.add('theme-xx-century');
+                        
+                        cardDiv.appendChild(indicator);
+                        
+                        cardDiv.addEventListener('dragstart', (e) => handleDragStart(e, card, colIndex));
+                        cardDiv.addEventListener('dragend', handleDragEnd);
+                    }
+                    
+                    colDiv.appendChild(cardDiv);
+                });
+
+                tableauEl.appendChild(colDiv);
+            });
+
+            Object.entries(foundation).forEach(([theme, cards]) => {
+                const slot = document.querySelector(`[data-theme="${theme}"]`);
+                const existing = slot.querySelector('.card');
+                if (existing) existing.remove();
+                
+                const label = slot.querySelector('.foundation-label');
+                
+                if (cards.length > 0) {
+                    const topCard = cards[cards.length - 1];
+                    const cardDiv = document.createElement('div');
+                    cardDiv.className = 'card';
+                    cardDiv.textContent = topCard.content;
+                    
+                    const number = document.createElement('div');
+                    number.className = 'card-number';
+                    number.textContent = topCard.order;
+                    cardDiv.appendChild(number);
+                    
+                    const count = document.createElement('div');
+                    count.className = 'card-count';
+                    count.textContent = `${cards.length}/6`;
+                    cardDiv.appendChild(count);
+                    
+                    slot.insertBefore(cardDiv, label);
+                }
+                
+                slot.addEventListener('dragover', handleDragOver);
+                slot.addEventListener('dragenter', handleDragEnter);
+                slot.addEventListener('dragleave', handleDragLeave);
+                slot.addEventListener('drop', (e) => handleDropOnFoundation(e, theme));
+            });
+        }
+
+        function updateInfoBox(message) {
+            document.getElementById('info-box').innerHTML = `<strong>Правила:</strong> ${message}`;
+        }
+
+        function checkWin() {
+            const totalInFoundation = Object.values(foundation).reduce((sum, arr) => sum + arr.length, 0);
+            if (totalInFoundation === cards.length) {
+                updateInfoBox('🎉 Вітаємо! Ви зібрали всі картки у правильному хронологічному порядку! Ви знаєте історію України! 🇺🇦');
+            }
+        }
+
+        function showHint() {
+            let hint = 'Підказка: ';
+            let found = false;
+            
+            for (let i = 0; i < tableau.length; i++) {
+                const column = tableau[i];
+                if (column.length > 0) {
+                    const topCard = column[column.length - 1];
+                    if (topCard.faceUp) {
+                        const canMoveToFoundation = canPlaceOnFoundation(topCard, topCard.theme);
+                        if (canMoveToFoundation) {
+                            hint += `Картку #${topCard.order} з теми "${topCard.theme}" з колонки ${i + 1} можна перемістити у фундамент!`;
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            
+            if (!found) {
+                hint += 'Спробуйте перемістити картки між колонками, щоб відкрити закриті картки! Шукайте картки з порядком 1 для початку збирання у фундаменті.';
+            }
+            
+            updateInfoBox(hint);
+        }
+
+        document.getElementById('reset-button').addEventListener('click', initializeGame);
+        document.getElementById('hint-button').addEventListener('click', showHint);
+
+        initializeGame();
+    </script>
+</body>
+</html>
