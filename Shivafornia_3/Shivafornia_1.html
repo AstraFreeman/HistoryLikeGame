@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Навчальна гра</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .game-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #ccc;
+        }
+
+        .answers {
+            margin-left: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .answers button {
+            margin: 5px 0;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        #result {
+            margin-top: 30px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .answer-log {
+            margin-top: 20px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            width: 80%;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>Навчальна гра</h1>
+
+    <div class="game-container">
+        <div class="image-container">
+            <img id="game-image" src="level1.jpg" alt="Level Image">
+        </div>
+
+        <div class="answers">
+            <button id="answer1" onclick="selectAnswer(1)">Відповідь 1</button>
+            <button id="answer2" onclick="selectAnswer(2)">Відповідь 2</button>
+            <button id="answer3" onclick="selectAnswer(3)">Відповідь 3</button>
+        </div>
+    </div>
+
+    <div id="result"></div>
+
+    <div class="answer-log" id="answer-log">
+        <h3>Лист відповідей:</h3>
+        <ul id="answer-list"></ul>
+    </div>
+
+    <script>
+        const levels = [
+            {
+                image: 'level1.jpg',
+                gif: 'level1.gif',
+                correctAnswer: 2,
+                color: '#ffcccc'
+            },
+            {
+                image: 'level2.jpg',
+                gif: 'level2.gif',
+                correctAnswer: 1,
+                color: '#ccffcc'
+            },
+            {
+                image: 'level3.jpg',
+                gif: 'level3.gif',
+                correctAnswer: 3,
+                color: '#ccccff'
+            }
+        ];
+
+        let currentLevel = 0;
+        let correctAnswers = 0;
+        let completedCycles = 0;
+
+        function selectAnswer(answer) {
+            const level = levels[currentLevel];
+
+            // Log the answer
+            const answerList = document.getElementById('answer-list');
+            const listItem = document.createElement('li');
+            listItem.textContent = `Рівень ${currentLevel + 1}: ${answer === level.correctAnswer ? 'Правильно' : 'Неправильно'}`;
+            answerList.appendChild(listItem);
+
+            // Check answer
+            if (answer === level.correctAnswer) {
+                correctAnswers++;
+            }
+
+            // Show GIF
+            const gameImage = document.getElementById('game-image');
+            gameImage.src = level.gif;
+
+            // Move to next level after GIF
+            setTimeout(() => {
+                currentLevel++;
+
+                if (currentLevel < levels.length) {
+                    // Load next level image and set background color
+                    gameImage.src = levels[currentLevel].image;
+                    document.body.style.backgroundColor = levels[currentLevel].color;
+                } else {
+                    // End of game
+                    completedCycles++;
+                    showResult();
+                    resetGame();
+                }
+            }, 3000); // GIF duration (3 seconds)
+        }
+
+        function showResult() {
+            const resultDiv = document.getElementById('result');
+            if (correctAnswers >= 3) {
+                resultDiv.textContent = `Вітаємо! Ви успішно завершили гру. Кількість завершених циклів: ${completedCycles}`;
+            } else {
+                resultDiv.textContent = `На жаль, ви не набрали достатньо балів. Спробуйте ще раз.`;
+            }
+        }
+
+        function resetGame() {
+            currentLevel = 0;
+            correctAnswers = 0;
+            document.getElementById('game-image').src = levels[currentLevel].image;
+            document.body.style.backgroundColor = levels[currentLevel].color;
+            document.getElementById('answer-list').innerHTML = '';
+        }
+
+        // Set initial background color
+        document.body.style.backgroundColor = levels[currentLevel].color;
+    </script>
+</body>
+</html>
