@@ -1,0 +1,676 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Влови яблуко - Історія Русі-України</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        #gameContainer {
+            position: relative;
+            width: 90vw;
+            height: 90vh;
+            max-width: 1200px;
+            max-height: 800px;
+            background: linear-gradient(to bottom, #87CEEB 0%, #E0F6FF 100%);
+            border: 4px solid #4a5568;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        #gameCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: none;
+        }
+        
+        #scoreBoard {
+            position: absolute;
+            top: 1%;
+            left: 1%;
+            background: rgba(255,255,255,0.9);
+            padding: 1.5% 2%;
+            border-radius: 8px;
+            font-size: clamp(14px, 2vw, 18px);
+            font-weight: bold;
+            color: #2d3748;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 10;
+        }
+        
+        #currentCategory {
+            position: absolute;
+            top: 1%;
+            right: 1%;
+            background: rgba(255,215,0,0.95);
+            padding: 1.5% 2%;
+            border-radius: 8px;
+            font-size: clamp(12px, 1.8vw, 16px);
+            font-weight: bold;
+            color: #2d3748;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 10;
+            max-width: 25%;
+        }
+        
+        #categoryAlert {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            padding: 3% 5%;
+            border-radius: 15px;
+            font-size: clamp(18px, 3vw, 24px);
+            font-weight: bold;
+            color: #2d3748;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+            z-index: 100;
+            display: none;
+            text-align: center;
+            border: 3px solid #fff;
+            animation: pulse 0.5s ease-in-out;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+        
+        #gameOver {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 200;
+        }
+        
+        #gameOver img {
+            max-width: 40%;
+            max-height: 35%;
+            border-radius: 10px;
+            margin-bottom: 2%;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+        
+        #gameOver h1 {
+            color: #FFD700;
+            font-size: clamp(24px, 4vw, 36px);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 1%;
+        }
+        
+        #gameOver p {
+            color: white;
+            font-size: clamp(16px, 2.5vw, 24px);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            text-align: center;
+            padding: 0 5%;
+            line-height: 1.5;
+        }
+        
+        #instructions {
+            position: absolute;
+            bottom: 1%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.9);
+            padding: 1% 1.5%;
+            border-radius: 8px;
+            font-size: clamp(12px, 1.5vw, 14px);
+            color: #2d3748;
+            z-index: 10;
+        }
+
+        #langSelector {
+            position: absolute;
+            top: 1%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.9);
+            padding: 1% 1.5%;
+            border-radius: 8px;
+            z-index: 10;
+        }
+
+        #langSelector select {
+            font-size: clamp(12px, 1.5vw, 14px);
+            padding: 0.5% 1%;
+            border: 2px solid #4a5568;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+        }
+
+        #introScreen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 300;
+        }
+
+        #introScreen h2 {
+            color: #FFD700;
+            font-size: clamp(20px, 3.5vw, 28px);
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 3%;
+            text-align: center;
+            padding: 0 5%;
+        }
+
+        #introScreen p {
+            color: white;
+            font-size: clamp(16px, 2.5vw, 22px);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            text-align: center;
+            padding: 0 10%;
+            line-height: 1.6;
+            max-width: 80%;
+        }
+
+        #startButton {
+            margin-top: 3%;
+            padding: 15px 40px;
+            font-size: clamp(16px, 2.5vw, 20px);
+            font-weight: bold;
+            background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+            border: 3px solid #fff;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            color: #2d3748;
+        }
+
+        #startButton:hover {
+            transform: scale(1.05);
+            box-shadow: 0 7px 20px rgba(0,0,0,0.4);
+        }
+
+        #startButton:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        <div id="scoreBoard">
+            <span class="lang-score">Очки</span>: <span id="score">0</span><br>
+            <span class="lang-caught">Зловлено</span>: <span id="caught">0</span>/15
+        </div>
+        <div id="currentCategory">
+            <span class="lang-category">Категорія</span>:<br><span id="categoryName">Князі</span>
+        </div>
+        <div id="langSelector">
+            <select id="langSelect">
+                <option value="uk">Українська</option>
+                <option value="cu">Старослов'янська</option>
+            </select>
+        </div>
+        <div id="categoryAlert"></div>
+        <div id="instructions">
+            <span class="lang-controls">Керування: ← → або A/D або миша</span>
+        </div>
+        <div id="introScreen">
+            <h2 id="introTitle">🛡️ Історія Русі-України 🍎</h2>
+            <p id="introText">Вікінг не хотів читати повість минулих літ. Тепер він ловить яблука. Допоможіть йому щоб знайти своє місце в Русі-Україні</p>
+            <button id="startButton">Почати гру</button>
+        </div>
+        <div id="gameOver">
+            <img id="victoryImage" src="image/cossak.jpg" alt="Козак" onerror="this.style.display='none'">
+            <h1 id="victoryTitle">Слава Русі-Україні!</h1>
+            <p id="victoryMessage">Гру завершено!</p>
+            <p id="ratingMessage" style="margin-top: 2%; color: #FFD700;"></p>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let gameStarted = false;
+        
+        // Адаптивний розмір canvas
+        function resizeCanvas() {
+            const container = document.getElementById('gameContainer');
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Мовні переклади
+        const translations = {
+            uk: {
+                score: 'Очки',
+                caught: 'Зловлено',
+                category: 'Категорія',
+                controls: 'Керування: ← → або A/D або миша',
+                newCategory: 'Нова категорія',
+                victoryTitle: 'Слава Русі-Україні!',
+                victoryMessage: 'Гру завершено!',
+                categories: {
+                    'Князі': 'Князі',
+                    'Соціальна': 'Соціальна',
+                    'Монгольське іго': 'Монгольське іго',
+                    'Сусіди': 'Сусіди'
+                },
+                ratings: {
+                    1: 'Ви мандрівник, який лише знайомиться із Руссю-Україною',
+                    2: 'Ви корінний житель, який радіє життю і не вникає в бурхливі процеси',
+                    3: 'Ви двигун середньовічного прогресу! В лЂто 6495. Съзва Вълодімерь бояры своя и старци градскыа',
+                    4: 'Пане Володимир, чи Ви це?'
+                }
+            },
+            cu: {
+                score: 'Чисмєна',
+                caught: 'Ѹловлѥно',
+                category: 'Чинъ',
+                controls: 'Правлѥниѥ: ← → или А/Д или мꙑшь',
+                newCategory: 'Новъ чинъ',
+                victoryTitle: 'Слава Роуси-Ѹкраинѣ!',
+                victoryMessage: 'Игра съвръшѥна!',
+                categories: {
+                    'Князі': 'Кънѧзи',
+                    'Соціальна': 'Обьщьствьна',
+                    'Монгольське іго': 'Монгольско иго',
+                    'Сусіди': 'Сѫсѣди'
+                },
+                ratings: {
+                    1: 'Вꙑ странникъ, иже толико знакомится съ Роусиѥѭ-Ѹкраиноѭ',
+                    2: 'Вꙑ кореньнъ жителъ, иже радоуѥтъ житию и не вникаѥтъ въ боурьливꙑѩ дѣла',
+                    3: 'Вꙑ двигатель срѣдьнѥвѣковааго прогрѥса! Въ лѣто ҂ѕ҃ф҃ч҃є҃. Съзъва Вълодимѣръ боѧры своѩ и старци градьскꙑѩ',
+                    4: 'Господинѥ Вълодимѣрѥ, чи Вꙑ ѥсте сѥ?'
+                }
+            }
+        };
+        
+        let currentLang = 'uk';
+        
+        function updateLanguage() {
+            const lang = translations[currentLang];
+            document.querySelector('.lang-score').textContent = lang.score;
+            document.querySelector('.lang-caught').textContent = lang.caught;
+            document.querySelector('.lang-category').textContent = lang.category;
+            document.querySelector('.lang-controls').textContent = lang.controls;
+            document.getElementById('victoryTitle').textContent = lang.victoryTitle;
+            document.getElementById('victoryMessage').textContent = lang.victoryMessage;
+            document.getElementById('categoryName').textContent = lang.categories[currentCategory];
+        }
+        
+        document.getElementById('langSelect').addEventListener('change', (e) => {
+            currentLang = e.target.value;
+            updateLanguage();
+        });
+        
+        // Категорії та терміни
+        const categories = {
+            'Князі': ['Володимир', 'Ярослав', 'В. Мономах', 'Данило'],
+            'Соціальна': ['ізгої', 'смерди', 'закупи', 'рядовичі'],
+            'Монгольське іго': ['Батий', 'Золота Орда', 'ярлик', 'баскак'],
+            'Сусіди': ['Польське кор.', 'Угорське кор.', 'Візантійська імп.', 'кочівники']
+        };
+        
+        const categoryNames = Object.keys(categories);
+        let currentCategoryIndex = 0;
+        let currentCategory = categoryNames[currentCategoryIndex];
+        
+        // Ігрові змінні
+        let score = 0;
+        let caughtCorrect = 0;
+        let apples = [];
+        let basket = {
+            x: 0.5,
+            y: 0.75,
+            width: 0.1,
+            height: 0.12,
+            speed: 0.015,
+            moving: false
+        };
+        
+        // Зображення
+        const images = {
+            topLoaded: false,
+            downLoaded: false,
+            moveLoaded: false,
+            cossackLoaded: false
+        };
+        
+        const imgTop = new Image();
+        imgTop.src = 'image/vik_top.png';
+        imgTop.onload = () => { images.topLoaded = true; };
+        imgTop.onerror = () => { images.topLoaded = false; };
+        
+        const imgDown = new Image();
+        imgDown.src = 'image/vik_down.png';
+        imgDown.onload = () => { images.downLoaded = true; };
+        imgDown.onerror = () => { images.downLoaded = false; };
+        
+        const imgMove = new Image();
+        imgMove.src = 'image/vik_move.gif';
+        imgMove.onload = () => { images.moveLoaded = true; };
+        imgMove.onerror = () => { images.moveLoaded = false; };
+        
+        // 6 вертикальних ліній для падіння яблук (у відсотках)
+        const lanes = [0.125, 0.25, 0.375, 0.5, 0.625, 0.875];
+        
+        // Керування
+        const keys = {};
+        let mouseX = 0.5;
+        
+        document.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+        });
+        
+        document.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+        
+        // Керування мишкою
+        canvas.addEventListener('mousemove', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            mouseX = (e.clientX - rect.left) / canvas.width;
+        });
+        
+        // Генерація яблука
+        function createApple() {
+            const categoryIndex = Math.floor(Math.random() * categoryNames.length);
+            const category = categoryNames[categoryIndex];
+            const terms = categories[category];
+            const term = terms[Math.floor(Math.random() * terms.length)];
+            const lane = lanes[Math.floor(Math.random() * lanes.length)];
+            
+            return {
+                x: lane,
+                y: -0.08,
+                radius: 0.04,
+                term: term,
+                category: category,
+                speed: 0.003 + Math.random() * 0.002,
+                color: getColorForCategory(category)
+            };
+        }
+        
+        function getColorForCategory(category) {
+            const colors = {
+                'Князі': '#FF6B6B',
+                'Соціальна': '#4ECDC4',
+                'Монгольське іго': '#FFD93D',
+                'Сусіди': '#95E1D3'
+            };
+            return colors[category] || '#FF6B6B';
+        }
+        
+        // Малювання яблука
+        function drawApple(apple) {
+            const x = apple.x * canvas.width;
+            const y = apple.y * canvas.height;
+            const r = apple.radius * canvas.width;
+            
+            // Тінь
+            ctx.fillStyle = 'rgba(0,0,0,0.2)';
+            ctx.beginPath();
+            ctx.arc(x + 3, y + 3, r, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Яблуко
+            ctx.fillStyle = apple.color;
+            ctx.beginPath();
+            ctx.arc(x, y, r, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Обводка
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Листочок
+            ctx.fillStyle = '#228B22';
+            ctx.beginPath();
+            ctx.ellipse(x + r/3, y - r + r/6, r/4, r/2, Math.PI / 4, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Текст
+            ctx.fillStyle = '#000';
+            ctx.font = `bold ${Math.max(10, r/2.5)}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            const words = apple.term.split(' ');
+            if (words.length > 1) {
+                ctx.fillText(words[0], x, y - r/4);
+                ctx.fillText(words.slice(1).join(' '), x, y + r/4);
+            } else {
+                ctx.fillText(apple.term, x, y);
+            }
+        }
+        
+        // Малювання каретки
+        function drawBasket() {
+            basket.moving = keys['ArrowLeft'] || keys['a'] || keys['A'] || 
+                           keys['ArrowRight'] || keys['d'] || keys['D'];
+            
+            const x = basket.x * canvas.width;
+            const y = basket.y * canvas.height;
+            const w = basket.width * canvas.width;
+            const h = basket.height * canvas.height;
+            
+            const topHeight = h * 0.33;
+            const downHeight = h - topHeight;
+            
+            // Верхня частина
+            if (images.topLoaded) {
+                ctx.drawImage(imgTop, x - w/2, y, w, topHeight);
+            } else {
+                ctx.fillStyle = '#8B4513';
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(x - w/2, y + topHeight);
+                ctx.lineTo(x + w/2, y + topHeight);
+                ctx.closePath();
+                ctx.fill();
+                ctx.strokeStyle = '#654321';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+            
+            // Нижня частина (зона ловлі)
+            if (basket.moving && images.moveLoaded) {
+                ctx.drawImage(imgMove, x - w/2, y + topHeight, w, downHeight);
+            } else if (images.downLoaded) {
+                ctx.drawImage(imgDown, x - w/2, y + topHeight, w, downHeight);
+            } else {
+                ctx.fillStyle = '#D2691E';
+                ctx.fillRect(x - w/2, y + topHeight, w, downHeight);
+                ctx.strokeStyle = '#8B4513';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(x - w/2, y + topHeight, w, downHeight);
+            }
+        }
+        
+        // Перевірка зіткнення
+        function checkCollision(apple) {
+            const catchZoneY = basket.y + (basket.height * 0.33);
+            
+            return apple.y + apple.radius >= catchZoneY &&
+                   apple.y - apple.radius <= basket.y + basket.height &&
+                   apple.x >= basket.x - basket.width/2 &&
+                   apple.x <= basket.x + basket.width/2;
+        }
+        
+        // Показ повідомлення про нову категорію
+        function showCategoryAlert() {
+            const alert = document.getElementById('categoryAlert');
+            const lang = translations[currentLang];
+            alert.textContent = `${lang.newCategory}: ${lang.categories[currentCategory]}`;
+            alert.style.display = 'block';
+            
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 2000);
+        }
+        
+        // Зміна категорії
+        function changeCategory() {
+            currentCategoryIndex = (currentCategoryIndex + 1) % categoryNames.length;
+            currentCategory = categoryNames[currentCategoryIndex];
+            document.getElementById('categoryName').textContent = translations[currentLang].categories[currentCategory];
+            showCategoryAlert();
+        }
+        
+        // Ефект помилки
+        function showError() {
+            canvas.style.filter = 'brightness(0.5)';
+            setTimeout(() => {
+                canvas.style.filter = 'brightness(1)';
+            }, 200);
+        }
+        
+        // Рейтинг
+        function getRating(score) {
+            const lang = translations[currentLang];
+            if (score >= 1 && score <= 5) return lang.ratings[1];
+            if (score >= 6 && score <= 10) return lang.ratings[2];
+            if (score >= 11 && score <= 14) return lang.ratings[3];
+            if (score >= 15) return lang.ratings[4];
+            return lang.ratings[1];
+        }
+        
+        // Завершення гри
+        function endGame() {
+            document.getElementById('ratingMessage').textContent = getRating(score);
+            document.getElementById('gameOver').style.display = 'flex';
+        }
+        
+        // Оновлення UI
+        function updateUI() {
+            document.getElementById('score').textContent = score;
+            document.getElementById('caught').textContent = caughtCorrect;
+        }
+        
+        // Головний ігровий цикл
+        let lastTime = Date.now();
+        let appleSpawnTimer = 0;
+        let categoryTimer = 0;
+        
+        function gameLoop() {
+            if (!gameStarted) return;
+            
+            const now = Date.now();
+            const deltaTime = (now - lastTime) / 1000;
+            lastTime = now;
+            
+            // Очищення canvas
+            ctx.fillStyle = 'rgba(135, 206, 235, 0.3)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Керування кареткою
+            if ((keys['ArrowLeft'] || keys['a'] || keys['A']) && basket.x > basket.width/2) {
+                basket.x -= basket.speed;
+            }
+            if ((keys['ArrowRight'] || keys['d'] || keys['D']) && basket.x < 1 - basket.width/2) {
+                basket.x += basket.speed;
+            }
+            
+            // Керування мишкою
+            const targetX = Math.max(basket.width/2, Math.min(1 - basket.width/2, mouseX));
+            basket.x += (targetX - basket.x) * 0.15;
+            
+            // Генерація яблук
+            appleSpawnTimer += deltaTime;
+            if (appleSpawnTimer > 1.5) {
+                apples.push(createApple());
+                appleSpawnTimer = 0;
+            }
+            
+            // Оновлення та малювання яблук
+            for (let i = apples.length - 1; i >= 0; i--) {
+                const apple = apples[i];
+                apple.y += apple.speed;
+                
+                // Перевірка зіткнення
+                if (checkCollision(apple)) {
+                    if (apple.category === currentCategory) {
+                        score++;
+                        caughtCorrect++;
+                        updateUI();
+                        
+                        if (caughtCorrect >= 15) {
+                            endGame();
+                            return;
+                        }
+                    } else {
+                        score = Math.max(0, score - 1);
+                        updateUI();
+                        showError();
+                    }
+                    apples.splice(i, 1);
+                    continue;
+                }
+                
+                // Видалення яблук, що впали
+                if (apple.y > 1.08) {
+                    apples.splice(i, 1);
+                    continue;
+                }
+                
+                drawApple(apple);
+            }
+            
+            // Малювання каретки
+            drawBasket();
+            
+            // Зміна категорії кожні 15 секунд
+            categoryTimer += deltaTime;
+            if (categoryTimer >= 15) {
+                changeCategory();
+                categoryTimer = 0;
+            }
+            
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // Обробник кнопки старту
+        document.getElementById('startButton').addEventListener('click', () => {
+            document.getElementById('introScreen').style.display = 'none';
+            gameStarted = true;
+            lastTime = Date.now();
+            showCategoryAlert();
+            gameLoop();
+        });
+    </script>
+</body>
+</html>
