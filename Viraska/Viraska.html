@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Гетьманщина 1918</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6fa;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+    }
+
+    .block {
+      display: none;
+      margin-bottom: 40px;
+    }
+
+    .block iframe {
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      background: #3b6cff;
+      color: white;
+    }
+
+    button:hover {
+      background: #2f55cc;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>Гетьманщина 1918</h1>
+
+  <!-- Блок 1 -->
+  <div id="block1" class="block">
+    <iframe style="max-width:100%"
+      src="https://wordwall.net/uk/embed/1327c2e297884e3587bbc0ef515efd7a?themeId=1&templateId=35&fontStackId=0"
+      width="500" height="380" frameborder="0" allowfullscreen>
+    </iframe>
+
+    <br>
+    <button onclick="openBlock(2)">Продовжити шлях ➜</button>
+  </div>
+
+  <!-- Блок 2 -->
+  <div id="block2" class="block">
+    <iframe style="max-width:100%"
+      src="https://wordwall.net/uk/embed/64403347f720426aa9bbc9f513d4d578?themeId=1&templateId=22&fontStackId=0"
+      width="500" height="380" frameborder="0" allowfullscreen>
+    </iframe>
+
+    <br>
+    <button onclick="openBlock(3)">До наступного випробування ➜</button>
+  </div>
+
+  <!-- Блок 3 -->
+  <div id="block3" class="block">
+    <iframe style="max-width:100%"
+      src="https://wordwall.net/uk/embed/8c7a572de6e648b497a3fe132dcfab83?themeId=1&templateId=50&fontStackId=0"
+      width="500" height="380" frameborder="0" allowfullscreen>
+    </iframe>
+
+    <p style="margin-top:20px; font-weight:bold;">
+      ✨ Випробування завершено ✨
+    </p>
+  </div>
+
+  <script>
+    function openBlock(number) {
+      document.getElementById('block' + number).style.display = 'block';
+    }
+
+    // Показуємо перший блок при завантаженні
+    openBlock(1);
+  </script>
+
+</body>
+</html>
