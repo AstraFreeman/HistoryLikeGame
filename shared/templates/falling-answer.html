@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Історична Вікторина</title>
+  <link rel="stylesheet" href="../../shared/css/reset.css">
+  <link rel="stylesheet" href="../../shared/css/theme.css">
+  <link rel="stylesheet" href="../../shared/css/layout.css">
+  <link rel="stylesheet" href="../../shared/css/components.css">
+  <link rel="stylesheet" href="../../shared/css/animations.css">
+  <link rel="stylesheet" href="../../shared/css/responsive.css">
+</head>
+<body data-section="" data-game-title="Вікторина" data-home-url="../../index.html">
+
+  <h1 id="gameTitle" class="section-title" style="margin-top:var(--space-lg);">Історична Вікторина</h1>
+
+  <div class="game-container">
+    <div class="game-area" id="gameArea"></div>
+    <div class="side-panel" id="answersPanel">
+      <h3>Пропущені питання</h3>
+      <div id="answersList"></div>
+    </div>
+  </div>
+
+  <div style="max-width:600px; margin:0 auto; padding:0 var(--space-md);">
+    <input type="text" id="input" class="input" placeholder="Введіть відповідь..." disabled>
+  </div>
+
+  <div class="stats-panel" style="max-width:400px; margin:var(--space-md) auto;">
+    <div class="stat-item">
+      <span class="stat-label">Рахунок</span>
+      <span class="stat-value" id="score">0</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Життя</span>
+      <span class="stat-value" id="lives">3</span>
+    </div>
+  </div>
+
+  <div id="pauseMenu" class="modal">
+    <h2>Гра на паузі</h2>
+    <button class="btn btn-primary" id="resumeButton" style="margin-top:var(--space-md);">Продовжити</button>
+  </div>
+
+  <div class="numpad" id="numPad">
+    <button class="num-btn" data-value="0">0</button>
+    <button class="num-btn" data-value="1">1</button>
+    <button class="num-btn" data-value="2">2</button>
+    <button class="num-btn" data-value="3">3</button>
+    <button class="num-btn" data-value="4">4</button>
+    <button class="num-btn" data-value="5">5</button>
+    <button class="num-btn" data-value="6">6</button>
+    <button class="num-btn" data-value="7">7</button>
+    <button class="num-btn" data-value="8">8</button>
+    <button class="num-btn" data-value="9">9</button>
+    <button class="num-btn num-btn-wide" id="clearButton">Стерти</button>
+  </div>
+
+  <div class="controls-panel">
+    <button class="btn btn-primary" id="startButton">Розпочати Гру</button>
+    <button class="btn btn-secondary" id="restartButton" disabled>Перезапустити</button>
+    <button class="btn btn-ghost" id="exitButton">Вийти</button>
+  </div>
+
+  <div class="overlay" id="winOverlay"></div>
+  <div class="modal modal-win" id="winMessage">
+    <h2>Вітаємо! Ви виграли!</h2>
+    <img id="winImage" src="" alt="Вітаємо!" onerror="this.style.display='none'">
+  </div>
+
+  <div class="overlay" id="loseOverlay"></div>
+  <div class="modal modal-lose" id="loseMessage">
+    <h2>Гру завершено!</h2>
+    <p>У вас закінчилися життя.</p>
+  </div>
+
+  <script src="../../shared/js/nav.js"></script>
+  <script src="../../shared/js/game-engine.js"></script>
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var id = params.get('id') || 'period-4-kozaky';
+      var scriptEl = document.createElement('script');
+      scriptEl.src = '../../data/falling/' + id + '.js';
+      scriptEl.onload = function () { initGame(); };
+      scriptEl.onerror = function () {
+        document.getElementById('gameArea').textContent =
+          'Не вдалося завантажити дані гри (id=' + id + ')';
+      };
+      document.head.appendChild(scriptEl);
+
+      function initGame() {
+        var data = window.FALLING_DATA;
+        if (!data) return;
+
+        // Set title
+        if (data.title) {
+          document.getElementById('gameTitle').textContent = data.title;
+          document.title = data.title;
+          document.body.setAttribute('data-game-title', data.title);
+        }
+        if (data.section) {
+          document.body.setAttribute('data-section', data.section);
+        }
+
+        // Set win image
+        if (data.winImage) {
+          document.getElementById('winImage').src = data.winImage;
+        }
+
+        FallingGame.init({
+          questions: data.questions,
+          lives: data.lives || 3,
+          winScore: data.winScore || 15,
+          dropSpeed: data.dropSpeed || 1,
+          addInterval: data.addInterval || 5000,
+          maxActive: data.maxActive || 5,
+          winImage: data.winImage || ''
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

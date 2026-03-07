@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Історична гра</title>
+  <link rel="stylesheet" href="../../shared/css/reset.css">
+  <link rel="stylesheet" href="../../shared/css/theme.css">
+  <link rel="stylesheet" href="../../shared/css/layout.css">
+  <link rel="stylesheet" href="../../shared/css/components.css">
+  <link rel="stylesheet" href="../../shared/css/animations.css">
+  <link rel="stylesheet" href="../../shared/css/responsive.css">
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+    }
+  </style>
+</head>
+<body data-section="Вікторина" data-game-title="" data-home-url="../../index.html">
+  <div class="quiz-container anim-fade-in" id="quizRoot">
+    <h1 id="quizTitle" style="font-size:var(--text-3xl); margin-bottom:var(--space-lg); text-align:center;"></h1>
+    <div class="theme-selector">
+      <button class="btn btn-sm btn-secondary" onclick="QuizGame.setTheme('light')">Свiтла тема</button>
+      <button class="btn btn-sm btn-secondary" onclick="QuizGame.setTheme('dark')">Темна тема</button>
+    </div>
+    <div id="questionsContainer"></div>
+    <div style="text-align:center; margin-top:var(--space-lg);">
+      <button class="btn btn-primary btn-lg" onclick="QuizGame.checkAnswers()">Перевірити відповіді</button>
+    </div>
+    <div class="password-block" id="passwordBlock">
+      <p>Пароль для наступного рівня: <strong id="password"></strong></p>
+    </div>
+    <footer class="site-footer">&copy; 2024 Історична гра. Усі права захищені.</footer>
+  </div>
+
+  <script src="../../shared/js/nav.js"></script>
+  <script src="../../shared/js/quiz-engine.js"></script>
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var id = params.get('id') || '1-1';
+      var scriptEl = document.createElement('script');
+      scriptEl.src = '../../data/quiz/crstm-s-' + id + '.js';
+      scriptEl.onload = function () { renderQuiz(); };
+      scriptEl.onerror = function () {
+        document.getElementById('quizRoot').textContent =
+          'Не вдалося завантажити дані вікторини (id=' + id + ')';
+      };
+      document.head.appendChild(scriptEl);
+
+      function renderQuiz() {
+        var data = window.QUIZ_DATA;
+        if (!data) return;
+
+        // Apply theme
+        if (data.theme) {
+          var root = document.documentElement;
+          var t = data.theme;
+          if (t.textColor) root.style.setProperty('--color-text-primary', t.textColor);
+          if (t.accentColor) root.style.setProperty('--game-accent', t.accentColor);
+          if (t.cardBg) {
+            document.querySelector('.quiz-container').style.background = t.cardBg;
+          }
+        }
+
+        // Apply background
+        if (data.background) {
+          document.body.style.backgroundImage = 'url(../../assets/images/' + data.background + ')';
+        }
+
+        // Title
+        var titleEl = document.getElementById('quizTitle');
+        titleEl.textContent = data.title || 'Iсторична гра: Зимова версія';
+        document.title = data.title || 'Iсторична гра';
+
+        // Update nav title
+        document.body.setAttribute('data-game-title', data.title || 'Вікторина');
+
+        // Render questions
+        var container = document.getElementById('questionsContainer');
+        var engineQuestions = [];
+
+        data.questions.forEach(function (q, idx) {
+          var qDiv = document.createElement('div');
+          qDiv.className = 'quiz-question anim-fade-in anim-delay-' + Math.min(idx + 1, 5);
+
+          var pEl = document.createElement('p');
+          var strong = document.createElement('strong');
+          strong.textContent = q.text;
+          pEl.appendChild(strong);
+          qDiv.appendChild(pEl);
+
+          if (q.type === 'text') {
+            var input = document.createElement('input');
+            input.type = 'text';
+            input.id = 'answer' + idx;
+            input.className = 'input';
+            input.placeholder = q.placeholder || 'Введіть відповідь...';
+            input.style.marginTop = 'var(--space-md)';
+            qDiv.appendChild(input);
+
+            engineQuestions.push({ id: 'answer' + idx, type: 'text', correct: q.correct });
+
+          } else if (q.type === 'choice') {
+            // Optional image
+            if (q.image) {
+              var img = document.createElement('img');
+              img.src = '../../assets/images/' + q.image;
+              img.alt = 'Ілюстрація';
+              img.style.borderRadius = 'var(--radius-sm)';
+              img.style.margin = 'var(--space-md) 0';
+              img.style.maxWidth = '100%';
+              qDiv.appendChild(img);
+            }
+
+            var optDiv = document.createElement('div');
+            optDiv.className = 'option-buttons';
+
+            q.options.forEach(function (opt) {
+              var btn = document.createElement('button');
+              btn.className = 'option-btn';
+              btn.textContent = opt.label;
+              btn.setAttribute('onclick',
+                "QuizGame.selectAnswer(this, '" + opt.value.replace(/'/g, "\\'") + "', '" + q.group + "')");
+              optDiv.appendChild(btn);
+            });
+
+            qDiv.appendChild(optDiv);
+            engineQuestions.push({ id: 'q' + idx, type: 'choice', group: q.group, correct: q.correct });
+          }
+
+          container.appendChild(qDiv);
+        });
+
+        QuizGame.init({
+          questions: engineQuestions,
+          password: data.password,
+          passwordBlockId: 'passwordBlock',
+          passwordDisplayId: 'password'
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

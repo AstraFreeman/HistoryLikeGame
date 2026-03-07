@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Різдвяна вікторина</title>
+    <link rel="stylesheet" href="../../shared/css/reset.css">
+    <link rel="stylesheet" href="../../shared/css/theme.css">
+    <link rel="stylesheet" href="../../shared/css/layout.css">
+    <link rel="stylesheet" href="../../shared/css/components.css">
+    <link rel="stylesheet" href="../../shared/css/animations.css">
+    <link rel="stylesheet" href="../../shared/css/responsive.css">
+    <style>
+        .quiz-header {
+            background: var(--gradient-warm);
+            padding: var(--space-xl);
+            text-align: center;
+            border-bottom: 1px solid var(--glass-border);
+        }
+        .quiz-header h1 {
+            font-size: var(--text-3xl);
+            color: var(--color-text-on-accent);
+            margin-bottom: var(--space-xs);
+        }
+        .quiz-header h2 {
+            font-size: var(--text-xl);
+            color: var(--color-text-on-accent);
+            opacity: 0.9;
+        }
+        .quiz-header h3 {
+            font-size: var(--text-sm);
+            color: rgba(255,255,255,0.6);
+            margin-top: var(--space-sm);
+        }
+        .omega-wrap {
+            text-align: center;
+            margin: var(--space-xl) 0;
+        }
+    </style>
+    <script>
+        var score = 0;
+
+        var passwords = {
+            '1_1': 'Богдан Хмельницький', '1_2': 'Скоропадський Іван', '1_3': 'Павло Полуботок', '1_4': 'Данило Апостол', '1_5': 'Автономія',
+            '2_1': 'Самар', '2_2': 'Іван Гонта', '2_3': 'Слобожанщина', '2_4': 'Таврія', '2_5': 'Самар',
+            '3_1': 'Запорізька Січ', '3_2': 'Кріпацтво', '3_3': 'Козацьке бароко', '3_4': 'Галичина', '3_5': 'Буковина',
+            '4_1': 'Борітеся', '4_2': 'Поборете', '4_3': 'Вам', '4_4': 'Бог', '4_5': 'Помагає',
+            '5_1': 'Pass21', '5_2': 'Pass22', '5_3': 'Pass23', '5_4': 'Pass24', '5_5': 'Pass25'
+        };
+
+        function updateScore(points) {
+            score += points;
+            document.getElementById('score-display').textContent = 'Відкриті бали: ' + score;
+        }
+
+        function openQuestion(row, col, button) {
+            if (button.classList.contains('opened')) {
+                alert('Ця кнопка вже відкрита!');
+                return;
+            }
+            var key = row + '_' + col;
+            var password = prompt('Введіть пароль для цієї кнопки:');
+            if (password === passwords[key]) {
+                window.open('../../shared/templates/quiz-question.html?id=' + row + '-' + col, '_blank');
+                button.classList.add('opened');
+                updateScore(row * 100);
+            } else {
+                alert('Неправильний пароль!');
+            }
+        }
+
+        function openOmega(button) {
+            if (button.classList.contains('opened')) {
+                alert('Ця кнопка вже відкрита!');
+                return;
+            }
+            var password = prompt('Введіть пароль для кнопки Омега:');
+            if (password === 'L0v3 H1sT0r') {
+                window.open('../../shared/templates/quiz-question.html?id=omega', '_blank');
+                button.classList.add('opened');
+                updateScore(500);
+            } else {
+                alert('Неправильний пароль!');
+            }
+        }
+    </script>
+</head>
+<body data-section="Вікторина" data-game-title="Різдвяний спец. випуск" data-home-url="../../index.html">
+    <div class="page-wrap">
+        <div class="quiz-header">
+            <h1>Не закривайте сторінку</h1>
+            <h2>Різдвяний спец. випуск. Вікторина</h2>
+            <h3>Перший пароль до кнопки *знак Омега* — L0v3 H1sT0r</h3>
+        </div>
+
+        <main class="page-content" style="max-width:700px;">
+            <p class="stats-panel" style="justify-content:center;">
+                <span id="score-display" class="stat-value" style="font-size:var(--text-lg);">Відкриті бали: 0</span>
+            </p>
+
+            <div class="quiz-grid" id="quizGrid"></div>
+
+            <div class="omega-wrap">
+                <button class="btn btn-accent btn-lg" onclick="openOmega(this)">&Omega;</button>
+            </div>
+        </main>
+    </div>
+
+    <script src="../../shared/js/nav.js"></script>
+    <script>
+        var grid = document.getElementById('quizGrid');
+        for (var row = 1; row <= 5; row++) {
+            for (var col = 1; col <= 5; col++) {
+                var btn = document.createElement('button');
+                btn.className = 'quiz-grid-btn';
+                btn.textContent = row * 100;
+                btn.setAttribute('data-row', row);
+                btn.setAttribute('data-col', col);
+                btn.addEventListener('click', (function(r, c) {
+                    return function() { openQuestion(r, c, this); };
+                })(row, col));
+                grid.appendChild(btn);
+            }
+        }
+    </script>
+</body>
+</html>

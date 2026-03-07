@@ -1,0 +1,131 @@
+/* responsive.css — Mobile-first media queries */
+
+/* ── Base: phones (< 640px) — default styles ── */
+
+/* Stack game containers vertically on mobile */
+.game-container {
+  flex-direction: column;
+}
+
+.game-area,
+.side-panel {
+  max-width: 100%;
+}
+
+.quiz-grid {
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  padding: var(--space-md);
+}
+
+.card-grid {
+  grid-template-columns: 1fr;
+}
+
+.assistant {
+  width: 70px;
+  height: 70px;
+}
+
+.fact-box {
+  max-width: 250px;
+  bottom: 110px;
+  right: 12px;
+}
+
+/* ── Tablets (>= 640px) ── */
+@media (min-width: 640px) {
+  .card-grid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .game-container {
+    flex-direction: row;
+  }
+
+  .game-area {
+    max-width: 600px;
+  }
+
+  .side-panel {
+    max-width: 350px;
+  }
+
+  .quiz-grid {
+    gap: var(--space-sm);
+    padding: var(--space-lg);
+  }
+
+  .assistant {
+    width: 90px;
+    height: 90px;
+  }
+
+  .fact-box {
+    max-width: 280px;
+    bottom: 130px;
+    right: 20px;
+  }
+
+  .option-buttons {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .option-btn {
+    flex: 1 1 calc(50% - var(--space-sm));
+  }
+}
+
+/* ── Desktop (>= 1024px) ── */
+@media (min-width: 1024px) {
+  .assistant {
+    width: 100px;
+    height: 100px;
+  }
+
+  .fact-box {
+    max-width: 300px;
+    bottom: 140px;
+  }
+
+  .page-content {
+    padding: var(--space-xl) var(--space-lg);
+  }
+}
+
+/* ── Short screens ── */
+@media (max-height: 600px) {
+  .game-area {
+    height: 45vh;
+    min-height: 280px;
+  }
+
+  .side-panel {
+    height: 45vh;
+    min-height: 280px;
+  }
+
+  .num-btn {
+    width: 50px;
+    height: 44px;
+    font-size: var(--text-base);
+  }
+}
+
+/* ── Touch-friendly adjustments ── */
+@media (hover: none) and (pointer: coarse) {
+  .btn {
+    min-height: 48px;
+  }
+
+  .option-btn {
+    min-height: 48px;
+    padding: var(--space-md) var(--space-lg);
+  }
+
+  .num-btn {
+    min-height: 48px;
+    min-width: 48px;
+  }
+}

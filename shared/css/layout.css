@@ -1,0 +1,220 @@
+/* layout.css — Game containers, stats panels, control panels, grids */
+
+/* ── Page wrapper ── */
+.page-wrap {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.page-content {
+  flex: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-lg) var(--space-md);
+}
+
+/* ── Game container ── */
+.game-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto var(--space-lg);
+}
+
+/* ── Game area (falling questions, canvas, etc.) ── */
+.game-area {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  height: 50vh;
+  min-height: 350px;
+  border: 2px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  overflow: hidden;
+  box-shadow: var(--glass-shadow);
+  flex: 1 1 300px;
+}
+
+/* ── Side panel (answers, info) ── */
+.side-panel {
+  width: 100%;
+  max-width: 350px;
+  height: 50vh;
+  min-height: 350px;
+  background: var(--glass-bg);
+  border: 2px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  overflow-y: auto;
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur));
+  flex: 1 1 250px;
+}
+
+.side-panel h3 {
+  margin-bottom: var(--space-md);
+  color: var(--color-text-secondary);
+  font-size: var(--text-lg);
+}
+
+/* ── Stats panel ── */
+.stats-panel {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-xl);
+  padding: var(--space-md) var(--space-lg);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(var(--glass-blur));
+  margin-bottom: var(--space-md);
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-label {
+  display: block;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-xs);
+}
+
+.stat-value {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--game-accent);
+}
+
+/* ── Controls panel ── */
+.controls-panel {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  margin: var(--space-lg) 0;
+}
+
+/* ── Card grid (for hub pages) ── */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-lg);
+  margin-bottom: var(--space-2xl);
+}
+
+/* ── Section titles ── */
+.section-title {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  text-align: center;
+  margin: var(--space-2xl) 0 var(--space-lg);
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Quiz container ── */
+.quiz-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--space-lg);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glass-shadow);
+}
+
+.quiz-question {
+  margin: var(--space-lg) 0;
+  padding: var(--space-lg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.quiz-question p {
+  margin-bottom: var(--space-md);
+  line-height: 1.7;
+}
+
+.quiz-question strong {
+  color: var(--color-text-primary);
+}
+
+.quiz-question img {
+  border-radius: var(--radius-sm);
+  margin: var(--space-md) 0;
+}
+
+/* ── Numpad grid ── */
+.numpad {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-sm);
+  margin: var(--space-md) 0;
+}
+
+/* ── Quiz grid (for Crstm_S_Main hub) ── */
+.quiz-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-sm);
+  padding: var(--space-lg);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* ── Answer item in side panel ── */
+.answer-item {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: var(--space-md);
+  margin: var(--space-sm) 0;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+}
+
+.answer-item strong {
+  display: block;
+  margin-bottom: var(--space-xs);
+  color: var(--color-text-primary);
+}
+
+.answer-item span {
+  color: var(--color-accent-orange);
+  font-weight: 600;
+}
+
+/* ── Canvas wrapper ── */
+.canvas-wrap {
+  position: relative;
+  width: 90vw;
+  height: 90vh;
+  max-width: 1200px;
+  max-height: 800px;
+  border: 2px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--glass-shadow);
+}
+
+.canvas-wrap canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}

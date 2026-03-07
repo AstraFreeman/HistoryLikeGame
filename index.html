@@ -4,479 +4,293 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Історія як гра</title>
+    <link rel="stylesheet" href="shared/css/reset.css">
+    <link rel="stylesheet" href="shared/css/theme.css">
+    <link rel="stylesheet" href="shared/css/layout.css">
+    <link rel="stylesheet" href="shared/css/components.css">
+    <link rel="stylesheet" href="shared/css/animations.css">
+    <link rel="stylesheet" href="shared/css/responsive.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        /* Page-specific: subtle animated gradient background */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            color: #333;
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 40%, #16213e 100%);
+            background-attachment: fixed;
         }
-
-        header {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            padding: 2rem;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        header h1 {
-            color: #667eea;
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        header p {
-            color: #555;
-            font-size: 1.1rem;
-        }
-
-        main {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1rem;
-        }
-
-        .section-title {
-            color: white;
-            font-size: 2rem;
-            margin: 2rem 0 1.5rem;
-            text-align: center;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .games {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
-        }
-
-        .game {
-            background: white;
-            border-radius: 15px;
-            padding: 1.5rem;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .game::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 5px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-        }
-
-        .game:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
-        }
-
-        .game h2, .game h3 {
-            color: #667eea;
-            margin-bottom: 0.75rem;
-            font-size: 1.4rem;
-        }
-
-        .game p {
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 1rem;
-        }
-
-        .game a {
+        /* Stagger card entrance */
+        .card-grid .card:nth-child(1) { animation-delay: 0.05s; }
+        .card-grid .card:nth-child(2) { animation-delay: 0.1s; }
+        .card-grid .card:nth-child(3) { animation-delay: 0.15s; }
+        .card-grid .card:nth-child(4) { animation-delay: 0.2s; }
+        .card-grid .card:nth-child(5) { animation-delay: 0.25s; }
+        .card-grid .card:nth-child(6) { animation-delay: 0.3s; }
+        .card-grid .card:nth-child(7) { animation-delay: 0.35s; }
+        .card-grid .card:nth-child(8) { animation-delay: 0.4s; }
+        .card-grid .card:nth-child(9) { animation-delay: 0.45s; }
+        /* Period number accent */
+        .period-num {
             display: inline-block;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 0.75rem 1.5rem;
-            text-decoration: none;
-            border-radius: 25px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            margin-right: 0.5rem;
-            margin-top: 0.5rem;
-        }
-
-        .game a:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-        }
-
-        .ar-games {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 2rem;
-            margin-bottom: 3rem;
-        }
-
-        .ar-games h2 {
-            color: white;
-            font-size: 2rem;
+            width: 32px;
+            height: 32px;
+            line-height: 32px;
             text-align: center;
-            margin-bottom: 1.5rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            border-radius: var(--radius-sm);
+            background: var(--gradient-primary);
+            color: var(--color-text-on-accent);
+            font-weight: 700;
+            font-size: var(--text-sm);
+            margin-right: var(--space-sm);
+            vertical-align: middle;
+            flex-shrink: 0;
         }
-
-        .control-panel {
+        .card h2 {
             display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin: 2rem 0;
-            flex-wrap: wrap;
+            align-items: center;
         }
-
-        .control-panel button {
-            background: white;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 25px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .control-panel button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-        }
-
-        #octopus {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 100px;
-            height: 100px;
-            cursor: pointer;
-            transition: all 0.5s ease;
-            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
-            z-index: 1000;
-        }
-
-        #octopus:hover {
-            transform: scale(1.1) rotate(5deg);
-        }
-
-        #factBox {
-            position: fixed;
-            bottom: 140px;
-            right: 20px;
-            background: white;
-            padding: 1.5rem;
-            border-radius: 15px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-            max-width: 300px;
-            z-index: 999;
-            animation: slideIn 0.5s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg) scale(1); }
-            50% { transform: rotate(180deg) scale(1.2); }
-            100% { transform: rotate(360deg) scale(1); }
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 1.8rem;
-            }
-
-            .games {
-                grid-template-columns: 1fr;
-            }
-
-            #octopus {
-                width: 80px;
-                height: 80px;
-            }
-
-            #factBox {
-                max-width: 250px;
-                bottom: 120px;
-            }
+        /* AR section styling */
+        .ar-section {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(var(--glass-blur));
+            border-radius: var(--radius-xl);
+            padding: var(--space-2xl);
+            margin-bottom: var(--space-2xl);
         }
     </style>
 </head>
-<body>
-    <header>
-        <h1>🎮 Історія як гра</h1>
-        <p>Відчуйте дух минулого, граючи в унікальні історичні ігри!</p>
-    </header>
-    <main>
-        <h2 class="section-title">📚 Історичні періоди</h2>
-        <section class="games">
-            <div class="game">
-                <h2>0. Вступ</h2>
-                <p>Коротко про все</p>
-                <a href="washhand_1.html">Хронобій</a>
-                <a href="new_makako_2.html">Іст. Bloock Buster</a>  
-                <a href="Shivafornia_3/Shivafornia_1.html">Характерне кафе</a>  
-            </div>
-            <div class="game">
-                <h2>1. Стародавня історія</h2>
-                <p>Дослідіть найдавніші часи на теренах України!</p>
-                <a href="shiwafornia_2.html">Грати</a>
-            </div>
-            <div class="game">
-                <h2>2. Русь-Україна</h2>
-                <p>Пориньте у середньовічну історію Києва та його правителів.</p>
-                <a href="New_Orlan_1.html">Грати</a>
-                <a href="masachuchi/masachuchi.html">Кара вікінга</a>
-            </div>
-            <div class="game">
-                <h2>3. Велике князівство Литовське</h2>
-                <p>Відкрийте період литовського панування на українських землях.</p>
-                <a href="Taxes_1.html">Грати</a>
-            </div>
-            <div class="game">
-                <h2>4. Козацька доба</h2>
-                <p>Дослідіть епоху козацтва та станьте справжнім гетьманом!</p>
-                <a href="compas.html">Грати</a>
-            </div>
-            <div class="game">
-                <h2>5. Імперський період</h2>
-                <p>Пройдіть через складні часи під владою імперій.</p>
-                <a href="compas.html">Грати</a>
-            </div>
-            <div class="game">
-                <h2>6. Українська революція</h2>
-                <p>Будьте учасником революційних подій початку XX століття.</p>
-                <a href="Viraska/Viraska.html">Грати</a>
-            </div>
-            <div class="game">
-                <h2>7. Радянський період</h2>
-                <p>Розкрийте таємниці та виклики радянської епохи.</p>
-                <a href="compas.html">Грати</a>
-            </div>
-            <div class="game">
-                <h2>8. Незалежність</h2>
-                <p>Відчуйте атмосферу подій, що змінили сучасну Україну!</p>
-                <a href="compas.html">Грати</a>
-            </div>
-        </section>
+<body data-nav="false">
+    <div class="page-wrap">
+        <header class="page-header">
+            <h1>Історія як гра</h1>
+            <p>Відчуйте дух минулого, граючи в унікальні історичні ігри!</p>
+        </header>
 
-        <section class="ar-games">
-            <h2>🔮 AR-ІГРИ</h2>
-            <div class="games">
-                <div class="game">
-                    <h3>AR-Гра 1: Квебек</h3>
-                    <p>Досліджуйте історичні питання через доповнену реальність!</p>
-                    <a href="kvebek.html">Для комп'ютерів</a>
-                    <a href="kvebek2.html">Для телефонів</a>
+        <main class="page-content">
+            <h2 class="section-title">Історичні періоди</h2>
+            <section class="card-grid">
+                <div class="card anim-fade-in">
+                    <h2><span class="period-num">0</span> Вступ</h2>
+                    <p>Коротко про все</p>
+                    <div class="card-actions">
+                        <a href="games/narrative/washhand-1.html" class="btn btn-primary btn-sm">Хронобій</a>
+                        <a href="games/narrative/new-makako-2.html" class="btn btn-primary btn-sm">Іст. block buster</a>
+                        <a href="games/narrative/shivafornia-3.html" class="btn btn-primary btn-sm">Характерне кафе</a>
+                    </div>
                 </div>
-                <div class="game">
-                    <h3>AR-Гра 2: Торонто</h3>
-                    <p>Створіть власну історичну подорож у віртуальному просторі.</p>
-                    <a href="totoronto.html">Грати</a>
+                <div class="card anim-fade-in">
+                    <h2><span class="period-num">1</span> Стародавня історія</h2>
+                    <p>Дослідіть найдавніші часи на теренах України!</p>
+                    <div class="card-actions">
+                        <a href="games/narrative/shiwafornia-2.html" class="btn btn-primary btn-sm">Грати</a>
+                    </div>
                 </div>
-                <div class="game">
-                    <h3>AR-Гра 3: Юкон</h3>
-                    <p>Підручник з громадянської освіти (неочікувано)</p>
-                    <a href="Usin/usin_1.html">Читати (зі смартфоном)</a>
-                    <a href="usin_blue/usin_blue_1.html">Синя сторінка</a>
-                    <a href="usin_green/usin_green_1.html">Зелена сторінка</a>
-                    <a href="usin_indg/usin_indg_1.html">Сторінка індиго</a>
-                    <a href="usin_prsk/usin_prsk_1.html">Персикова сторінка</a>
+                <div class="card anim-fade-in">
+                    <h2><span class="period-num">2</span> Русь-Україна</h2>
+                    <p>Пориньте у середньовічну історію Києва та його правителів.</p>
+                    <div class="card-actions">
+                        <a href="games/narrative/new-orlan-1.html" class="btn btn-primary btn-sm">Грати</a>
+                        <a href="games/narrative/masachuchi/masachuchi.html" class="btn btn-secondary btn-sm">Кара вікінга</a>
+                    </div>
                 </div>
+                <div class="card anim-fade-in">
+                    <h2><span class="period-num">3</span> Велике князівство Литовське</h2>
+                    <p>Відкрийте період литовського панування на українських землях.</p>
+                    <div class="card-actions">
+                        <a href="games/narrative/taxes-1.html" class="btn btn-primary btn-sm">Грати</a>
+                    </div>
+                </div>
+                <div class="card anim-fade-in">
+                    <h2><span class="period-num">4</span> Козацька доба</h2>
+                    <p>Дослідіть епоху козацтва та станьте справжнім гетьманом!</p>
+                    <div class="card-actions">
+                        <a href="games/narrative/compas.html" class="btn btn-primary btn-sm">Грати</a>
+                    </div>
+                </div>
+                <div class="card anim-fade-in">
+                    <h2><span class="period-num">5</span> Імперський період</h2>
+                    <p>Пройдіть через складні часи під владою імперій.</p>
+                    <div class="card-actions">
+                        <a href="games/narrative/compas.html" class="btn btn-primary btn-sm">Грати</a>
+                    </div>
+                </div>
+                <div class="card anim-fade-in">
+                    <h2><span class="period-num">6</span> Українська революція</h2>
+                    <p>Будьте учасником революційних подій початку XX століття.</p>
+                    <div class="card-actions">
+                        <a href="games/narrative/viraska.html" class="btn btn-primary btn-sm">Грати</a>
+                    </div>
+                </div>
+                <div class="card anim-fade-in">
+                    <h2><span class="period-num">7</span> Радянський період</h2>
+                    <p>Розкрийте таємниці та виклики радянської епохи.</p>
+                    <div class="card-actions">
+                        <a href="games/narrative/compas.html" class="btn btn-primary btn-sm">Грати</a>
+                    </div>
+                </div>
+                <div class="card anim-fade-in">
+                    <h2><span class="period-num">8</span> Незалежність</h2>
+                    <p>Відчуйте атмосферу подій, що змінили сучасну Україну!</p>
+                    <div class="card-actions">
+                        <a href="games/narrative/compas.html" class="btn btn-primary btn-sm">Грати</a>
+                    </div>
+                </div>
+            </section>
+
+            <section class="ar-section">
+                <h2 class="section-title" style="margin-top:0;">AR-ігри</h2>
+                <div class="card-grid">
+                    <div class="card anim-fade-in">
+                        <h3>AR-гра 1: Квебек</h3>
+                        <p>Досліджуйте історичні питання через доповнену реальність!</p>
+                        <div class="card-actions">
+                            <a href="ar/kvebek.html" class="btn btn-accent btn-sm">Для комп'ютерів</a>
+                            <a href="ar/kvebek-2.html" class="btn btn-accent btn-sm">Для телефонів</a>
+                        </div>
+                    </div>
+                    <div class="card anim-fade-in">
+                        <h3>AR-гра 2: Торонто</h3>
+                        <p>Створіть власну історичну подорож у віртуальному просторі.</p>
+                        <div class="card-actions">
+                            <a href="games/narrative/totoronto.html" class="btn btn-accent btn-sm">Грати</a>
+                        </div>
+                    </div>
+                    <div class="card anim-fade-in">
+                        <h3>AR-гра 3: Юкон</h3>
+                        <p>Підручник з громадянської освіти (неочікувано)</p>
+                        <div class="card-actions">
+                            <a href="ar/usin/usin-1.html" class="btn btn-accent btn-sm">Читати (зі смартфоном)</a>
+                            <a href="ar/usin-blue/usin-blue-1.html" class="btn btn-secondary btn-sm">Синя сторінка</a>
+                            <a href="ar/usin-green/usin-green-1.html" class="btn btn-secondary btn-sm">Зелена сторінка</a>
+                            <a href="ar/usin-indg/usin-indg-1.html" class="btn btn-secondary btn-sm">Сторінка індиго</a>
+                            <a href="ar/usin-prsk/usin-prsk-1.html" class="btn btn-secondary btn-sm">Персикова сторінка</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="controls-panel">
+                <button class="btn btn-secondary" id="toggleAssistant">Показати/сховати помічника</button>
+                <button class="btn btn-secondary" id="showFact">Цікавий факт</button>
+                <button class="btn btn-secondary" id="dance">Танець</button>
             </div>
-        </section>
 
-        <div class="control-panel">
-            <button id="toggleAssistant">🔍 Показати/Сховати Помічника</button>
-            <button id="showFact">📜 Цікавий факт</button>
-            <button id="dance">💃 Танець</button>
-        </div>
+            <img src="assets/images/Sprut_Idle.gif" alt="Помічник" id="octopus" class="assistant">
+            <div id="factBox" class="fact-box hidden">Цікава історія: у 1654 році відбулася Переяславська рада!</div>
+        </main>
+    </div>
 
-        <img src="image/Sprut_Idle.gif" alt="Помічник" id="octopus">
-        <div id="factBox" class="hidden">📖 Цікава історія: У 1654 році відбулася Переяславська рада!</div>
-    </main>
-
-    <script src="assistant.js"></script>
+    <script src="shared/js/assistant.js"></script>
     <script>
-        const octopus = document.getElementById('octopus');
-        const factBox = document.getElementById('factBox');
-        const toggleBtn = document.getElementById('toggleAssistant');
-        const factBtn = document.getElementById('showFact');
-        const danceBtn = document.getElementById('dance');
+        var octopus = document.getElementById('octopus');
+        var factBox = document.getElementById('factBox');
+        var toggleBtn = document.getElementById('toggleAssistant');
+        var factBtn = document.getElementById('showFact');
+        var danceBtn = document.getElementById('dance');
 
-        const facts = [
-            '📖 Цікава історія: У 1654 році відбулася Переяславська рада!',
-            '📖 Київська Русь була заснована у 882 році князем Олегом.',
-            '📖 Запорозька Січ стала центром українського козацтва.',
-            '📖 Акт проголошення незалежності України підписано 24 серпня 1991 року.',
-            '📖 Князь Володимир Великий хрестив Русь у 988 році.',
-            '📖 Битва під Берестечком 1651 року - одна з найбільших битв козацької доби.'
+        var facts = [
+            'Цікава історія: у 1654 році відбулася Переяславська рада!',
+            'Київська Русь була заснована у 882 році князем Олегом.',
+            'Запорозька Січ стала центром українського козацтва.',
+            'Акт проголошення незалежності України підписано 24 серпня 1991 року.',
+            'Князь Володимир Великий хрестив Русь у 988 році.',
+            'Битва під Берестечком 1651 року — одна з найбільших битв козацької доби.'
         ];
 
-        // Стан асистента
-        let isMoving = false;
-        let isDancing = false;
-        let isVisible = true;
-        let moveInterval = null;
-        let assistantLoaded = false;
+        var isMoving = false;
+        var isDancing = false;
+        var isVisible = true;
+        var moveInterval = null;
+        var assistantLoaded = false;
 
-        // Перевірка завантаження assistant.js
         if (typeof initAssistant === 'function') {
             try {
                 initAssistant(octopus);
                 assistantLoaded = true;
-                console.log('Assistant.js успішно підключено');
-            } catch (error) {
-                console.warn('Помилка ініціалізації assistant.js:', error);
-            }
-        } else {
-            console.log('Assistant.js не знайдено, використовується вбудований функціонал');
+            } catch (e) {}
         }
 
-        // Функція зміни GIF
         function setAssistantGif(gif) {
-            octopus.src = `image/${gif}`;
+            octopus.src = 'assets/images/' + gif;
         }
 
-        // Функція переміщення асистента
         function moveAssistant() {
             if (isDancing || !isVisible) return;
-            
-            // Перевірка чи асистент не рухається клавіатурою
-            if (typeof isAssistantMoving === 'function' && isAssistantMoving()) {
-                return;
-            }
+            if (typeof isAssistantMoving === 'function' && isAssistantMoving()) return;
 
             isMoving = true;
             setAssistantGif('Sprut_Move.gif');
 
-            const currentBottom = parseInt(window.getComputedStyle(octopus).bottom) || 20;
-            const currentRight = parseInt(window.getComputedStyle(octopus).right) || 20;
-
-            const maxMoveX = window.innerWidth * 0.05;
-            const maxMoveY = window.innerHeight * 0.05;
-
-            const moveX = (Math.random() - 0.5) * 2 * maxMoveX;
-            const moveY = (Math.random() - 0.5) * 2 * maxMoveY;
-
-            const newRight = Math.max(20, Math.min(window.innerWidth - 120, currentRight + moveX));
-            const newBottom = Math.max(20, Math.min(window.innerHeight - 120, currentBottom + moveY));
+            var currentBottom = parseInt(window.getComputedStyle(octopus).bottom) || 20;
+            var currentRight = parseInt(window.getComputedStyle(octopus).right) || 20;
+            var maxMoveX = window.innerWidth * 0.05;
+            var maxMoveY = window.innerHeight * 0.05;
+            var moveX = (Math.random() - 0.5) * 2 * maxMoveX;
+            var moveY = (Math.random() - 0.5) * 2 * maxMoveY;
+            var newRight = Math.max(20, Math.min(window.innerWidth - 120, currentRight + moveX));
+            var newBottom = Math.max(20, Math.min(window.innerHeight - 120, currentBottom + moveY));
 
             octopus.style.right = newRight + 'px';
             octopus.style.bottom = newBottom + 'px';
 
-            setTimeout(() => {
+            setTimeout(function () {
                 isMoving = false;
-                if (!isDancing) {
-                    setAssistantGif('Sprut_Idle.gif');
-                }
+                if (!isDancing) setAssistantGif('Sprut_Idle.gif');
             }, 1000);
         }
 
-        // Періодичне переміщення асистента
         function startRandomMovement() {
             if (moveInterval) clearInterval(moveInterval);
-            
-            moveInterval = setInterval(() => {
-                if (Math.random() < 0.3) { // 30% шанс руху
-                    moveAssistant();
-                }
-            }, 5000); // Перевірка кожні 5 секунд
+            moveInterval = setInterval(function () {
+                if (Math.random() < 0.3) moveAssistant();
+            }, 5000);
         }
 
-        // Кнопка показати/сховати
-        toggleBtn.addEventListener('click', () => {
+        toggleBtn.addEventListener('click', function () {
             isVisible = !isVisible;
             octopus.classList.toggle('hidden');
-            
-            if (isVisible) {
-                startRandomMovement();
-            } else {
-                if (moveInterval) clearInterval(moveInterval);
-            }
+            if (isVisible) { startRandomMovement(); }
+            else { if (moveInterval) clearInterval(moveInterval); }
         });
 
-        // Кнопка цікавий факт
-        factBtn.addEventListener('click', () => {
-            const randomFact = facts[Math.floor(Math.random() * facts.length)];
+        factBtn.addEventListener('click', function () {
+            var randomFact = facts[Math.floor(Math.random() * facts.length)];
             factBox.textContent = randomFact;
             factBox.classList.remove('hidden');
-            setTimeout(() => {
-                factBox.classList.add('hidden');
-            }, 5000);
+            setTimeout(function () { factBox.classList.add('hidden'); }, 5000);
         });
 
-        // Кнопка танець
-        danceBtn.addEventListener('click', () => {
+        danceBtn.addEventListener('click', function () {
             if (isDancing || !isVisible) return;
-            
             isDancing = true;
             setAssistantGif('Sprut_Dance.gif');
             octopus.style.animation = 'spin 1s ease-in-out';
-            
-            setTimeout(() => {
+            setTimeout(function () {
                 octopus.style.animation = '';
                 isDancing = false;
-                if (!isMoving) {
-                    setAssistantGif('Sprut_Idle.gif');
-                }
+                if (!isMoving) setAssistantGif('Sprut_Idle.gif');
             }, 1000);
         });
 
-        // Клік по асистенту
-        octopus.addEventListener('click', () => {
+        octopus.addEventListener('click', function () {
             if (assistantLoaded && typeof onAssistantClick === 'function') {
                 onAssistantClick();
             } else {
-                // Альтернативна поведінка
-                const messages = [
-                    'Привіт! Я тут, щоб допомогти тобі вивчати історію! 📚',
-                    'Обери гру та починай свою подорож у минуле! 🎮',
-                    'Не забудь натиснути "Цікавий факт" для нових знань! 🔍',
-                    'Готовий до пригод? Вперед! 🚀'
+                var messages = [
+                    'Привіт! Я тут, щоб допомогти тобі вивчати історію!',
+                    'Обери гру та починай свою подорож у минуле!',
+                    'Не забудь натиснути "Цікавий факт" для нових знань!',
+                    'Готовий до пригод? Вперед!'
                 ];
                 factBox.textContent = messages[Math.floor(Math.random() * messages.length)];
                 factBox.classList.remove('hidden');
-                setTimeout(() => {
-                    factBox.classList.add('hidden');
-                }, 3000);
+                setTimeout(function () { factBox.classList.add('hidden'); }, 3000);
             }
         });
 
-        // Запуск періодичного руху
         startRandomMovement();
 
-        // Обробка помилок завантаження GIF
-        octopus.addEventListener('error', () => {
-            console.warn('Не вдалося завантажити GIF, використовується emoji');
+        octopus.addEventListener('error', function () {
             octopus.style.fontSize = '80px';
-            octopus.innerHTML = '🐙';
+            octopus.textContent = '\uD83D\uDC19';
         });
     </script>
 </body>
