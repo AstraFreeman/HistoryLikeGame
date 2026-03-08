@@ -1,0 +1,2 @@
+[    5353ms] [ERROR] Error loading 3D model: CustomEvent @ http://localhost:8080/ar/totoronto-2.html:67
+[    5366ms] [WARNING] ArMarkerControls: 'markersAreaEnabled' is not a property of this material. @ https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js:0
