@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Характерне кафе: незалежність</title>
+  <link rel="stylesheet" href="../../shared/css/reset.css">
+  <link rel="stylesheet" href="../../shared/css/theme.css">
+  <link rel="stylesheet" href="../../shared/css/components.css">
+  <link rel="stylesheet" href="../../shared/css/animations.css">
+  <style>
+    :root {
+      --game-accent: var(--color-accent-orange);
+    }
+
+    /* ── Game wrapper ── */
+    .kafe-wrap {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: var(--space-md);
+    }
+
+    /* ── Header ── */
+    .game-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      padding: var(--space-md) var(--space-lg);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(var(--glass-blur));
+      margin-bottom: var(--space-md);
+    }
+
+    .game-header h1 {
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      background: var(--gradient-warm);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-stats {
+      display: flex;
+      gap: var(--space-lg);
+      align-items: center;
+    }
+
+    .header-stat {
+      text-align: center;
+    }
+
+    .header-stat-label {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      display: block;
+    }
+
+    .header-stat-value {
+      font-size: var(--text-xl);
+      font-weight: 700;
+      color: var(--color-accent-orange);
+    }
+
+    /* ── 3-column layout ── */
+    .game-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr 1fr;
+      gap: var(--space-md);
+      flex: 1;
+      min-height: 0;
+    }
+
+    .game-panel {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      backdrop-filter: blur(var(--glass-blur));
+      box-shadow: var(--glass-shadow);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .panel-title {
+      font-weight: 600;
+      margin-bottom: var(--space-md);
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: var(--text-sm);
+    }
+
+    /* ── Kitchen panel ── */
+    .menu-item-btn {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      width: 100%;
+      padding: var(--space-sm) var(--space-md);
+      margin-bottom: var(--space-sm);
+      background: var(--color-surface);
+      border: 2px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      color: var(--color-text-primary);
+      font-size: var(--text-sm);
+      text-align: left;
+      transition: all var(--transition-base);
+      cursor: pointer;
+      min-height: 44px;
+    }
+
+    .menu-item-btn:hover {
+      background: var(--color-surface-hover);
+      border-color: var(--color-accent-orange);
+    }
+
+    .menu-item-btn.active {
+      border-color: var(--color-accent-orange);
+      background: rgba(249, 115, 22, 0.15);
+    }
+
+    .menu-item-btn .menu-emoji {
+      font-size: var(--text-xl);
+      flex-shrink: 0;
+    }
+
+    .ingredient-list {
+      margin-top: var(--space-sm);
+      padding: var(--space-sm);
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--glass-border);
+    }
+
+    .ingredient-list-title {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-xs);
+    }
+
+    .ingredient-btn {
+      display: inline-block;
+      padding: var(--space-xs) var(--space-sm);
+      margin: 3px;
+      background: var(--color-surface);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-full);
+      color: var(--color-text-primary);
+      font-size: var(--text-xs);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      min-height: 32px;
+    }
+
+    .ingredient-btn:hover {
+      background: rgba(249, 115, 22, 0.2);
+      border-color: var(--color-accent-orange);
+    }
+
+    .ingredient-btn.selected {
+      background: rgba(249, 115, 22, 0.3);
+      border-color: var(--color-accent-orange);
+      color: var(--color-accent-orange);
+    }
+
+    /* ── Counter panel ── */
+    .counter-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .order-display {
+      text-align: center;
+      margin-bottom: var(--space-md);
+      padding: var(--space-md);
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: var(--radius-md);
+      border: 1px dashed var(--glass-border);
+      width: 100%;
+    }
+
+    .order-display-title {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-xs);
+    }
+
+    .order-display-name {
+      font-size: var(--text-xl);
+      font-weight: 700;
+      color: var(--color-accent-orange);
+      min-height: 1.5em;
+    }
+
+    .assembly-area {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      width: 100%;
+      flex: 1;
+    }
+
+    .assembly-slot {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: var(--space-sm) var(--space-md);
+      background: var(--color-surface);
+      border: 2px dashed var(--glass-border);
+      border-radius: var(--radius-md);
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+      transition: all var(--transition-base);
+      cursor: pointer;
+    }
+
+    .assembly-slot.filled {
+      border-style: solid;
+      border-color: var(--color-accent-orange);
+      color: var(--color-text-primary);
+      background: rgba(249, 115, 22, 0.1);
+    }
+
+    .assembly-slot.filled:hover {
+      border-color: var(--color-accent-red);
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    .serve-btn {
+      margin-top: var(--space-md);
+      width: 100%;
+      padding: var(--space-md);
+      font-size: var(--text-lg);
+      font-weight: 700;
+    }
+
+    .clear-btn {
+      margin-top: var(--space-sm);
+      width: 100%;
+    }
+
+    /* ── Customer queue ── */
+    .customer-card {
+      background: var(--color-surface);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      margin-bottom: var(--space-sm);
+      animation: slideInRight 0.4s ease both;
+      position: relative;
+    }
+
+    .customer-card.first {
+      border-color: var(--color-accent-orange);
+      background: rgba(249, 115, 22, 0.08);
+    }
+
+    .customer-card.leaving {
+      animation: shake 0.4s ease;
+      border-color: var(--color-accent-red);
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    .customer-card.happy {
+      border-color: var(--color-accent-green);
+      background: rgba(34, 197, 94, 0.1);
+      animation: pulse 0.5s ease;
+    }
+
+    .customer-name {
+      font-weight: 600;
+      font-size: var(--text-base);
+      color: var(--color-text-primary);
+    }
+
+    .customer-order {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      margin-top: var(--space-xs);
+    }
+
+    .patience-bar-wrap {
+      margin-top: var(--space-sm);
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+
+    .patience-bar {
+      height: 100%;
+      border-radius: var(--radius-full);
+      background: var(--color-accent-green);
+      transition: width 1s linear, background-color 0.5s ease;
+    }
+
+    .patience-bar.warning {
+      background: var(--color-accent-orange);
+    }
+
+    .patience-bar.critical {
+      background: var(--color-accent-red);
+    }
+
+    .empty-queue {
+      text-align: center;
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+      padding: var(--space-lg);
+    }
+
+    /* ── Fact toast ── */
+    .fact-toast {
+      position: fixed;
+      bottom: var(--space-lg);
+      left: 50%;
+      transform: translateX(-50%);
+      max-width: 600px;
+      width: calc(100% - var(--space-2xl));
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-accent-green);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      z-index: var(--z-toast);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+      animation: slideIn 0.4s ease both;
+    }
+
+    .fact-toast-title {
+      font-size: var(--text-sm);
+      color: var(--color-accent-green);
+      font-weight: 600;
+      margin-bottom: var(--space-xs);
+    }
+
+    .fact-toast-text {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+
+    .fact-toast.hiding {
+      animation: fadeOut 0.3s ease both;
+    }
+
+    /* ── Intro & end screens ── */
+    .screen-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: var(--z-modal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .screen-overlay.hidden {
+      display: none;
+    }
+
+    .screen-card {
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl) var(--space-xl);
+      max-width: 560px;
+      width: calc(100% - var(--space-2xl));
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .screen-card h2 {
+      font-size: var(--text-3xl);
+      margin-bottom: var(--space-md);
+      background: var(--gradient-warm);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .screen-card p {
+      color: var(--color-text-secondary);
+      line-height: 1.7;
+      margin-bottom: var(--space-md);
+    }
+
+    .screen-card .btn {
+      margin-top: var(--space-md);
+    }
+
+    /* ── End screen specifics ── */
+    .end-stats {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-xl);
+      margin: var(--space-lg) 0;
+    }
+
+    .end-stat {
+      text-align: center;
+    }
+
+    .end-stat-value {
+      font-size: var(--text-3xl);
+      font-weight: 700;
+      color: var(--color-accent-orange);
+    }
+
+    .end-stat-label {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+    }
+
+    .facts-learned {
+      text-align: left;
+      margin: var(--space-lg) 0;
+    }
+
+    .facts-learned h3 {
+      font-size: var(--text-lg);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-md);
+    }
+
+    .fact-item {
+      background: var(--color-surface);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      margin-bottom: var(--space-sm);
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+
+    .fact-item strong {
+      color: var(--color-accent-orange);
+      display: block;
+      margin-bottom: var(--space-xs);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .game-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .game-panel {
+        max-height: none;
+      }
+
+      .game-header h1 {
+        font-size: var(--text-xl);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .kafe-wrap {
+        padding: var(--space-sm);
+      }
+
+      .game-header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .end-stats {
+        flex-direction: column;
+        gap: var(--space-md);
+      }
+    }
+  </style>
+</head>
+<body data-nav="overlay" data-home-url="../../index.html" data-game-title="Характерне кафе">
+
+  <!-- ── Intro screen ── -->
+  <div id="introScreen" class="screen-overlay">
+    <div class="screen-card">
+      <h2>Характерне кафе</h2>
+      <p style="font-size: var(--text-3xl); margin-bottom: var(--space-sm);">&#x1F37D;&#xFE0F;</p>
+      <p>Ласкаво просимо до історичного кафе! Ви &#x2014; кухар, який готує особливі страви з інгредієнтів української історії періоду незалежності.</p>
+      <p>Клієнти замовлятимуть історичні страви. Ваше завдання &#x2014; обрати правильні інгредієнти (дати, події, постаті) та подати замовлення вчасно, поки клієнт не втратив терпіння.</p>
+      <p><strong>Як грати:</strong></p>
+      <p>1. Оберіть страву з меню зліва<br>
+         2. Натисніть на інгредієнти, щоб додати їх на прилавок<br>
+         3. Натисніть &#x00AB;Подати страву&#x00BB;, коли все готово<br>
+         4. Слідкуйте за терпінням клієнтів!</p>
+      <button class="btn btn-accent btn-lg" id="startBtn">Почати зміну</button>
+    </div>
+  </div>
+
+  <!-- ── End screen ── -->
+  <div id="endScreen" class="screen-overlay hidden">
+    <div class="screen-card">
+      <h2 id="endTitle">Зміна закінчена!</h2>
+      <div class="end-stats">
+        <div class="end-stat">
+          <div class="end-stat-value" id="endScore">0</div>
+          <div class="end-stat-label">Очки</div>
+        </div>
+        <div class="end-stat">
+          <div class="end-stat-value" id="endServed">0</div>
+          <div class="end-stat-label">Обслуговано</div>
+        </div>
+        <div class="end-stat">
+          <div class="end-stat-value" id="endTotal">0</div>
+          <div class="end-stat-label">Всього клієнтів</div>
+        </div>
+      </div>
+      <div class="facts-learned" id="factsLearned"></div>
+      <button class="btn btn-accent btn-lg" id="restartBtn">Грати ще раз</button>
+      <br>
+      <a href="../../index.html" class="btn btn-secondary" style="margin-top: var(--space-sm); display: inline-flex;">На головну</a>
+    </div>
+  </div>
+
+  <!-- ── Game UI ── -->
+  <div class="kafe-wrap" id="gameUI" style="display: none;">
+    <div class="game-header">
+      <h1 id="gameTitle">Характерне кафе</h1>
+      <div class="header-stats">
+        <div class="header-stat">
+          <span class="header-stat-label">Очки</span>
+          <span class="header-stat-value" id="scoreDisplay">0</span>
+        </div>
+        <div class="header-stat">
+          <span class="header-stat-label">Обслуговано</span>
+          <span class="header-stat-value" id="servedDisplay">0/10</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-layout">
+      <!-- Left: Kitchen -->
+      <div class="game-panel" id="kitchenPanel">
+        <div class="panel-title">&#x1F373; Кухня (меню)</div>
+        <div id="menuList"></div>
+      </div>
+
+      <!-- Center: Counter -->
+      <div class="game-panel counter-panel" id="counterPanel">
+        <div class="panel-title">&#x1F37D;&#xFE0F; Прилавок</div>
+        <div class="order-display">
+          <div class="order-display-title">Поточне замовлення</div>
+          <div class="order-display-name" id="currentOrderName">Оберіть страву з меню</div>
+        </div>
+        <div class="assembly-area" id="assemblyArea">
+          <div class="assembly-slot" data-slot="0">Інгредієнт 1</div>
+          <div class="assembly-slot" data-slot="1">Інгредієнт 2</div>
+          <div class="assembly-slot" data-slot="2">Інгредієнт 3</div>
+        </div>
+        <button class="btn btn-accent serve-btn" id="serveBtn" disabled>Подати страву</button>
+        <button class="btn btn-secondary btn-sm clear-btn" id="clearBtn">Очистити</button>
+      </div>
+
+      <!-- Right: Customer queue -->
+      <div class="game-panel" id="queuePanel">
+        <div class="panel-title">&#x1F465; Черга клієнтів</div>
+        <div id="customerQueue">
+          <div class="empty-queue">Клієнти скоро з'являться...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../shared/js/ui-utils.js"></script>
+  <script src="../../data/games/kafe-independence.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      /* ── State ── */
+      var data = window.KAFE_DATA;
+      var state = {
+        score: 0,
+        served: 0,
+        totalCustomers: data.customers.length,
+        currentCustomerIndex: 0,
+        activeQueue: [],
+        assembledIngredients: [null, null, null],
+        selectedMenuItem: null,
+        gameRunning: false,
+        customerInterval: null,
+        patienceInterval: null,
+        factsLearned: [],
+        allIngredientsPool: []
+      };
+
+      /* ── DOM refs ── */
+      var els = {
+        introScreen: document.getElementById('introScreen'),
+        endScreen: document.getElementById('endScreen'),
+        gameUI: document.getElementById('gameUI'),
+        gameTitle: document.getElementById('gameTitle'),
+        scoreDisplay: document.getElementById('scoreDisplay'),
+        servedDisplay: document.getElementById('servedDisplay'),
+        menuList: document.getElementById('menuList'),
+        currentOrderName: document.getElementById('currentOrderName'),
+        assemblyArea: document.getElementById('assemblyArea'),
+        serveBtn: document.getElementById('serveBtn'),
+        clearBtn: document.getElementById('clearBtn'),
+        customerQueue: document.getElementById('customerQueue'),
+        endScore: document.getElementById('endScore'),
+        endServed: document.getElementById('endServed'),
+        endTotal: document.getElementById('endTotal'),
+        endTitle: document.getElementById('endTitle'),
+        factsLearned: document.getElementById('factsLearned'),
+        startBtn: document.getElementById('startBtn'),
+        restartBtn: document.getElementById('restartBtn')
+      };
+
+      /* ── Helpers ── */
+      function getMenuItem(id) {
+        for (var i = 0; i < data.menuItems.length; i++) {
+          if (data.menuItems[i].id === id) return data.menuItems[i];
+        }
+        return null;
+      }
+
+      function escapeText(str) {
+        var div = document.createElement('div');
+        div.appendChild(document.createTextNode(str));
+        return div.textContent;
+      }
+
+      function updateStats() {
+        els.scoreDisplay.textContent = state.score;
+        els.servedDisplay.textContent = state.served + '/' + state.totalCustomers;
+      }
+
+      /* ── Build kitchen menu ── */
+      function buildMenu() {
+        // Remove previous contents
+        while (els.menuList.firstChild) {
+          els.menuList.removeChild(els.menuList.firstChild);
+        }
+
+        // Build all-ingredients pool: gather all unique ingredients from all menu items
+        var allIngredients = [];
+        var i, j, k;
+        for (i = 0; i < data.menuItems.length; i++) {
+          for (j = 0; j < data.menuItems[i].ingredients.length; j++) {
+            var ing = data.menuItems[i].ingredients[j];
+            if (allIngredients.indexOf(ing) === -1) {
+              allIngredients.push(ing);
+            }
+          }
+        }
+        // Shuffle
+        for (k = allIngredients.length - 1; k > 0; k--) {
+          var r = Math.floor(Math.random() * (k + 1));
+          var tmp = allIngredients[k];
+          allIngredients[k] = allIngredients[r];
+          allIngredients[r] = tmp;
+        }
+        state.allIngredientsPool = allIngredients;
+
+        for (i = 0; i < data.menuItems.length; i++) {
+          var item = data.menuItems[i];
+          var btn = document.createElement('button');
+          btn.className = 'menu-item-btn';
+          btn.setAttribute('data-menu-id', item.id);
+
+          var emojiSpan = document.createElement('span');
+          emojiSpan.className = 'menu-emoji';
+          emojiSpan.textContent = item.emoji;
+          btn.appendChild(emojiSpan);
+
+          var nameText = document.createTextNode(' ' + item.name);
+          btn.appendChild(nameText);
+
+          btn.addEventListener('click', (function (id) {
+            return function () { selectMenuItem(id); };
+          })(item.id));
+          els.menuList.appendChild(btn);
+        }
+
+        // Ingredient list area
+        var ingArea = document.createElement('div');
+        ingArea.id = 'ingredientArea';
+        ingArea.className = 'ingredient-list';
+        ingArea.style.display = 'none';
+
+        var ingTitle = document.createElement('div');
+        ingTitle.className = 'ingredient-list-title';
+        ingTitle.textContent = 'Доступні інгредієнти:';
+        ingArea.appendChild(ingTitle);
+
+        var ingButtons = document.createElement('div');
+        ingButtons.id = 'ingredientButtons';
+        ingArea.appendChild(ingButtons);
+
+        els.menuList.appendChild(ingArea);
+      }
+
+      function selectMenuItem(id) {
+        state.selectedMenuItem = id;
+
+        // Highlight active menu button
+        var btns = document.querySelectorAll('.menu-item-btn');
+        for (var i = 0; i < btns.length; i++) {
+          if (btns[i].getAttribute('data-menu-id') === id) {
+            btns[i].classList.add('active');
+          } else {
+            btns[i].classList.remove('active');
+          }
+        }
+
+        // Show ingredients
+        var ingArea = document.getElementById('ingredientArea');
+        ingArea.style.display = 'block';
+
+        renderIngredientButtons();
+      }
+
+      function renderIngredientButtons() {
+        var container = document.getElementById('ingredientButtons');
+        while (container.firstChild) {
+          container.removeChild(container.firstChild);
+        }
+
+        for (var i = 0; i < state.allIngredientsPool.length; i++) {
+          var ingName = state.allIngredientsPool[i];
+          var btn = document.createElement('button');
+          btn.className = 'ingredient-btn';
+          btn.textContent = ingName;
+
+          // Check if already in assembly
+          var inSlot = false;
+          for (var s = 0; s < state.assembledIngredients.length; s++) {
+            if (state.assembledIngredients[s] === ingName) {
+              inSlot = true;
+              break;
+            }
+          }
+
+          if (inSlot) {
+            btn.classList.add('selected');
+          }
+
+          btn.addEventListener('click', (function (ingredient) {
+            return function () { addIngredient(ingredient); };
+          })(ingName));
+
+          container.appendChild(btn);
+        }
+      }
+
+      /* ── Assembly ── */
+      function addIngredient(ingredient) {
+        // If already in a slot, remove it
+        var i;
+        for (i = 0; i < state.assembledIngredients.length; i++) {
+          if (state.assembledIngredients[i] === ingredient) {
+            state.assembledIngredients[i] = null;
+            renderAssembly();
+            renderIngredientButtons();
+            updateServeButton();
+            return;
+          }
+        }
+
+        // Find first empty slot
+        for (i = 0; i < state.assembledIngredients.length; i++) {
+          if (state.assembledIngredients[i] === null) {
+            state.assembledIngredients[i] = ingredient;
+            renderAssembly();
+            renderIngredientButtons();
+            updateServeButton();
+            return;
+          }
+        }
+
+        // All slots full
+        UIUtils.showNotification('Всі слоти зайняті! Натисніть на інгредієнт, щоб прибрати.', 2000);
+      }
+
+      function handleSlotClick(index) {
+        if (state.assembledIngredients[index] !== null) {
+          state.assembledIngredients[index] = null;
+          renderAssembly();
+          renderIngredientButtons();
+          updateServeButton();
+        }
+      }
+
+      function clearAssembly() {
+        state.assembledIngredients = [null, null, null];
+        renderAssembly();
+        if (document.getElementById('ingredientButtons')) {
+          renderIngredientButtons();
+        }
+        updateServeButton();
+      }
+
+      function renderAssembly() {
+        var slots = els.assemblyArea.querySelectorAll('.assembly-slot');
+        for (var i = 0; i < slots.length; i++) {
+          if (state.assembledIngredients[i]) {
+            slots[i].textContent = state.assembledIngredients[i];
+            slots[i].classList.add('filled');
+          } else {
+            slots[i].textContent = 'Інгредієнт ' + (i + 1);
+            slots[i].classList.remove('filled');
+          }
+        }
+
+        // Update current order display to match first customer
+        if (state.activeQueue.length > 0) {
+          var firstCustomer = state.activeQueue[0];
+          var menuItem = getMenuItem(firstCustomer.order);
+          if (menuItem) {
+            els.currentOrderName.textContent = menuItem.emoji + ' ' + menuItem.name;
+          }
+        } else {
+          els.currentOrderName.textContent = 'Очікуємо клієнтів...';
+        }
+      }
+
+      function updateServeButton() {
+        var filled = 0;
+        for (var i = 0; i < state.assembledIngredients.length; i++) {
+          if (state.assembledIngredients[i] !== null) filled++;
+        }
+        els.serveBtn.disabled = (filled < 3 || state.activeQueue.length === 0);
+      }
+
+      /* ── Customer queue ── */
+      function renderQueue() {
+        while (els.customerQueue.firstChild) {
+          els.customerQueue.removeChild(els.customerQueue.firstChild);
+        }
+
+        if (state.activeQueue.length === 0) {
+          var emptyDiv = document.createElement('div');
+          emptyDiv.className = 'empty-queue';
+          if (state.currentCustomerIndex >= state.totalCustomers) {
+            emptyDiv.textContent = 'Всіх клієнтів обслуговано!';
+          } else {
+            emptyDiv.textContent = "Клієнти скоро з'являться...";
+          }
+          els.customerQueue.appendChild(emptyDiv);
+          renderAssembly();
+          updateServeButton();
+          return;
+        }
+
+        for (var i = 0; i < state.activeQueue.length; i++) {
+          var c = state.activeQueue[i];
+          var menuItem = getMenuItem(c.order);
+          var patiencePercent = (c.remainingPatience / c.maxPatience) * 100;
+
+          var card = document.createElement('div');
+          card.className = 'customer-card' + (i === 0 ? ' first' : '');
+
+          var nameEl = document.createElement('div');
+          nameEl.className = 'customer-name';
+          nameEl.textContent = c.name;
+          card.appendChild(nameEl);
+
+          var orderEl = document.createElement('div');
+          orderEl.className = 'customer-order';
+          var orderText = 'Замовлення: ';
+          if (menuItem) {
+            orderText += menuItem.emoji + ' ' + menuItem.name;
+          } else {
+            orderText += c.order;
+          }
+          orderEl.textContent = orderText;
+          card.appendChild(orderEl);
+
+          var barWrap = document.createElement('div');
+          barWrap.className = 'patience-bar-wrap';
+
+          var bar = document.createElement('div');
+          bar.className = 'patience-bar';
+          if (patiencePercent <= 30) {
+            bar.classList.add('critical');
+          } else if (patiencePercent <= 60) {
+            bar.classList.add('warning');
+          }
+          bar.style.width = patiencePercent + '%';
+          barWrap.appendChild(bar);
+          card.appendChild(barWrap);
+
+          els.customerQueue.appendChild(card);
+        }
+
+        renderAssembly();
+        updateServeButton();
+      }
+
+      function addCustomer() {
+        if (state.currentCustomerIndex >= state.totalCustomers) {
+          clearInterval(state.customerInterval);
+          if (state.activeQueue.length === 0) {
+            endGame();
+          }
+          return;
+        }
+
+        if (state.activeQueue.length >= 3) {
+          return;
+        }
+
+        var customerData = data.customers[state.currentCustomerIndex];
+        state.activeQueue.push({
+          name: customerData.name,
+          order: customerData.order,
+          maxPatience: customerData.patience,
+          remainingPatience: customerData.patience
+        });
+        state.currentCustomerIndex++;
+        renderQueue();
+      }
+
+      function tickPatience() {
+        if (!state.gameRunning) return;
+
+        for (var i = state.activeQueue.length - 1; i >= 0; i--) {
+          state.activeQueue[i].remainingPatience--;
+          if (state.activeQueue[i].remainingPatience <= 0) {
+            var leavingName = state.activeQueue[i].name;
+            state.activeQueue.splice(i, 1);
+            state.score -= 25;
+            if (state.score < 0) state.score = 0;
+            UIUtils.showNotification(leavingName + ' пішов/пішла, не дочекавшись! (\u221225 очок)', 2500);
+          }
+        }
+
+        updateStats();
+        renderQueue();
+
+        if (state.activeQueue.length === 0 && state.currentCustomerIndex >= state.totalCustomers) {
+          endGame();
+        }
+      }
+
+      /* ── Serving ── */
+      function serveDish() {
+        if (state.activeQueue.length === 0) return;
+
+        var firstCustomer = state.activeQueue[0];
+        var menuItem = getMenuItem(firstCustomer.order);
+
+        if (!menuItem) return;
+
+        // Check if assembled ingredients match
+        var correctIngredients = menuItem.ingredients.slice().sort();
+        var assembled = state.assembledIngredients.slice().sort();
+
+        var isCorrect = true;
+        for (var i = 0; i < 3; i++) {
+          if (correctIngredients[i] !== assembled[i]) {
+            isCorrect = false;
+            break;
+          }
+        }
+
+        if (isCorrect) {
+          state.score += 100;
+          state.served++;
+
+          var firstCard = els.customerQueue.querySelector('.customer-card.first');
+          if (firstCard) {
+            firstCard.classList.add('happy');
+          }
+
+          state.activeQueue.shift();
+
+          if (state.factsLearned.indexOf(menuItem.id) === -1) {
+            state.factsLearned.push(menuItem.id);
+          }
+
+          showFactToast(menuItem);
+          UIUtils.showNotification(firstCustomer.name + ' задоволений/задоволена! (+100 очок)', 2000);
+        } else {
+          state.score -= 50;
+          if (state.score < 0) state.score = 0;
+
+          var wrongCard = els.customerQueue.querySelector('.customer-card.first');
+          if (wrongCard) {
+            wrongCard.classList.add('leaving');
+          }
+
+          state.activeQueue.shift();
+          UIUtils.showNotification('Неправильні інгредієнти! ' + firstCustomer.name + ' розчарований/розчарована. (\u221250 очок)', 2500);
+        }
+
+        clearAssembly();
+        updateStats();
+
+        setTimeout(function () {
+          renderQueue();
+          if (state.activeQueue.length === 0 && state.currentCustomerIndex >= state.totalCustomers) {
+            endGame();
+          }
+        }, 400);
+      }
+
+      function showFactToast(menuItem) {
+        var existing = document.querySelector('.fact-toast');
+        if (existing) existing.parentNode.removeChild(existing);
+
+        var toast = document.createElement('div');
+        toast.className = 'fact-toast';
+
+        var title = document.createElement('div');
+        title.className = 'fact-toast-title';
+        title.textContent = menuItem.emoji + ' ' + menuItem.name;
+        toast.appendChild(title);
+
+        var text = document.createElement('div');
+        text.className = 'fact-toast-text';
+        text.textContent = menuItem.fullFact;
+        toast.appendChild(text);
+
+        document.body.appendChild(toast);
+
+        setTimeout(function () {
+          toast.classList.add('hiding');
+          setTimeout(function () {
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+          }, 300);
+        }, 4000);
+      }
+
+      /* ── Game lifecycle ── */
+      function startGame() {
+        els.introScreen.classList.add('hidden');
+        els.endScreen.classList.add('hidden');
+        els.gameUI.style.display = 'flex';
+
+        state.gameRunning = true;
+        state.score = 0;
+        state.served = 0;
+        state.currentCustomerIndex = 0;
+        state.activeQueue = [];
+        state.assembledIngredients = [null, null, null];
+        state.selectedMenuItem = null;
+        state.factsLearned = [];
+
+        els.gameTitle.textContent = data.title;
+        buildMenu();
+        renderAssembly();
+        updateStats();
+        renderQueue();
+
+        // First customer arrives immediately
+        addCustomer();
+
+        // Additional customers every 5 seconds
+        state.customerInterval = setInterval(addCustomer, 5000);
+
+        // Patience countdown every second
+        state.patienceInterval = setInterval(tickPatience, 1000);
+      }
+
+      function endGame() {
+        state.gameRunning = false;
+        clearInterval(state.customerInterval);
+        clearInterval(state.patienceInterval);
+
+        // Remove any fact toast
+        var toast = document.querySelector('.fact-toast');
+        if (toast && toast.parentNode) toast.parentNode.removeChild(toast);
+
+        // Fill end screen
+        els.endScore.textContent = state.score;
+        els.endServed.textContent = state.served;
+        els.endTotal.textContent = state.totalCustomers;
+
+        // Rating
+        if (state.served >= 8) {
+          els.endTitle.textContent = 'Чудова зміна!';
+          els.endTitle.style.webkitTextFillColor = '';
+          els.endTitle.style.color = 'var(--color-accent-green)';
+        } else if (state.served >= 5) {
+          els.endTitle.textContent = 'Непогано!';
+          els.endTitle.style.webkitTextFillColor = '';
+          els.endTitle.style.color = 'var(--color-accent-orange)';
+        } else {
+          els.endTitle.textContent = 'Потрібно більше практики!';
+          els.endTitle.style.webkitTextFillColor = '';
+          els.endTitle.style.color = 'var(--color-accent-red)';
+        }
+
+        // Facts learned
+        while (els.factsLearned.firstChild) {
+          els.factsLearned.removeChild(els.factsLearned.firstChild);
+        }
+
+        if (state.factsLearned.length > 0) {
+          var heading = document.createElement('h3');
+          heading.textContent = 'Історичні факти, які ви дізналися:';
+          els.factsLearned.appendChild(heading);
+
+          for (var i = 0; i < state.factsLearned.length; i++) {
+            var item = getMenuItem(state.factsLearned[i]);
+            if (item) {
+              var factDiv = document.createElement('div');
+              factDiv.className = 'fact-item';
+
+              var factStrong = document.createElement('strong');
+              factStrong.textContent = item.emoji + ' ' + item.name;
+              factDiv.appendChild(factStrong);
+
+              var factText = document.createTextNode(item.fullFact);
+              factDiv.appendChild(factText);
+
+              els.factsLearned.appendChild(factDiv);
+            }
+          }
+        } else {
+          var noFactsP = document.createElement('p');
+          noFactsP.style.color = 'var(--color-text-muted)';
+          noFactsP.textContent = 'На жаль, жодного факту не було розкрито. Спробуйте ще раз!';
+          els.factsLearned.appendChild(noFactsP);
+        }
+
+        els.endScreen.classList.remove('hidden');
+      }
+
+      /* ── Event listeners ── */
+      els.startBtn.addEventListener('click', startGame);
+      els.restartBtn.addEventListener('click', startGame);
+      els.serveBtn.addEventListener('click', serveDish);
+      els.clearBtn.addEventListener('click', clearAssembly);
+
+      // Assembly slot click handlers
+      var slots = els.assemblyArea.querySelectorAll('.assembly-slot');
+      for (var s = 0; s < slots.length; s++) {
+        slots[s].addEventListener('click', (function (index) {
+          return function () { handleSlotClick(index); };
+        })(s));
+      }
+
+    })();
+  </script>
+  <script src="../../shared/js/nav.js"></script>
+</body>
+</html>

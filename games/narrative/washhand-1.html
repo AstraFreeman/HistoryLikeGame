@@ -63,6 +63,7 @@
             border-radius: 10px;
             border: 2px solid #ff6b6b;
             box-shadow: 0 0 20px rgba(255, 107, 107, 0.4);
+            z-index: 15;
         }
         
         #score-panel h3 {
@@ -95,6 +96,7 @@
             transform: translateX(-50%);
             width: 90%;
             max-width: 1000px;
+            z-index: 20;
         }
         
         #collapsible-content {
@@ -445,7 +447,77 @@
             font-weight: bold;
             color: #ffd93d;
             text-shadow: 0 0 10px rgba(255, 217, 61, 0.6);
-            z-index: 100;
+            z-index: 15;
+        }
+
+        /* Feedback animations for sequence placement */
+        @keyframes slotCorrect {
+            0% { box-shadow: 0 0 10px rgba(255, 217, 61, 0.4); }
+            50% { box-shadow: 0 0 30px rgba(107, 207, 127, 0.8); border-color: #6bcf7f; }
+            100% { box-shadow: 0 0 10px rgba(255, 217, 61, 0.4); }
+        }
+        @keyframes slotError {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); }
+            60% { transform: translateX(-4px); }
+            80% { transform: translateX(4px); }
+        }
+        .sequence-slot.anim-correct {
+            animation: slotCorrect 0.6s ease;
+        }
+        .sequence-slot.anim-error {
+            animation: slotError 0.4s ease;
+        }
+        .event-card.anim-placed {
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Mobile responsive fixes */
+        @media (max-width: 768px) {
+            #game-title {
+                font-size: 18px;
+                padding: 10px;
+            }
+            #score-panel {
+                top: 50px;
+                right: 10px;
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+            #accuracy-bar { width: 120px; height: 20px; }
+            #enemy-name-display {
+                top: 50px;
+                left: 10px;
+                transform: none;
+                font-size: 14px;
+                padding: 8px 14px;
+                max-width: 55%;
+            }
+            #events-container {
+                width: 95%;
+                bottom: 10px;
+            }
+            .event-card {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+            .sequence-slot {
+                width: 140px;
+                min-height: 50px;
+            }
+            #sequence-slots {
+                flex-wrap: wrap;
+            }
+            .btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+            #feedback {
+                padding: 20px 25px;
+                max-width: 90%;
+                font-size: 14px;
+            }
         }
     </style>
 </head>
@@ -851,7 +923,13 @@
             
             e.currentTarget.appendChild(card);
             e.currentTarget.classList.add('filled');
-            
+            e.currentTarget.classList.add('anim-correct');
+            card.classList.add('anim-placed');
+            setTimeout(() => {
+                e.currentTarget.classList.remove('anim-correct');
+                card.classList.remove('anim-placed');
+            }, 600);
+
             renderEvents();
             draggedElement = null;
         }
@@ -923,8 +1001,13 @@
                 showFeedback(accuracy, "ЗБРОЮ ЗАРЯДЖЕНО! ✅", `Послідовність правильна!\nЗаряджено для знищення ворога з періоду: ${currentScenario.name}\nНатисніть 'ВІДСТРІЛИТИ' для атаки!`, false);
             } else {
                 const hint = getDetailedHint(filledSlots, currentScenario);
-                showFeedback(accuracy, "ПОМИЛКА В ПОСЛІДОВНОСТІ ⚠️", 
-                    `Точність: ${accuracy}/5\n\n${hint}\n\n${currentScenario.explanation}`, true); // 'isError' = true
+                showFeedback(accuracy, "ПОМИЛКА В ПОСЛІДОВНОСТІ ⚠️",
+                    `Точність: ${accuracy}/5\n\n${hint}\n\n${currentScenario.explanation}`, true);
+                // Animate error on filled slots
+                document.querySelectorAll('.sequence-slot.filled').forEach(slot => {
+                    slot.classList.add('anim-error');
+                    setTimeout(() => slot.classList.remove('anim-error'), 400);
+                });
             }
             
             updateUI();

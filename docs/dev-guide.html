@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Посібник розробника — Історія як гра</title>
+    <link rel="stylesheet" href="../shared/css/reset.css">
+    <link rel="stylesheet" href="../shared/css/theme.css">
+    <link rel="stylesheet" href="../shared/css/layout.css">
+    <link rel="stylesheet" href="../shared/css/components.css">
+    <link rel="stylesheet" href="../shared/css/animations.css">
+    <link rel="stylesheet" href="../shared/css/responsive.css">
+    <style>
+        body {
+            background: var(--gradient-bg);
+            background-attachment: fixed;
+            color: var(--color-text-primary);
+        }
+
+        .doc-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: var(--space-lg) var(--space-md) var(--space-3xl);
+        }
+
+        .doc-section {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-2xl);
+            backdrop-filter: blur(var(--glass-blur));
+            box-shadow: var(--glass-shadow);
+            margin-bottom: var(--space-xl);
+            animation: fadeIn 0.5s ease both;
+        }
+
+        .doc-section:nth-child(2) { animation-delay: 0.05s; }
+        .doc-section:nth-child(3) { animation-delay: 0.1s; }
+        .doc-section:nth-child(4) { animation-delay: 0.15s; }
+        .doc-section:nth-child(5) { animation-delay: 0.2s; }
+        .doc-section:nth-child(6) { animation-delay: 0.25s; }
+        .doc-section:nth-child(7) { animation-delay: 0.3s; }
+        .doc-section:nth-child(8) { animation-delay: 0.35s; }
+        .doc-section:nth-child(9) { animation-delay: 0.4s; }
+        .doc-section:nth-child(10) { animation-delay: 0.45s; }
+
+        .doc-section h2 {
+            font-size: var(--text-2xl);
+            font-weight: 700;
+            margin-bottom: var(--space-lg);
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .doc-section h3 {
+            font-size: var(--text-xl);
+            font-weight: 600;
+            color: var(--color-accent-cyan);
+            margin-top: var(--space-xl);
+            margin-bottom: var(--space-md);
+        }
+
+        .doc-section h3:first-of-type {
+            margin-top: 0;
+        }
+
+        .doc-section p {
+            color: var(--color-text-secondary);
+            line-height: 1.7;
+            margin-bottom: var(--space-md);
+        }
+
+        .doc-section ul,
+        .doc-section ol {
+            color: var(--color-text-secondary);
+            line-height: 1.8;
+            margin-bottom: var(--space-md);
+            padding-left: var(--space-xl);
+        }
+
+        .doc-section li {
+            margin-bottom: var(--space-xs);
+        }
+
+        .doc-section li code {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--color-accent-blue);
+            padding: 0.1em 0.4em;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+        }
+
+        .doc-section strong {
+            color: var(--color-text-primary);
+        }
+
+        pre {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            overflow-x: auto;
+            margin-bottom: var(--space-md);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        pre code {
+            font-family: var(--font-mono);
+            font-size: var(--text-sm);
+            color: var(--color-text-primary);
+            line-height: 1.6;
+        }
+
+        code {
+            font-family: var(--font-mono);
+        }
+
+        .inline-code {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--color-accent-blue);
+            padding: 0.15em 0.4em;
+            border-radius: var(--radius-sm);
+            font-family: var(--font-mono);
+            font-size: 0.9em;
+        }
+
+        .dir-tree {
+            font-family: var(--font-mono);
+            font-size: var(--text-sm);
+            color: var(--color-text-secondary);
+            line-height: 1.5;
+        }
+
+        .dir-tree .comment {
+            color: var(--color-text-muted);
+        }
+
+        .api-block {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: var(--space-lg);
+            margin-bottom: var(--space-lg);
+        }
+
+        .api-block h3 {
+            margin-top: 0;
+        }
+
+        .step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius-sm);
+            background: var(--gradient-primary);
+            color: var(--color-text-on-accent);
+            font-weight: 700;
+            font-size: var(--text-sm);
+            margin-right: var(--space-sm);
+            flex-shrink: 0;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: var(--space-lg);
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-content p {
+            margin-bottom: var(--space-sm);
+        }
+
+        .toc {
+            list-style: none;
+            padding: 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: var(--space-sm);
+        }
+
+        .toc li {
+            margin: 0;
+        }
+
+        .toc a {
+            display: block;
+            padding: var(--space-sm) var(--space-md);
+            background: var(--color-surface);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            color: var(--color-text-secondary);
+            transition: all var(--transition-base);
+            font-size: var(--text-sm);
+        }
+
+        .toc a:hover {
+            background: var(--color-surface-hover);
+            color: var(--color-text-primary);
+            border-color: var(--color-accent-blue);
+        }
+
+        @media (max-width: 600px) {
+            .doc-section {
+                padding: var(--space-lg);
+            }
+
+            pre {
+                padding: var(--space-md);
+                font-size: var(--text-xs);
+            }
+
+            .toc {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body data-section="Документація" data-game-title="Посібник розробника" data-home-url="../index.html">
+
+    <div class="doc-content">
+
+        <!-- Заголовок -->
+        <header class="page-header" style="border-radius: var(--radius-lg); margin-bottom: var(--space-xl); border: 1px solid var(--glass-border);">
+            <h1>Історія як гра</h1>
+            <p>Посібник розробника</p>
+        </header>
+
+        <!-- Зміст -->
+        <section class="doc-section">
+            <h2>Зміст</h2>
+            <ul class="toc">
+                <li><a href="#architecture">Архітектура</a></li>
+                <li><a href="#directory">Структура директорій</a></li>
+                <li><a href="#js-api">Shared JS API</a></li>
+                <li><a href="#navigation">Навігація</a></li>
+                <li><a href="#css-theming">CSS theming</a></li>
+                <li><a href="#new-game">Як додати нову гру</a></li>
+                <li><a href="#quiz-falling">Quiz/falling шаблони</a></li>
+                <li><a href="#conventions">Конвенції</a></li>
+            </ul>
+        </section>
+
+        <!-- Архітектура -->
+        <section class="doc-section" id="architecture">
+            <h2>Архітектура</h2>
+            <ul>
+                <li><strong>Hub-and-spoke:</strong> <code>index.html</code> → окремі ігри</li>
+                <li><strong>Без збірника (build system)</strong> — чистий HTML/CSS/JS</li>
+                <li>Працює з <code>file://</code> протоколом</li>
+                <li>Shared JS через <code>window.*</code> глобальні об'єкти (без ES modules)</li>
+            </ul>
+        </section>
+
+        <!-- Структура директорій -->
+        <section class="doc-section" id="directory">
+            <h2>Структура директорій</h2>
+            <pre><code class="dir-tree">index.html                    <span class="comment"># Головна сторінка</span>
+shared/
+  css/
+    reset.css                 <span class="comment"># Box-sizing, базова типографіка</span>
+    theme.css                 <span class="comment"># CSS custom properties (кольори, відступи)</span>
+    layout.css                <span class="comment"># Контейнери ігор, сітки, панелі</span>
+    components.css            <span class="comment"># Кнопки, картки, модалки, навбар</span>
+    animations.css            <span class="comment"># @keyframes та класи анімацій</span>
+    responsive.css            <span class="comment"># Mobile-first медіа-запити</span>
+  js/
+    nav.js                    <span class="comment"># Sticky навбар</span>
+    quiz-engine.js            <span class="comment"># window.QuizGame</span>
+    game-engine.js            <span class="comment"># window.FallingGame</span>
+    canvas-utils.js           <span class="comment"># window.CanvasUtils</span>
+    ui-utils.js               <span class="comment"># window.UIUtils</span>
+    assistant.js              <span class="comment"># Помічник-восьминог</span>
+  templates/
+    quiz-question.html        <span class="comment"># Шаблон вікторини</span>
+    falling-answer.html       <span class="comment"># Шаблон гри з падаючими відповідями</span>
+data/
+  quiz/                       <span class="comment"># 23 файли даних вікторин</span>
+  falling/                    <span class="comment"># 3 файли даних падаючих ігор</span>
+  assistant/facts.js          <span class="comment"># 50+ фактів для помічника</span>
+  games/                      <span class="comment"># Дані нових ігор</span>
+    solitaire-v2-cossack.js
+    bobble-imperial.js
+    puzzle-soviet.js
+    kafe-independence.js
+games/
+  narrative/                  <span class="comment"># Наративні та унікальні ігри</span>
+  start-pages/               <span class="comment"># Вступні сторінки</span>
+  quiz-hub/                  <span class="comment"># Сітка вікторин</span>
+  map/                       <span class="comment"># Інтерактивна карта</span>
+ar/                          <span class="comment"># A-Frame / AR.js сторінки</span>
+assets/                      <span class="comment"># Зображення, моделі, музика, шрифти</span>
+docs/                        <span class="comment"># Документація</span></code></pre>
+        </section>
+
+        <!-- Shared JS API -->
+        <section class="doc-section" id="js-api">
+            <h2>Shared JS API</h2>
+
+            <div class="api-block">
+                <h3>QuizGame (<span class="inline-code">shared/js/quiz-engine.js</span>)</h3>
+<pre><code>window.QuizGame.init({
+  dataVar: 'QUIZ_DATA',
+  containerId: 'quiz-container'
+});</code></pre>
+            </div>
+
+            <div class="api-block">
+                <h3>FallingGame (<span class="inline-code">shared/js/game-engine.js</span>)</h3>
+<pre><code>window.FallingGame.init({
+  dataVar: 'FALLING_DATA',
+  canvasId: 'game-canvas'
+});</code></pre>
+            </div>
+
+            <div class="api-block">
+                <h3>CanvasUtils (<span class="inline-code">shared/js/canvas-utils.js</span>)</h3>
+<pre><code>window.CanvasUtils.setup(canvasId, containerId)
+window.CanvasUtils.resize()
+window.CanvasUtils.getSize()
+window.CanvasUtils.checkCollisionAABB(a, b)  // {x,y,w,h}
+window.CanvasUtils.checkCollisionCircle(a, b) // {x,y,radius}
+window.CanvasUtils.reflectOffWalls(ball, bounds)
+window.CanvasUtils.clear(bgColor)</code></pre>
+            </div>
+
+            <div class="api-block">
+                <h3>UIUtils (<span class="inline-code">shared/js/ui-utils.js</span>)</h3>
+<pre><code>window.UIUtils.showModal(modalId, overlayId)
+window.UIUtils.hideModal(modalId, overlayId)
+window.UIUtils.updateText(elementId, text)
+window.UIUtils.updateScore(scoreId, value)
+window.UIUtils.updateLives(livesId, value)
+window.UIUtils.showNotification(message, duration)</code></pre>
+            </div>
+        </section>
+
+        <!-- Навігація -->
+        <section class="doc-section" id="navigation">
+            <h2>Навігація (<span class="inline-code">shared/js/nav.js</span>)</h2>
+            <p>Читає data-атрибути з <code class="inline-code">&lt;body&gt;</code>:</p>
+            <ul>
+                <li><code>data-section</code> — назва розділу</li>
+                <li><code>data-game-title</code> — назва гри</li>
+                <li><code>data-home-url</code> — шлях до index.html</li>
+                <li><code>data-nav="overlay"</code> — плаваюча кнопка для повноекранних ігор</li>
+                <li><code>data-nav="false"</code> — без навбару</li>
+            </ul>
+        </section>
+
+        <!-- CSS theming -->
+        <section class="doc-section" id="css-theming">
+            <h2>CSS theming</h2>
+            <p><code class="inline-code">theme.css</code> визначає CSS custom properties:</p>
+            <ul>
+                <li><code>--color-bg-primary</code>, <code>--color-accent-blue</code>, тощо</li>
+                <li><code>--glass-bg</code>, <code>--glass-border</code>, <code>--glass-blur</code></li>
+                <li><code>--space-xs</code> через <code>--space-3xl</code></li>
+                <li><code>--text-xs</code> через <code>--text-4xl</code></li>
+                <li><code>--game-accent</code>, <code>--game-bg</code> — для кастомізації на рівні сторінки</li>
+            </ul>
+        </section>
+
+        <!-- Як додати нову гру -->
+        <section class="doc-section" id="new-game">
+            <h2>Як додати нову гру</h2>
+
+            <div class="step">
+                <span class="step-num">1</span>
+                <div class="step-content">
+                    <p>Створіть файл даних: <code class="inline-code">data/games/my-game-data.js</code></p>
+<pre><code>window.MY_GAME_DATA = { ... };</code></pre>
+                </div>
+            </div>
+
+            <div class="step">
+                <span class="step-num">2</span>
+                <div class="step-content">
+                    <p>Створіть HTML: <code class="inline-code">games/narrative/my-game.html</code></p>
+<pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="uk"&gt;
+&lt;head&gt;
+    &lt;link rel="stylesheet" href="../../shared/css/reset.css"&gt;
+    &lt;link rel="stylesheet" href="../../shared/css/theme.css"&gt;
+    &lt;link rel="stylesheet" href="../../shared/css/animations.css"&gt;
+&lt;/head&gt;
+&lt;body data-nav="overlay" data-home-url="../../index.html"&gt;
+    &lt;!-- Гра --&gt;
+    &lt;script src="../../data/games/my-game-data.js"&gt;&lt;/script&gt;
+    &lt;script&gt;/* Логіка гри */&lt;/script&gt;
+    &lt;script src="../../shared/js/nav.js"&gt;&lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+                </div>
+            </div>
+
+            <div class="step">
+                <span class="step-num">3</span>
+                <div class="step-content">
+                    <p>Додайте посилання в <code class="inline-code">index.html</code></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz/Falling шаблони -->
+        <section class="doc-section" id="quiz-falling">
+            <h2>Як додати дані для quiz/falling шаблонів</h2>
+
+            <h3>Quiz</h3>
+            <p>Створіть <code class="inline-code">data/quiz/crstm-s-{row}-{col}.js</code>:</p>
+<pre><code>window.QUIZ_DATA = {
+  title: "...",
+  questions: [
+    { question: "...", answers: ["..."], correct: 0 }
+  ]
+};</code></pre>
+            <p>Посилання: <code class="inline-code">shared/templates/quiz-question.html?id={row}-{col}</code></p>
+
+            <h3>Falling</h3>
+            <p>Створіть <code class="inline-code">data/falling/period-{n}-{name}.js</code>:</p>
+<pre><code>window.FALLING_DATA = { ... };</code></pre>
+            <p>Посилання: <code class="inline-code">shared/templates/falling-answer.html?id={n}-{name}</code></p>
+        </section>
+
+        <!-- Конвенції -->
+        <section class="doc-section" id="conventions">
+            <h2>Конвенції</h2>
+            <ul>
+                <li><strong>Файли:</strong> kebab-case (<code>my-game.html</code>, <code>my-data.js</code>)</li>
+                <li><strong>Мова UI:</strong> українська, тільки перше слово з великої літери</li>
+                <li><strong>Без ES модулів:</strong> <code>window.*</code> глобальні об'єкти</li>
+                <li><strong>Шляхи від ігор:</strong> <code>../../shared/</code>, <code>../../assets/</code></li>
+                <li><strong>AR-сторінки:</strong> inline floating <code>&lt;a&gt;</code> замість nav.js</li>
+            </ul>
+        </section>
+
+        <footer class="site-footer">
+            Історія як гра — посібник розробника
+        </footer>
+
+    </div>
+
+    <script src="../shared/js/nav.js"></script>
+</body>
+</html>

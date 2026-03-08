@@ -368,24 +368,18 @@
         const images = {
             topLoaded: false,
             downLoaded: false,
-            moveLoaded: false,
             cossackLoaded: false
         };
         
         const imgTop = new Image();
-        imgTop.src = '../../../assets/images/vik_top.png';
+        imgTop.src = './image/vik_top.png';
         imgTop.onload = () => { images.topLoaded = true; };
         imgTop.onerror = () => { images.topLoaded = false; };
-        
+
         const imgDown = new Image();
-        imgDown.src = '../../../assets/images/vik_down.png';
+        imgDown.src = './image/vik_botom.png';
         imgDown.onload = () => { images.downLoaded = true; };
         imgDown.onerror = () => { images.downLoaded = false; };
-        
-        const imgMove = new Image();
-        imgMove.src = '../../../assets/images/vik_move.gif';
-        imgMove.onload = () => { images.moveLoaded = true; };
-        imgMove.onerror = () => { images.moveLoaded = false; };
         
         // 6 вертикальних ліній для падіння яблук (у відсотках)
         const lanes = [0.125, 0.25, 0.375, 0.5, 0.625, 0.875];
@@ -511,9 +505,7 @@
             }
             
             // Нижня частина (зона ловлі)
-            if (basket.moving && images.moveLoaded) {
-                ctx.drawImage(imgMove, x - w/2, y + topHeight, w, downHeight);
-            } else if (images.downLoaded) {
+            if (images.downLoaded) {
                 ctx.drawImage(imgDown, x - w/2, y + topHeight, w, downHeight);
             } else {
                 ctx.fillStyle = '#D2691E';

@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Історична косинка: козацька доба</title>
+    <link rel="stylesheet" href="../../shared/css/reset.css">
+    <link rel="stylesheet" href="../../shared/css/theme.css">
+    <link rel="stylesheet" href="../../shared/css/animations.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
+            font-size: 1.8em;
+        }
+
+        #info-box {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 15px 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            max-width: 800px;
+            text-align: center;
+            font-size: 14px;
+            color: #e0e0e0;
+        }
+
+        #info-box strong {
+            color: #FFD700;
+        }
+
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            width: 100%;
+            max-width: 1400px;
+        }
+
+        #tableau {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 15px;
+            width: 100%;
+        }
+
+        .tableau-column {
+            min-height: 200px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            transition: background 0.3s;
+        }
+
+        .tableau-column.drag-over {
+            background: rgba(255, 215, 0, 0.15);
+            border-color: rgba(255, 215, 0, 0.6);
+        }
+
+        .card {
+            width: 100%;
+            min-height: 120px;
+            border-radius: 8px;
+            padding: 12px;
+            padding-top: 36px;
+            cursor: grab;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            position: relative;
+            font-size: 12px;
+            line-height: 1.4;
+            transition: transform 0.2s, box-shadow 0.2s;
+            user-select: none;
+        }
+
+        .card:active {
+            cursor: grabbing;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+        }
+
+        .card.dragging {
+            opacity: 0.5;
+        }
+
+        .card.face-down {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 50%, #1e3c72 100%);
+            color: transparent;
+            cursor: default;
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .card.face-down:hover {
+            transform: none;
+        }
+
+        .card.face-down::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: 50px;
+            background: radial-gradient(circle, rgba(255,215,0,0.3) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .card.face-down::after {
+            content: '\2694';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 30px;
+            color: rgba(255, 215, 0, 0.5);
+        }
+
+        .theme-indicator {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .card-number {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .card-weight {
+            position: absolute;
+            top: 8px;
+            left: 48px;
+            background: rgba(255, 215, 0, 0.85);
+            color: #1a1a2e;
+            padding: 3px 7px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .card-year {
+            position: absolute;
+            bottom: 6px;
+            left: 8px;
+            background: rgba(0,0,0,0.5);
+            color: rgba(255, 255, 255, 0.8);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        #foundation-area {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(8px);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .foundation-slot {
+            width: 150px;
+            min-height: 180px;
+            border: 3px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.03);
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .foundation-slot.drag-over {
+            background: rgba(255, 215, 0, 0.15);
+            border-color: rgba(255, 215, 0, 0.6);
+            transform: scale(1.05);
+        }
+
+        .foundation-slot .card {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            min-height: 140px;
+        }
+
+        .foundation-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 11px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+
+        .foundation-theme-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+
+        #controls {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            color: #FFD700;
+            font-weight: bold;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            transition: all 0.3s;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            background: rgba(255, 215, 0, 0.15);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .card-count {
+            position: absolute;
+            bottom: 6px;
+            right: 8px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        #win-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #win-overlay.active {
+            display: flex;
+        }
+
+        .win-modal {
+            background: rgba(30, 30, 60, 0.95);
+            backdrop-filter: blur(16px);
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            color: #e0e0e0;
+        }
+
+        .win-modal h2 {
+            color: #FFD700;
+            font-size: 1.8em;
+            margin-bottom: 16px;
+        }
+
+        .win-modal p {
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 1000px) {
+            #tableau {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            #foundation-area {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 600px) {
+            #tableau {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .card {
+                min-height: 100px;
+                font-size: 11px;
+                padding-top: 32px;
+            }
+            h1 {
+                font-size: 1.3em;
+            }
+            .foundation-slot {
+                width: 120px;
+                min-height: 150px;
+            }
+        }
+    </style>
+</head>
+<body data-section="Ігри" data-game-title="Історична косинка v2" data-home-url="../../index.html">
+    <h1>Історична косинка: козацька доба</h1>
+    <div id="info-box">
+        <strong>Правила:</strong> Перетягуйте картки між колонками. На картку можна класти лише картку тієї ж теми з <em>меншою вагою</em> (або меншим порядком при рівній вазі).
+        У фундамент складайте картки за хронологічним порядком від 1 до 6. Зберіть усі картки за темами!
+    </div>
+
+    <div id="game-container">
+        <div id="foundation-area"></div>
+        <div id="tableau"></div>
+    </div>
+
+    <div id="controls">
+        <button id="reset-button">Нова гра</button>
+        <button id="hint-button">Підказка</button>
+    </div>
+
+    <div id="win-overlay">
+        <div class="win-modal">
+            <h2>Перемога!</h2>
+            <p>Ви зібрали всі картки козацької доби у правильному хронологічному порядку! Козацька слава не вмирає!</p>
+            <button id="win-restart">Грати ще раз</button>
+        </div>
+    </div>
+
+    <script src="../../data/games/solitaire-v2-cossack.js"></script>
+    <script>
+        (function() {
+            'use strict';
+
+            var data = window.SOLITAIRE_DATA;
+            if (!data) {
+                document.body.textContent = 'Помилка: дані гри не знайдено.';
+                return;
+            }
+
+            // Build flat card list with theme metadata
+            var themeMap = {};
+            var cards = [];
+            var cardId = 1;
+
+            data.themes.forEach(function(theme) {
+                themeMap[theme.id] = theme;
+                theme.cards.forEach(function(card) {
+                    cards.push({
+                        id: cardId++,
+                        themeId: theme.id,
+                        themeName: theme.name,
+                        order: card.order,
+                        content: card.content,
+                        year: card.year,
+                        weight: card.weight
+                    });
+                });
+            });
+
+            var tableau = [];
+            var foundation = {};
+            var draggedCard = null;
+            var draggedFrom = null;
+
+            // Initialize foundation structure
+            function resetFoundation() {
+                foundation = {};
+                data.themes.forEach(function(theme) {
+                    foundation[theme.id] = [];
+                });
+            }
+
+            // Build foundation area from data
+            function buildFoundationArea() {
+                var area = document.getElementById('foundation-area');
+                while (area.firstChild) area.removeChild(area.firstChild);
+
+                data.themes.forEach(function(theme) {
+                    var slot = document.createElement('div');
+                    slot.className = 'foundation-slot';
+                    slot.setAttribute('data-theme-id', theme.id);
+
+                    var dot = document.createElement('span');
+                    dot.className = 'foundation-theme-dot';
+                    dot.style.background = theme.color.gradient;
+
+                    var label = document.createElement('div');
+                    label.className = 'foundation-label';
+                    label.appendChild(dot);
+                    label.appendChild(document.createElement('br'));
+                    label.appendChild(document.createTextNode(theme.name));
+                    label.appendChild(document.createElement('br'));
+                    label.appendChild(document.createTextNode('(1\u20136)'));
+
+                    slot.appendChild(label);
+                    area.appendChild(slot);
+                });
+            }
+
+            function shuffle(array) {
+                var arr = array.slice();
+                for (var i = arr.length - 1; i > 0; i--) {
+                    var j = Math.floor(Math.random() * (i + 1));
+                    var temp = arr[i];
+                    arr[i] = arr[j];
+                    arr[j] = temp;
+                }
+                return arr;
+            }
+
+            function initializeGame() {
+                var shuffled = shuffle(cards);
+                tableau = [];
+                for (var c = 0; c < 7; c++) {
+                    tableau.push([]);
+                }
+                resetFoundation();
+
+                var cardIndex = 0;
+                for (var col = 0; col < 7; col++) {
+                    var cardsInColumn = col + 1;
+                    for (var row = 0; row < cardsInColumn && cardIndex < shuffled.length; row++) {
+                        var cardCopy = {};
+                        for (var key in shuffled[cardIndex]) {
+                            if (shuffled[cardIndex].hasOwnProperty(key)) {
+                                cardCopy[key] = shuffled[cardIndex][key];
+                            }
+                        }
+                        cardCopy.faceUp = (row === cardsInColumn - 1);
+                        tableau[col].push(cardCopy);
+                        cardIndex++;
+                    }
+                }
+
+                // Remaining cards go to columns round-robin
+                while (cardIndex < shuffled.length) {
+                    var targetCol = cardIndex % 7;
+                    var cardCopy = {};
+                    for (var key in shuffled[cardIndex]) {
+                        if (shuffled[cardIndex].hasOwnProperty(key)) {
+                            cardCopy[key] = shuffled[cardIndex][key];
+                        }
+                    }
+                    cardCopy.faceUp = true;
+                    tableau[targetCol].push(cardCopy);
+                    cardIndex++;
+                }
+
+                // Ensure last card in each column is face up
+                for (var i = 0; i < tableau.length; i++) {
+                    if (tableau[i].length > 0) {
+                        tableau[i][tableau[i].length - 1].faceUp = true;
+                    }
+                }
+
+                document.getElementById('win-overlay').classList.remove('active');
+                buildFoundationArea();
+                renderGame();
+                updateInfoBox('Гра розпочата! Збирайте картки козацької доби за темами у хронологічному порядку.');
+            }
+
+            function getThemeColor(themeId) {
+                var theme = themeMap[themeId];
+                return theme ? theme.color : { gradient: '#888', text: '#fff' };
+            }
+
+            // Tableau stacking: can place on card with HIGHER weight of same theme,
+            // or higher order if same weight
+            function canPlaceOnTableau(card, targetColumn) {
+                if (targetColumn.length === 0) return true;
+
+                var topCard = targetColumn[targetColumn.length - 1];
+                if (!topCard.faceUp) return false;
+
+                if (card.themeId !== topCard.themeId) return false;
+
+                if (topCard.weight > card.weight) return true;
+                if (topCard.weight === card.weight && topCard.order > card.order) return true;
+
+                return false;
+            }
+
+            function canPlaceOnFoundation(card, themeId) {
+                if (card.themeId !== themeId) return false;
+
+                var pile = foundation[themeId];
+                if (pile.length === 0) {
+                    return card.order === 1;
+                }
+                var topCard = pile[pile.length - 1];
+                return card.order === topCard.order + 1;
+            }
+
+            function handleDragStart(e, card, columnIndex) {
+                if (!card.faceUp) {
+                    e.preventDefault();
+                    return;
+                }
+                draggedCard = card;
+                draggedFrom = { type: 'tableau', index: columnIndex };
+                e.target.classList.add('dragging');
+                e.dataTransfer.effectAllowed = 'move';
+                e.dataTransfer.setData('text/plain', String(card.id));
+            }
+
+            function handleDragEnd(e) {
+                e.target.classList.remove('dragging');
+                var dragOvers = document.querySelectorAll('.drag-over');
+                for (var i = 0; i < dragOvers.length; i++) {
+                    dragOvers[i].classList.remove('drag-over');
+                }
+            }
+
+            function handleDragOver(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+            }
+
+            function handleDragEnter(e) {
+                var target = e.currentTarget;
+                if (target.classList.contains('tableau-column') ||
+                    target.classList.contains('foundation-slot')) {
+                    target.classList.add('drag-over');
+                }
+            }
+
+            function handleDragLeave(e) {
+                var target = e.currentTarget;
+                if (target.classList.contains('tableau-column') ||
+                    target.classList.contains('foundation-slot')) {
+                    target.classList.remove('drag-over');
+                }
+            }
+
+            function handleDropOnTableau(e, targetColumnIndex) {
+                e.preventDefault();
+                e.currentTarget.classList.remove('drag-over');
+
+                if (!draggedCard || !draggedFrom || draggedFrom.type !== 'tableau') return;
+
+                var sourceColumn = tableau[draggedFrom.index];
+                var targetColumn = tableau[targetColumnIndex];
+
+                if (canPlaceOnTableau(draggedCard, targetColumn)) {
+                    var cardIndex = -1;
+                    for (var i = 0; i < sourceColumn.length; i++) {
+                        if (sourceColumn[i].id === draggedCard.id) { cardIndex = i; break; }
+                    }
+                    var movedCards = sourceColumn.splice(cardIndex);
+                    for (var i = 0; i < movedCards.length; i++) {
+                        targetColumn.push(movedCards[i]);
+                    }
+
+                    if (sourceColumn.length > 0) {
+                        sourceColumn[sourceColumn.length - 1].faceUp = true;
+                    }
+
+                    updateInfoBox('Картку переміщено!');
+                    renderGame();
+                } else if (targetColumn.length === 0) {
+                    var cardIndex = -1;
+                    for (var i = 0; i < sourceColumn.length; i++) {
+                        if (sourceColumn[i].id === draggedCard.id) { cardIndex = i; break; }
+                    }
+                    var movedCards = sourceColumn.splice(cardIndex);
+                    for (var i = 0; i < movedCards.length; i++) {
+                        targetColumn.push(movedCards[i]);
+                    }
+
+                    if (sourceColumn.length > 0) {
+                        sourceColumn[sourceColumn.length - 1].faceUp = true;
+                    }
+
+                    updateInfoBox('Картку переміщено у порожню колонку!');
+                    renderGame();
+                } else {
+                    var topCard = targetColumn[targetColumn.length - 1];
+                    if (draggedCard.themeId !== topCard.themeId) {
+                        updateInfoBox('Картки повинні бути однієї теми!');
+                    } else {
+                        updateInfoBox('На картку з вагою ' + topCard.weight + ' можна класти лише картку з меншою вагою (ваша вага: ' + draggedCard.weight + ').');
+                    }
+                }
+
+                draggedCard = null;
+                draggedFrom = null;
+            }
+
+            function handleDropOnFoundation(e, themeId) {
+                e.preventDefault();
+                e.currentTarget.classList.remove('drag-over');
+
+                if (!draggedCard || !draggedFrom || draggedFrom.type !== 'tableau') return;
+
+                if (canPlaceOnFoundation(draggedCard, themeId)) {
+                    var sourceColumn = tableau[draggedFrom.index];
+                    var cardIndex = -1;
+                    for (var i = 0; i < sourceColumn.length; i++) {
+                        if (sourceColumn[i].id === draggedCard.id) { cardIndex = i; break; }
+                    }
+
+                    if (cardIndex === sourceColumn.length - 1) {
+                        sourceColumn.splice(cardIndex, 1);
+                        foundation[themeId].push(draggedCard);
+
+                        if (sourceColumn.length > 0) {
+                            sourceColumn[sourceColumn.length - 1].faceUp = true;
+                        }
+
+                        var themeName = themeMap[themeId].name;
+                        updateInfoBox('Картку #' + draggedCard.order + ' додано до фундаменту \u00ab' + themeName + '\u00bb!');
+                        renderGame();
+                        checkWin();
+                    } else {
+                        updateInfoBox('У фундамент можна переносити тільки верхню картку колонки.');
+                    }
+                } else {
+                    var pile = foundation[themeId];
+                    var expectedOrder = pile.length + 1;
+                    var themeName = themeMap[themeId].name;
+                    if (draggedCard.themeId !== themeId) {
+                        updateInfoBox('Картка теми \u00ab' + draggedCard.themeName + '\u00bb не підходить до фундаменту \u00ab' + themeName + '\u00bb.');
+                    } else {
+                        updateInfoBox('Потрібна картка #' + expectedOrder + ', але ваша картка #' + draggedCard.order + '.');
+                    }
+                }
+
+                draggedCard = null;
+                draggedFrom = null;
+            }
+
+            function createCardElement(card, colIndex) {
+                var cardDiv = document.createElement('div');
+                cardDiv.className = 'card';
+                cardDiv.draggable = card.faceUp;
+
+                if (!card.faceUp) {
+                    cardDiv.classList.add('face-down');
+                    cardDiv.draggable = false;
+                } else {
+                    var themeColor = getThemeColor(card.themeId);
+
+                    // Card background based on theme
+                    cardDiv.style.background = themeColor.gradient;
+                    cardDiv.style.color = themeColor.text;
+
+                    // Content text
+                    var contentSpan = document.createElement('span');
+                    contentSpan.textContent = card.content;
+                    cardDiv.appendChild(contentSpan);
+
+                    // Order number badge
+                    var number = document.createElement('div');
+                    number.className = 'card-number';
+                    number.textContent = card.order;
+                    cardDiv.appendChild(number);
+
+                    // Weight badge
+                    var weightBadge = document.createElement('div');
+                    weightBadge.className = 'card-weight';
+                    weightBadge.textContent = '\u2696 ' + card.weight;
+                    cardDiv.appendChild(weightBadge);
+
+                    // Year badge
+                    var yearBadge = document.createElement('div');
+                    yearBadge.className = 'card-year';
+                    yearBadge.textContent = card.year + ' p.';
+                    cardDiv.appendChild(yearBadge);
+
+                    // Theme indicator dot
+                    var indicator = document.createElement('div');
+                    indicator.className = 'theme-indicator';
+                    indicator.style.background = themeColor.gradient;
+                    cardDiv.appendChild(indicator);
+
+                    cardDiv.addEventListener('dragstart', function(e) {
+                        handleDragStart(e, card, colIndex);
+                    });
+                    cardDiv.addEventListener('dragend', handleDragEnd);
+                }
+
+                return cardDiv;
+            }
+
+            function renderGame() {
+                var tableauEl = document.getElementById('tableau');
+                while (tableauEl.firstChild) tableauEl.removeChild(tableauEl.firstChild);
+
+                for (var colIndex = 0; colIndex < tableau.length; colIndex++) {
+                    var colDiv = document.createElement('div');
+                    colDiv.className = 'tableau-column';
+                    colDiv.addEventListener('dragover', handleDragOver);
+                    colDiv.addEventListener('dragenter', handleDragEnter);
+                    colDiv.addEventListener('dragleave', handleDragLeave);
+                    (function(ci) {
+                        colDiv.addEventListener('drop', function(e) { handleDropOnTableau(e, ci); });
+                    })(colIndex);
+
+                    var column = tableau[colIndex];
+                    for (var cardIndex = 0; cardIndex < column.length; cardIndex++) {
+                        var cardDiv = createCardElement(column[cardIndex], colIndex);
+                        colDiv.appendChild(cardDiv);
+                    }
+
+                    tableauEl.appendChild(colDiv);
+                }
+
+                // Render foundation
+                var themeIds = Object.keys(foundation);
+                for (var t = 0; t < themeIds.length; t++) {
+                    var themeId = themeIds[t];
+                    var pile = foundation[themeId];
+                    var slot = document.querySelector('[data-theme-id="' + themeId + '"]');
+                    if (!slot) continue;
+
+                    // Remove old card if present
+                    var existingCard = slot.querySelector('.card');
+                    if (existingCard) existingCard.parentNode.removeChild(existingCard);
+
+                    var label = slot.querySelector('.foundation-label');
+
+                    if (pile.length > 0) {
+                        var topCard = pile[pile.length - 1];
+                        var themeColor = getThemeColor(themeId);
+
+                        var cardDiv = document.createElement('div');
+                        cardDiv.className = 'card';
+                        cardDiv.style.background = themeColor.gradient;
+                        cardDiv.style.color = themeColor.text;
+                        cardDiv.textContent = topCard.content;
+
+                        var number = document.createElement('div');
+                        number.className = 'card-number';
+                        number.textContent = topCard.order;
+                        cardDiv.appendChild(number);
+
+                        var weightBadge = document.createElement('div');
+                        weightBadge.className = 'card-weight';
+                        weightBadge.textContent = '\u2696 ' + topCard.weight;
+                        cardDiv.appendChild(weightBadge);
+
+                        var count = document.createElement('div');
+                        count.className = 'card-count';
+                        count.textContent = pile.length + '/6';
+                        cardDiv.appendChild(count);
+
+                        slot.insertBefore(cardDiv, label);
+                    }
+
+                    // Attach drop handlers
+                    slot.addEventListener('dragover', handleDragOver);
+                    slot.addEventListener('dragenter', handleDragEnter);
+                    slot.addEventListener('dragleave', handleDragLeave);
+                    (function(tid) {
+                        slot.addEventListener('drop', function(e) { handleDropOnFoundation(e, tid); });
+                    })(themeId);
+                }
+            }
+
+            function updateInfoBox(message) {
+                var box = document.getElementById('info-box');
+                while (box.firstChild) box.removeChild(box.firstChild);
+                var strong = document.createElement('strong');
+                strong.textContent = 'Статус: ';
+                box.appendChild(strong);
+                box.appendChild(document.createTextNode(message));
+            }
+
+            function checkWin() {
+                var total = 0;
+                var keys = Object.keys(foundation);
+                for (var i = 0; i < keys.length; i++) {
+                    total += foundation[keys[i]].length;
+                }
+                if (total === cards.length) {
+                    document.getElementById('win-overlay').classList.add('active');
+                }
+            }
+
+            function showHint() {
+                var hint = '';
+                var found = false;
+
+                // Check for foundation moves first
+                for (var i = 0; i < tableau.length; i++) {
+                    var column = tableau[i];
+                    if (column.length > 0) {
+                        var topCard = column[column.length - 1];
+                        if (topCard.faceUp && canPlaceOnFoundation(topCard, topCard.themeId)) {
+                            hint = 'Картку #' + topCard.order + ' (\u00ab' + topCard.themeName + '\u00bb) з колонки ' + (i + 1) + ' можна перемістити у фундамент!';
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+
+                // Check for tableau moves
+                if (!found) {
+                    for (var i = 0; i < tableau.length; i++) {
+                        var column = tableau[i];
+                        if (column.length > 0) {
+                            var topCard = column[column.length - 1];
+                            if (topCard.faceUp) {
+                                for (var j = 0; j < tableau.length; j++) {
+                                    if (j !== i && canPlaceOnTableau(topCard, tableau[j])) {
+                                        hint = 'Спробуйте перемістити картку #' + topCard.order + ' з колонки ' + (i + 1) + ' до колонки ' + (j + 1) + '.';
+                                        found = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if (found) break;
+                    }
+                }
+
+                if (!found) {
+                    hint = 'Спробуйте перемістити картки між колонками, щоб відкрити закриті картки. Шукайте картки з порядком 1 для початку збирання у фундаменті.';
+                }
+
+                updateInfoBox(hint);
+            }
+
+            document.getElementById('reset-button').addEventListener('click', initializeGame);
+            document.getElementById('hint-button').addEventListener('click', showHint);
+            document.getElementById('win-restart').addEventListener('click', initializeGame);
+
+            initializeGame();
+        })();
+    </script>
+    <script src="../../shared/js/nav.js"></script>
+</body>
+</html>

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Посібник гравця — Історія як гра</title>
+    <link rel="stylesheet" href="../shared/css/reset.css">
+    <link rel="stylesheet" href="../shared/css/theme.css">
+    <link rel="stylesheet" href="../shared/css/layout.css">
+    <link rel="stylesheet" href="../shared/css/components.css">
+    <link rel="stylesheet" href="../shared/css/animations.css">
+    <link rel="stylesheet" href="../shared/css/responsive.css">
+    <style>
+        .guide-section {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-lg);
+            padding: var(--space-xl) var(--space-lg);
+            backdrop-filter: blur(var(--glass-blur));
+            box-shadow: var(--glass-shadow);
+            margin-bottom: var(--space-lg);
+        }
+        .guide-section h2 {
+            font-size: var(--text-2xl);
+            font-weight: 700;
+            margin-bottom: var(--space-md);
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .guide-section h3 {
+            font-size: var(--text-xl);
+            font-weight: 600;
+            color: var(--color-text-primary);
+            margin-top: var(--space-lg);
+            margin-bottom: var(--space-sm);
+        }
+        .guide-section p {
+            color: var(--color-text-secondary);
+            line-height: 1.7;
+            margin-bottom: var(--space-sm);
+        }
+        .guide-section ul {
+            list-style: none;
+            padding: 0;
+            margin: var(--space-sm) 0 var(--space-md);
+        }
+        .guide-section ul li {
+            position: relative;
+            padding-left: var(--space-lg);
+            margin-bottom: var(--space-sm);
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+        }
+        .guide-section ul li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0.55em;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--color-accent-blue);
+        }
+        .guide-section strong {
+            color: var(--color-text-primary);
+        }
+        .guide-section code {
+            font-family: var(--font-mono);
+            background: var(--color-surface);
+            padding: 0.15em 0.4em;
+            border-radius: var(--radius-sm);
+            font-size: 0.9em;
+            color: var(--color-accent-cyan);
+        }
+        .period-badge {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            line-height: 28px;
+            text-align: center;
+            border-radius: var(--radius-sm);
+            background: var(--gradient-primary);
+            color: var(--color-text-on-accent);
+            font-weight: 700;
+            font-size: var(--text-sm);
+            margin-right: var(--space-xs);
+            vertical-align: middle;
+            flex-shrink: 0;
+        }
+        .period-heading {
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-top: var(--space-lg);
+            margin-bottom: var(--space-sm);
+        }
+        .period-heading h3 {
+            margin: 0;
+        }
+        .game-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: var(--space-md) var(--space-lg);
+            margin: var(--space-sm) 0;
+        }
+        .game-card strong {
+            color: var(--color-accent-orange);
+        }
+        .tip-box {
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.25);
+            border-radius: var(--radius-md);
+            padding: var(--space-md) var(--space-lg);
+            margin-top: var(--space-sm);
+        }
+        .tip-box li::before {
+            background: var(--color-accent-green) !important;
+        }
+        .secret-box {
+            background: rgba(168, 85, 247, 0.08);
+            border: 1px solid rgba(168, 85, 247, 0.25);
+            border-radius: var(--radius-md);
+            padding: var(--space-md) var(--space-lg);
+            margin-top: var(--space-sm);
+        }
+        .secret-box strong {
+            color: var(--color-accent-purple);
+        }
+    </style>
+</head>
+<body data-section="Документація" data-game-title="Посібник гравця" data-home-url="../index.html">
+    <div class="page-wrap">
+        <header class="page-header">
+            <h1>Посібник гравця</h1>
+            <p>Все, що потрібно знати, щоб розпочати свою історичну подорож</p>
+        </header>
+
+        <main class="page-content">
+
+            <!-- Загальний опис -->
+            <section class="guide-section anim-fade-in">
+                <h2>Загальний опис</h2>
+                <p>"Історія як гра" — це інтерактивна навчальна платформа, що дозволяє вивчати українську історію через браузерні ігри. Проект охоплює 9 історичних періодів — від стародавніх часів до незалежності України. Кожен період представлений унікальними іграми різних жанрів: вікторини, аркади, пазли, карткові ігри та ігри з доповненою реальністю.</p>
+            </section>
+
+            <!-- Навігація сайтом -->
+            <section class="guide-section anim-fade-in">
+                <h2>Навігація сайтом</h2>
+                <ul>
+                    <li>Відкрийте файл <code>index.html</code> безпосередньо у браузері або запустіть локальний сервер командою <code>python3 -m http.server 8000</code></li>
+                    <li>Головна сторінка містить картки з 9 історичними періодами — кожна картка веде до відповідних ігор</li>
+                    <li>Навігація назад через кнопку "Додому" у верхній панелі кожної гри</li>
+                    <li>На повноекранних іграх використовується плаваюча кнопка повернення</li>
+                </ul>
+            </section>
+
+            <!-- Ігри за періодами -->
+            <section class="guide-section anim-fade-in">
+                <h2>Ігри за періодами</h2>
+
+                <!-- Період 0 -->
+                <div class="period-heading">
+                    <span class="period-badge">0</span>
+                    <h3>Вступ</h3>
+                </div>
+                <div class="game-card">
+                    <strong>Хронобій</strong> (washhand-1) — три ворога з різних періодів. Сортуйте події в хронологічному порядку, заряджайте зброю та атакуйте. Клавіатура: перетягування подій у слоти
+                </div>
+                <div class="game-card">
+                    <strong>Іст. Block Buster</strong> (new-makako-2) — арканоїд з історичними блоками
+                </div>
+                <div class="game-card">
+                    <strong>Характерне кафе</strong> (shivafornia-3) — стартова версія
+                </div>
+
+                <!-- Період 1 -->
+                <div class="period-heading">
+                    <span class="period-badge">1</span>
+                    <h3>Стародавня історія</h3>
+                </div>
+                <div class="game-card">
+                    <strong>Стародавня історія</strong> (shiwafornia-2) — хронологічний шлях по стародавніх культурах
+                </div>
+
+                <!-- Період 2 -->
+                <div class="period-heading">
+                    <span class="period-badge">2</span>
+                    <h3>Русь-Україна</h3>
+                </div>
+                <div class="game-card">
+                    <strong>Русь-Україна вікторина</strong> (new-orlan-1) — падаючі дати, ловіть правильні відповіді
+                </div>
+                <div class="game-card">
+                    <strong>Кара вікінга</strong> (masachuchi) — ловіть яблука відповідної категорії, 4 категорії, уникайте чужих
+                </div>
+
+                <!-- Період 3 -->
+                <div class="period-heading">
+                    <span class="period-badge">3</span>
+                    <h3>Велике князівство Литовське</h3>
+                </div>
+                <div class="game-card">
+                    <strong>ВКЛ вікторина</strong> (taxes-1) — падаючі дати
+                </div>
+
+                <!-- Період 4 -->
+                <div class="period-heading">
+                    <span class="period-badge">4</span>
+                    <h3>Козацька доба</h3>
+                </div>
+                <div class="game-card">
+                    <strong>Історична косинка v2</strong> (solitaire-v2) — пасянс з козацькими подіями. 4 теми: гетьманська політика, військові кампанії, культурне життя, міжнародні відносини. Перетягуйте картки між колонками
+                </div>
+                <div class="game-card">
+                    <strong>Пасянс</strong> (los-elviros-1) — класична карткова гра з 4 темами
+                </div>
+                <div class="game-card">
+                    <strong>Козацька вікторина</strong> (new-makako-1) — падаючі питання про козацьку добу. Набирайте числові відповіді (роки подій) на клавіатурі або цифровому блоці, щоб зловити питання до того, як вони впадуть. 3 життя, ціль — 50 правильних відповідей
+                </div>
+
+                <!-- Період 5 -->
+                <div class="period-heading">
+                    <span class="period-badge">5</span>
+                    <h3>Імперський період</h3>
+                </div>
+                <div class="game-card">
+                    <strong>Bobble Shooter</strong> (bobble-shooter) — стрільба кульками. 4 кольори = 4 категорії (культура, політика, економіка, військова справа). Ціль мишкою, клік для пострілу. 3+ однакові кульки вибухають
+                </div>
+
+                <!-- Період 6 -->
+                <div class="period-heading">
+                    <span class="period-badge">6</span>
+                    <h3>Українська революція</h3>
+                </div>
+                <div class="game-card">
+                    <strong>Українська революція</strong> (viraska) — Wordwall тести
+                </div>
+
+                <!-- Період 7 -->
+                <div class="period-heading">
+                    <span class="period-badge">7</span>
+                    <h3>Радянський період</h3>
+                </div>
+                <div class="game-card">
+                    <strong>Історичний пазл</strong> (puzzle-phenikis) — зберіть 3 пазли з радянського періоду. Перетягуйте шматочки на правильні місця. Після кожного пазлу — освітній текст
+                </div>
+
+                <!-- Період 8 -->
+                <div class="period-heading">
+                    <span class="period-badge">8</span>
+                    <h3>Незалежність</h3>
+                </div>
+                <div class="game-card">
+                    <strong>Характерне кафе</strong> (kafe-simulator) — симулятор кафе. Готуйте "страви" (історичні факти) для клієнтів. 5 позицій меню, 10 клієнтів. Стежте за терпінням клієнтів!
+                </div>
+            </section>
+
+            <!-- Різдвяна вікторина -->
+            <section class="guide-section anim-fade-in">
+                <h2>Різдвяна вікторина</h2>
+                <p>Квест з паролями через сітку питань</p>
+            </section>
+
+            <!-- AR-ігри -->
+            <section class="guide-section anim-fade-in">
+                <h2>AR-ігри</h2>
+                <p>Квебек, Торонто, Юкон — ігри з доповненою реальністю. Потрібен смартфон з камерою та маркер</p>
+            </section>
+
+            <!-- Карта де Боплана -->
+            <section class="guide-section anim-fade-in">
+                <h2>Карта де Боплана</h2>
+                <p>Інтерактивна масштабовна історична карта</p>
+            </section>
+
+            <!-- Помічник-восьминіг -->
+            <section class="guide-section anim-fade-in">
+                <h2>Помічник-восьминіг</h2>
+                <ul>
+                    <li>Переміщуйте стрілками клавіатури</li>
+                    <li>Клікайте для цікавих фактів</li>
+                    <li>Кнопка "Цікавий факт" — випадковий факт</li>
+                    <li>Кнопка "Танець" — анімація танцю</li>
+                </ul>
+                <div class="secret-box">
+                    <strong>Секрети:</strong> переміщуйте восьминога до 3 кутків екрану для пасхалок
+                </div>
+            </section>
+
+            <!-- Поради -->
+            <section class="guide-section anim-fade-in">
+                <h2>Поради</h2>
+                <div class="tip-box">
+                    <ul>
+                        <li>Працює в будь-якому сучасному браузері</li>
+                        <li>Можна грати офлайн (файл <code>file://</code>)</li>
+                        <li>На мобільних пристроях використовуйте горизонтальну орієнтацію для кращого відображення</li>
+                    </ul>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="site-footer">
+            <p>Історія як гра &mdash; навчальний проект з української історії</p>
+        </footer>
+    </div>
+
+    <script src="../shared/js/nav.js"></script>
+</body>
+</html>

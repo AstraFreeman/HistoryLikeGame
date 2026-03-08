@@ -102,14 +102,15 @@
                     <h2><span class="period-num">4</span> Козацька доба</h2>
                     <p>Дослідіть епоху козацтва та станьте справжнім гетьманом!</p>
                     <div class="card-actions">
-                        <a href="games/narrative/compas.html" class="btn btn-primary btn-sm">Грати</a>
+                        <a href="games/narrative/solitaire-v2.html" class="btn btn-primary btn-sm">Історична косинка</a>
+                        <a href="games/narrative/los-elviros-1.html" class="btn btn-secondary btn-sm">Пасянс</a>
                     </div>
                 </div>
                 <div class="card anim-fade-in">
                     <h2><span class="period-num">5</span> Імперський період</h2>
                     <p>Пройдіть через складні часи під владою імперій.</p>
                     <div class="card-actions">
-                        <a href="games/narrative/compas.html" class="btn btn-primary btn-sm">Грати</a>
+                        <a href="games/narrative/bobble-shooter.html" class="btn btn-primary btn-sm">Bobble Shooter</a>
                     </div>
                 </div>
                 <div class="card anim-fade-in">
@@ -123,14 +124,14 @@
                     <h2><span class="period-num">7</span> Радянський період</h2>
                     <p>Розкрийте таємниці та виклики радянської епохи.</p>
                     <div class="card-actions">
-                        <a href="games/narrative/compas.html" class="btn btn-primary btn-sm">Грати</a>
+                        <a href="games/narrative/puzzle-phenikis.html" class="btn btn-primary btn-sm">Історичний пазл</a>
                     </div>
                 </div>
                 <div class="card anim-fade-in">
                     <h2><span class="period-num">8</span> Незалежність</h2>
                     <p>Відчуйте атмосферу подій, що змінили сучасну Україну!</p>
                     <div class="card-actions">
-                        <a href="games/narrative/compas.html" class="btn btn-primary btn-sm">Грати</a>
+                        <a href="games/narrative/kafe-simulator.html" class="btn btn-primary btn-sm">Характерне кафе</a>
                     </div>
                 </div>
             </section>
@@ -173,11 +174,17 @@
                 <button class="btn btn-secondary" id="dance">Танець</button>
             </div>
 
+            <footer style="margin-top: var(--space-2xl); padding-top: var(--space-lg); border-top: 1px solid var(--glass-border); text-align: center;">
+                <a href="docs/guide.html" class="btn btn-ghost btn-sm">Посібник гравця</a>
+                <a href="docs/dev-guide.html" class="btn btn-ghost btn-sm">Посібник розробника</a>
+            </footer>
+
             <img src="assets/images/Sprut_Idle.gif" alt="Помічник" id="octopus" class="assistant">
             <div id="factBox" class="fact-box hidden">Цікава історія: у 1654 році відбулася Переяславська рада!</div>
         </main>
     </div>
 
+    <script src="data/assistant/facts.js"></script>
     <script src="shared/js/assistant.js"></script>
     <script>
         var octopus = document.getElementById('octopus');
@@ -186,14 +193,25 @@
         var factBtn = document.getElementById('showFact');
         var danceBtn = document.getElementById('dance');
 
-        var facts = [
-            'Цікава історія: у 1654 році відбулася Переяславська рада!',
-            'Київська Русь була заснована у 882 році князем Олегом.',
-            'Запорозька Січ стала центром українського козацтва.',
-            'Акт проголошення незалежності України підписано 24 серпня 1991 року.',
-            'Князь Володимир Великий хрестив Русь у 988 році.',
-            'Битва під Берестечком 1651 року — одна з найбільших битв козацької доби.'
-        ];
+        // Build facts pool from external database
+        var facts = [];
+        if (window.ASSISTANT_FACTS) {
+            facts = facts.concat(window.ASSISTANT_FACTS.general || []);
+            var byPeriod = window.ASSISTANT_FACTS.byPeriod || {};
+            for (var p in byPeriod) {
+                facts = facts.concat(byPeriod[p]);
+            }
+        }
+        if (facts.length === 0) {
+            facts = [
+                'Цікава історія: у 1654 році відбулася Переяславська рада!',
+                'Київська Русь була заснована у 882 році князем Олегом.',
+                'Запорозька Січ стала центром українського козацтва.',
+                'Акт проголошення незалежності України підписано 24 серпня 1991 року.',
+                'Князь Володимир Великий хрестив Русь у 988 році.',
+                'Битва під Берестечком 1651 року — одна з найбільших битв козацької доби.'
+            ];
+        }
 
         var isMoving = false;
         var isDancing = false;
@@ -237,18 +255,27 @@
             }, 1000);
         }
 
-        function startRandomMovement() {
-            if (moveInterval) clearInterval(moveInterval);
-            moveInterval = setInterval(function () {
+        var lastMoveTime = 0;
+        function randomMovementLoop(timestamp) {
+            if (!isVisible) return;
+            if (timestamp - lastMoveTime >= 5000) {
+                lastMoveTime = timestamp;
                 if (Math.random() < 0.3) moveAssistant();
-            }, 5000);
+            }
+            moveInterval = requestAnimationFrame(randomMovementLoop);
+        }
+
+        function startRandomMovement() {
+            if (moveInterval) cancelAnimationFrame(moveInterval);
+            lastMoveTime = performance.now();
+            moveInterval = requestAnimationFrame(randomMovementLoop);
         }
 
         toggleBtn.addEventListener('click', function () {
             isVisible = !isVisible;
             octopus.classList.toggle('hidden');
             if (isVisible) { startRandomMovement(); }
-            else { if (moveInterval) clearInterval(moveInterval); }
+            else { if (moveInterval) cancelAnimationFrame(moveInterval); }
         });
 
         factBtn.addEventListener('click', function () {
