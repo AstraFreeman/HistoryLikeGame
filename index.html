@@ -4,6 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Історія як гра</title>
+    <script>
+        // Apply saved theme/font/motion/contrast BEFORE render to avoid flash
+        (function(){
+            try {
+                var t = localStorage.getItem('histgame_theme');
+                var f = localStorage.getItem('histgame_fontsize');
+                var m = localStorage.getItem('histgame_reducemotion');
+                var c = localStorage.getItem('histgame_highcontrast');
+                if (f === 'large') document.documentElement.classList.add('font-lg');
+                else if (f === 'xlarge') document.documentElement.classList.add('font-xl');
+                if (m === 'true') document.documentElement.classList.add('reduce-motion');
+                if (c === 'true') document.documentElement.classList.add('high-contrast');
+                // theme-light is applied to body in accessibility.js after DOMContentLoaded
+                // but we store a data attr so body can pick it up early
+                if (t === 'light') document.documentElement.dataset.themeHint = 'light';
+            } catch(e){}
+        })();
+    </script>
     <link rel="stylesheet" href="shared/css/reset.css">
     <link rel="stylesheet" href="shared/css/theme.css">
     <link rel="stylesheet" href="shared/css/layout.css">
@@ -13,7 +31,7 @@
     <style>
         /* Page-specific: subtle animated gradient background */
         body {
-            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 40%, #16213e 100%);
+            background: var(--gradient-bg);
             background-attachment: fixed;
         }
         /* Stagger card entrance */
@@ -46,6 +64,103 @@
             display: flex;
             align-items: center;
         }
+        /* Fact box — fixed top center, above octopus */
+        #factBox {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 2000;
+            max-width: 90%;
+            width: 400px;
+            text-align: center;
+        }
+        /* Mini-puzzle (β section) */
+        .mini-puzzle-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            width: 100%;
+            max-width: 450px;
+            aspect-ratio: 1;
+            margin: 0 auto;
+            border: 2px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            background: rgba(0,0,0,0.3);
+            touch-action: none;
+        }
+        .mini-puzzle-cell {
+            border: 1px solid rgba(255,255,255,0.08);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            cursor: pointer;
+            aspect-ratio: 1;
+        }
+        .mini-puzzle-cell.drag-over {
+            background: rgba(249,115,22,0.15);
+            border-color: rgba(249,115,22,0.5);
+        }
+        .mini-puzzle-cell .mp-piece {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+        .mini-puzzle-cell .mp-num {
+            font-size: 11px;
+            opacity: 0.2;
+            pointer-events: none;
+            user-select: none;
+        }
+        .mp-tray {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            margin-top: var(--space-md);
+        }
+        .mp-tray-item {
+            width: 80px;
+            height: 80px;
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            cursor: grab;
+            transition: transform 0.15s, box-shadow 0.15s;
+            background: rgba(0,0,0,0.3);
+        }
+        .mp-tray-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+        }
+        .mp-tray-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+        .mp-tray-item.dragging { opacity: 0.3; }
+        .mp-portrait {
+            width: 100%;
+            max-width: 450px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--glass-shadow);
+            animation: fadeIn 0.5s ease;
+        }
+        .mp-congrats {
+            margin-top: var(--space-md);
+            font-size: var(--text-lg);
+            color: var(--color-accent-orange);
+            font-weight: 600;
+        }
         /* AR section styling */
         .ar-section {
             background: var(--glass-bg);
@@ -73,7 +188,8 @@
                     <div class="card-actions">
                         <a href="games/narrative/washhand-1.html" class="btn btn-primary btn-sm">Хронобій</a>
                         <a href="games/narrative/new-makako-2.html" class="btn btn-primary btn-sm">Іст. block buster</a>
-                        <a href="games/narrative/shivafornia-3.html" class="btn btn-primary btn-sm">Характерне кафе</a>
+                        <a href="games/narrative/compas.html" class="btn btn-primary btn-sm">Компас</a>
+                        <a href="games/narrative/los-elviros-1.html" class="btn btn-secondary btn-sm">Пасянс</a>
                     </div>
                 </div>
                 <div class="card anim-fade-in">
@@ -103,7 +219,6 @@
                     <p>Дослідіть епоху козацтва та станьте справжнім гетьманом!</p>
                     <div class="card-actions">
                         <a href="games/narrative/solitaire-v2.html" class="btn btn-primary btn-sm">Історична косинка</a>
-                        <a href="games/narrative/los-elviros-1.html" class="btn btn-secondary btn-sm">Пасянс</a>
                     </div>
                 </div>
                 <div class="card anim-fade-in">
@@ -111,6 +226,7 @@
                     <p>Пройдіть через складні часи під владою імперій.</p>
                     <div class="card-actions">
                         <a href="games/narrative/bobble-shooter.html" class="btn btn-primary btn-sm">Bobble Shooter</a>
+                        <a href="games/narrative/tower-defense.html" class="btn btn-secondary btn-sm">Оборона фортеці</a>
                     </div>
                 </div>
                 <div class="card anim-fade-in">
@@ -134,6 +250,32 @@
                         <a href="games/narrative/kafe-simulator.html" class="btn btn-primary btn-sm">Характерне кафе</a>
                     </div>
                 </div>
+            </section>
+
+            <!-- Secret Christmas section (α) — hidden by default -->
+            <section id="secretChristmas" class="ar-section" style="display:none;">
+                <h2 class="section-title" style="margin-top:0;">
+                    <span class="period-num" style="background:linear-gradient(135deg,#ef4444,#22c55e);">&alpha;</span>
+                    Різдвяний особливий
+                </h2>
+                <div class="card-grid">
+                    <div class="card anim-fade-in">
+                        <h3>Різдвяна вікторина</h3>
+                        <p>Святкове випробування з історії та традицій!</p>
+                        <div class="card-actions">
+                            <a href="games/quiz-hub/crstm-s-main.html" class="btn btn-accent btn-sm">Грати</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- "Гра у грі" section (β) -->
+            <section class="ar-section">
+                <h2 class="section-title" style="margin-top:0;">
+                    <span class="period-num" style="background:linear-gradient(135deg,#f97316,#a855f7);">&beta;</span>
+                    Гра у грі
+                </h2>
+                <div id="miniGameContainer" style="max-width:450px;margin:0 auto;text-align:center;"></div>
             </section>
 
             <section class="ar-section">
@@ -282,19 +424,17 @@
             var randomFact = facts[Math.floor(Math.random() * facts.length)];
             factBox.textContent = randomFact;
             factBox.classList.remove('hidden');
-            setTimeout(function () { factBox.classList.add('hidden'); }, 5000);
+            setTimeout(function () { factBox.classList.add('hidden'); }, 10000);
         });
 
         danceBtn.addEventListener('click', function () {
             if (isDancing || !isVisible) return;
             isDancing = true;
             setAssistantGif('Sprut_Dance.gif');
-            octopus.style.animation = 'spin 1s ease-in-out';
             setTimeout(function () {
-                octopus.style.animation = '';
                 isDancing = false;
                 if (!isMoving) setAssistantGif('Sprut_Idle.gif');
-            }, 1000);
+            }, 3000);
         });
 
         octopus.addEventListener('click', function () {
@@ -313,12 +453,299 @@
             }
         });
 
+        // ── β section: inline mini-puzzle ──────────────────────────────
+        (function () {
+            var container = document.getElementById('miniGameContainer');
+            if (!container) return;
+
+            var SETS = [
+                { prefix: 'MZP', name: 'Іван Мазепа' },
+                { prefix: 'PTL', name: 'Симон Петлюра' },
+                { prefix: 'SGD', name: 'Петро Сагайдачний' }
+            ];
+            var BASE = 'data/games/pheniks_2/';
+
+            // 50% chance to show puzzle
+            if (Math.random() > 0.5) {
+                showPlaceholder();
+                return;
+            }
+            startPuzzle();
+
+            function showPlaceholder() {
+                container.textContent = '';
+                var img = document.createElement('img');
+                img.src = 'assets/images/Paint_2.jpg';
+                img.alt = 'Міні-гра';
+                img.style.cssText = 'width:100%;border-radius:var(--radius-md);box-shadow:var(--glass-shadow);';
+                container.appendChild(img);
+                var p = document.createElement('p');
+                p.style.cssText = 'margin-top:var(--space-md);color:var(--color-text-secondary);';
+                p.textContent = 'Міні-гра не випала цього разу. Спробуйте пізніше!';
+                container.appendChild(p);
+            }
+
+            function startPuzzle() {
+                var set = SETS[Math.floor(Math.random() * SETS.length)];
+                container.textContent = '';
+
+                // Build grid
+                var grid = document.createElement('div');
+                grid.className = 'mini-puzzle-grid';
+                var cells = [];
+                for (var i = 1; i <= 9; i++) {
+                    var cell = document.createElement('div');
+                    cell.className = 'mini-puzzle-cell';
+                    cell.dataset.index = i;
+                    var num = document.createElement('span');
+                    num.className = 'mp-num';
+                    num.textContent = i;
+                    cell.appendChild(num);
+                    grid.appendChild(cell);
+                    cells.push(cell);
+                }
+                container.appendChild(grid);
+
+                // Build tray with shuffled pieces
+                var tray = document.createElement('div');
+                tray.className = 'mp-tray';
+                var order = shuffleArr([1,2,3,4,5,6,7,8,9]);
+                order.forEach(function (idx) {
+                    var item = document.createElement('div');
+                    item.className = 'mp-tray-item';
+                    item.dataset.piece = idx;
+                    var img = document.createElement('img');
+                    img.src = BASE + set.prefix + '_' + idx + '.png';
+                    img.alt = 'Деталь ' + idx;
+                    item.appendChild(img);
+                    tray.appendChild(item);
+                });
+                container.appendChild(tray);
+
+                // New game button
+                var btnWrap = document.createElement('div');
+                btnWrap.style.marginTop = 'var(--space-md)';
+                var btn = document.createElement('button');
+                btn.className = 'btn btn-secondary btn-sm';
+                btn.textContent = 'Нова гра';
+                btn.addEventListener('click', function () { startPuzzle(); });
+                btnWrap.appendChild(btn);
+                container.appendChild(btnWrap);
+
+                // Drag & drop (mouse + touch)
+                setupDragDrop(cells, tray, set);
+            }
+
+            function setupDragDrop(cells, tray, set) {
+                var dragged = null;
+                var dragOrigin = null;
+
+                function onStart(piece, ev) {
+                    if (!piece) return;
+                    ev.preventDefault();
+                    dragged = piece;
+                    dragOrigin = piece.parentElement;
+                    piece.classList.add('dragging');
+                }
+
+                function onEnd(clientX, clientY) {
+                    if (!dragged) return;
+                    dragged.classList.remove('dragging');
+                    cells.forEach(function (c) { c.classList.remove('drag-over'); });
+
+                    var target = cellFromPoint(clientX, clientY, cells);
+                    if (target) {
+                        // If target is a tray item inside a cell, get the cell
+                        var existingPiece = target.querySelector('.mp-tray-item');
+                        if (existingPiece && existingPiece !== dragged) {
+                            dragOrigin.appendChild(existingPiece);
+                        }
+                        // Place piece: remove num placeholder
+                        var numEl = target.querySelector('.mp-num');
+                        if (numEl) numEl.style.display = 'none';
+                        // Create img for cell
+                        var img = document.createElement('img');
+                        img.className = 'mp-piece';
+                        img.src = dragged.querySelector('img').src;
+                        img.alt = dragged.querySelector('img').alt;
+                        // Store piece index on cell
+                        target.dataset.placedPiece = dragged.dataset.piece;
+                        // Remove old piece img from cell if any
+                        var oldImg = target.querySelector('.mp-piece');
+                        if (oldImg) oldImg.remove();
+                        target.appendChild(img);
+                        // Remove from tray
+                        dragged.remove();
+                        checkWin(cells, set);
+                    }
+                    dragged = null;
+                    dragOrigin = null;
+                }
+
+                function onMove(clientX, clientY) {
+                    cells.forEach(function (c) { c.classList.remove('drag-over'); });
+                    var target = cellFromPoint(clientX, clientY, cells);
+                    if (target) target.classList.add('drag-over');
+                }
+
+                // Mouse events on tray items
+                container.addEventListener('mousedown', function (e) {
+                    var piece = e.target.closest('.mp-tray-item');
+                    onStart(piece, e);
+                    if (!piece) return;
+
+                    function mm(ev) { onMove(ev.clientX, ev.clientY); }
+                    function mu(ev) {
+                        document.removeEventListener('mousemove', mm);
+                        document.removeEventListener('mouseup', mu);
+                        onEnd(ev.clientX, ev.clientY);
+                    }
+                    document.addEventListener('mousemove', mm);
+                    document.addEventListener('mouseup', mu);
+                });
+
+                container.addEventListener('touchstart', function (e) {
+                    var piece = e.target.closest('.mp-tray-item');
+                    onStart(piece, e);
+                    if (!piece) return;
+
+                    function tm(ev) {
+                        ev.preventDefault();
+                        var t = ev.touches[0];
+                        onMove(t.clientX, t.clientY);
+                    }
+                    function te(ev) {
+                        document.removeEventListener('touchmove', tm);
+                        document.removeEventListener('touchend', te);
+                        var t = ev.changedTouches[0];
+                        onEnd(t.clientX, t.clientY);
+                    }
+                    document.addEventListener('touchmove', tm, { passive: false });
+                    document.addEventListener('touchend', te);
+                }, { passive: false });
+
+                // Also support click-to-place: click tray item, then click cell
+                var selected = null;
+                container.addEventListener('click', function (e) {
+                    var piece = e.target.closest('.mp-tray-item');
+                    var cell = e.target.closest('.mini-puzzle-cell');
+
+                    if (piece) {
+                        // Select this piece
+                        if (selected) selected.style.outline = '';
+                        selected = piece;
+                        piece.style.outline = '2px solid var(--color-accent-orange)';
+                        return;
+                    }
+
+                    if (cell && selected) {
+                        // Place selected piece
+                        var numEl = cell.querySelector('.mp-num');
+                        if (numEl) numEl.style.display = 'none';
+                        var oldImg = cell.querySelector('.mp-piece');
+                        if (oldImg) oldImg.remove();
+                        var img = document.createElement('img');
+                        img.className = 'mp-piece';
+                        img.src = selected.querySelector('img').src;
+                        img.alt = selected.querySelector('img').alt;
+                        cell.dataset.placedPiece = selected.dataset.piece;
+                        cell.appendChild(img);
+                        selected.remove();
+                        selected = null;
+                        checkWin(cells, set);
+                    }
+                });
+            }
+
+            function cellFromPoint(x, y, cells) {
+                for (var i = 0; i < cells.length; i++) {
+                    var r = cells[i].getBoundingClientRect();
+                    if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
+                        return cells[i];
+                    }
+                }
+                return null;
+            }
+
+            function checkWin(cells, set) {
+                for (var i = 0; i < cells.length; i++) {
+                    var placed = cells[i].dataset.placedPiece;
+                    if (!placed || parseInt(placed) !== i + 1) return;
+                }
+                // All correct!
+                container.textContent = '';
+                var img = document.createElement('img');
+                img.className = 'mp-portrait';
+                img.src = BASE + set.prefix + '_0.jpg';
+                img.alt = set.name;
+                container.appendChild(img);
+                var p = document.createElement('p');
+                p.className = 'mp-congrats';
+                p.textContent = 'Вітаємо! Ви зібрали портрет: ' + set.name;
+                container.appendChild(p);
+                var btnWrap = document.createElement('div');
+                btnWrap.style.marginTop = 'var(--space-md)';
+                var btn = document.createElement('button');
+                btn.className = 'btn btn-primary btn-sm';
+                btn.textContent = 'Нова гра';
+                btn.addEventListener('click', function () { startPuzzle(); });
+                btnWrap.appendChild(btn);
+                container.appendChild(btnWrap);
+            }
+
+            function shuffleArr(arr) {
+                var a = arr.slice();
+                for (var i = a.length - 1; i > 0; i--) {
+                    var j = Math.floor(Math.random() * (i + 1));
+                    var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+                }
+                return a;
+            }
+        })();
+
         startRandomMovement();
 
         octopus.addEventListener('error', function () {
             octopus.style.fontSize = '80px';
             octopus.textContent = '\uD83D\uDC19';
         });
+
+        // Secret Christmas section unlock
+        (function () {
+            var SECRET_KEY = 'histgame_christmas_unlocked';
+            var secretEl = document.getElementById('secretChristmas');
+            if (!secretEl) return;
+
+            // Check if already unlocked
+            try {
+                if (localStorage.getItem(SECRET_KEY) === 'true') {
+                    secretEl.style.display = '';
+                    return;
+                }
+            } catch (e) {}
+
+            // Unlock via octopus click near Period 8 area
+            var clickCount = 0;
+            var clickTimer = null;
+            octopus.addEventListener('dblclick', function () {
+                clickCount++;
+                if (clickTimer) clearTimeout(clickTimer);
+                clickTimer = setTimeout(function () { clickCount = 0; }, 3000);
+
+                if (clickCount >= 3) {
+                    var pass = prompt('Введіть таємний пароль:');
+                    if (pass === 'L0v3 H1sT0r') {
+                        try { localStorage.setItem(SECRET_KEY, 'true'); } catch (e) {}
+                        secretEl.style.display = '';
+                        factBox.textContent = 'Різдвяний секрет розблоковано!';
+                        factBox.classList.remove('hidden');
+                        setTimeout(function () { factBox.classList.add('hidden'); }, 5000);
+                    }
+                    clickCount = 0;
+                }
+            });
+        })();
     </script>
+    <script src="shared/js/accessibility.js"></script>
 </body>
 </html>

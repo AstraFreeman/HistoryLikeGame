@@ -243,6 +243,7 @@
                 <li><a href="#js-api">Shared JS API</a></li>
                 <li><a href="#navigation">Навігація</a></li>
                 <li><a href="#css-theming">CSS theming</a></li>
+                <li><a href="#accessibility">Система доступності</a></li>
                 <li><a href="#new-game">Як додати нову гру</a></li>
                 <li><a href="#quiz-falling">Quiz/falling шаблони</a></li>
                 <li><a href="#conventions">Конвенції</a></li>
@@ -279,6 +280,7 @@ shared/
     canvas-utils.js           <span class="comment"># window.CanvasUtils</span>
     ui-utils.js               <span class="comment"># window.UIUtils</span>
     assistant.js              <span class="comment"># Помічник-восьминог</span>
+    accessibility.js          <span class="comment"># Плаваюча панель налаштувань доступності</span>
   templates/
     quiz-question.html        <span class="comment"># Шаблон вікторини</span>
     falling-answer.html       <span class="comment"># Шаблон гри з падаючими відповідями</span>
@@ -291,8 +293,10 @@ data/
     bobble-imperial.js
     puzzle-soviet.js
     kafe-independence.js
+  pheniks_2/                  <span class="comment"># Зображення пазлів (MZP/PTL/SGD)</span>
 games/
   narrative/                  <span class="comment"># Наративні та унікальні ігри</span>
+    tower-defense.html        <span class="comment"># Three.js tower defense (Період 5)</span>
   start-pages/               <span class="comment"># Вступні сторінки</span>
   quiz-hub/                  <span class="comment"># Сітка вікторин</span>
   map/                       <span class="comment"># Інтерактивна карта</span>
@@ -369,6 +373,33 @@ window.UIUtils.showNotification(message, duration)</code></pre>
             </ul>
         </section>
 
+        <!-- Система доступності -->
+        <section class="doc-section" id="accessibility">
+            <h2>Система доступності (<span class="inline-code">shared/js/accessibility.js</span>)</h2>
+            <p>IIFE-модуль, що створює плаваючу кнопку-шестеренку та панель налаштувань через <code class="inline-code">document.createElement</code> (без innerHTML).</p>
+
+            <h3>CSS-класи</h3>
+            <ul>
+                <li><code>.theme-light</code> на <code>&lt;body&gt;</code> — світла тема</li>
+                <li><code>.font-lg</code>, <code>.font-xl</code> на <code>&lt;html&gt;</code> — збільшений / великий шрифт</li>
+                <li><code>.reduce-motion</code> на <code>&lt;html&gt;</code> — зменшення анімацій</li>
+                <li><code>.high-contrast</code> на <code>&lt;html&gt;</code> — висока контрастність</li>
+            </ul>
+
+            <h3>localStorage ключі</h3>
+            <ul>
+                <li><code>histgame_theme</code> — <code>'dark'</code> або <code>'light'</code></li>
+                <li><code>histgame_fontsize</code> — <code>'normal'</code>, <code>'large'</code>, <code>'xlarge'</code></li>
+                <li><code>histgame_reducemotion</code> — <code>'true'</code> або <code>'false'</code></li>
+                <li><code>histgame_highcontrast</code> — <code>'true'</code> або <code>'false'</code></li>
+            </ul>
+
+            <h3>Підключення</h3>
+            <p>Додайте перед <code class="inline-code">&lt;/body&gt;</code>:</p>
+<pre><code>&lt;script src="../../shared/js/accessibility.js"&gt;&lt;/script&gt;</code></pre>
+            <p><strong>Запобігання FOUC:</strong> на <code class="inline-code">index.html</code> є ранній <code class="inline-code">&lt;script&gt;</code> в <code class="inline-code">&lt;head&gt;</code>, що застосовує збережені класи до рендеру.</p>
+        </section>
+
         <!-- Як додати нову гру -->
         <section class="doc-section" id="new-game">
             <h2>Як додати нову гру</h2>
@@ -397,6 +428,7 @@ window.UIUtils.showNotification(message, duration)</code></pre>
     &lt;script src="../../data/games/my-game-data.js"&gt;&lt;/script&gt;
     &lt;script&gt;/* Логіка гри */&lt;/script&gt;
     &lt;script src="../../shared/js/nav.js"&gt;&lt;/script&gt;
+    &lt;script src="../../shared/js/accessibility.js"&gt;&lt;/script&gt;
 &lt;/body&gt;
 &lt;/html&gt;</code></pre>
                 </div>
@@ -449,5 +481,6 @@ window.UIUtils.showNotification(message, duration)</code></pre>
     </div>
 
     <script src="../shared/js/nav.js"></script>
+    <script src="../shared/js/accessibility.js"></script>
 </body>
 </html>

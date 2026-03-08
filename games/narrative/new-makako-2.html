@@ -205,6 +205,36 @@
             }
         }
 
+        .game-over-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .game-over-overlay h2 {
+            color: #00ffff;
+            font-size: 32px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(0,255,255,0.5);
+        }
+
+        .game-over-overlay button {
+            padding: 14px 36px;
+            font-size: 18px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #00d4ff 0%, #0095dd 100%);
+            color: white;
+            border: 2px solid #00ffff;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
         @media (max-width: 600px) {
             canvas {
                 max-width: 100%;
@@ -378,10 +408,14 @@
                 if (block.isActive) {
                     ctx.fillStyle = block.color;
                     ctx.fillRect(block.x, block.y, block.width, block.height);
-                    ctx.fillStyle = 'black';
-                    ctx.font = '10px Arial';
+                    ctx.fillStyle = 'white';
+                    ctx.font = 'bold 13px Arial';
                     ctx.textAlign = 'center';
+                    ctx.shadowColor = 'rgba(0,0,0,0.7)';
+                    ctx.shadowBlur = 3;
                     ctx.fillText(questions[block.questionIndex].answer, block.x + block.width / 2, block.y + block.height / 2 + 4);
+                    ctx.shadowColor = 'transparent';
+                    ctx.shadowBlur = 0;
                 }
             });
         }
@@ -422,8 +456,17 @@
 
         // 🔄 Restart Game
         function restartGame() {
-            alert('Гру завершено. Спробуйте знову!');
-            document.location.reload();
+            clearInterval(gameInterval);
+            var overlay = document.createElement('div');
+            overlay.className = 'game-over-overlay';
+            var h2 = document.createElement('h2');
+            h2.textContent = 'Гру завершено!';
+            overlay.appendChild(h2);
+            var btn = document.createElement('button');
+            btn.textContent = 'Грати знову';
+            btn.addEventListener('click', function() { document.location.reload(); });
+            overlay.appendChild(btn);
+            document.body.appendChild(overlay);
         }
 
         // 🕹 Game Loop
@@ -468,5 +511,6 @@
         render();
     </script>
     <script src="../../shared/js/nav.js"></script>
+    <script src="../../shared/js/accessibility.js"></script>
 </body>
 </html>

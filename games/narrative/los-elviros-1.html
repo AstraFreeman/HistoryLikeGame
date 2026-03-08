@@ -73,6 +73,7 @@
             width: 100%;
             min-height: 120px;
             background: white;
+            color: #333;
             border-radius: 8px;
             padding: 12px;
             cursor: grab;
@@ -257,6 +258,7 @@
     <div id="controls">
         <button id="reset-button">🔄 Нова гра</button>
         <button id="hint-button">💡 Підказка</button>
+        <button id="undo-button">↩ Скасувати</button>
     </div>
 
     <script>
@@ -299,6 +301,29 @@
         };
         let draggedCard = null;
         let draggedFrom = null;
+        let moveHistory = [];
+
+        function saveState() {
+            moveHistory.push({
+                tableau: tableau.map(col => col.map(card => ({...card}))),
+                foundation: Object.fromEntries(
+                    Object.entries(foundation).map(([k, v]) => [k, v.map(card => ({...card}))])
+                )
+            });
+            if (moveHistory.length > 50) moveHistory.shift();
+        }
+
+        function undo() {
+            if (moveHistory.length === 0) {
+                updateInfoBox('Немає ходів для скасування!');
+                return;
+            }
+            var prev = moveHistory.pop();
+            tableau = prev.tableau;
+            foundation = prev.foundation;
+            renderGame();
+            updateInfoBox('Хід скасовано!');
+        }
 
         function shuffle(array) {
             const arr = [...array];
@@ -331,6 +356,14 @@
                 }
             }
 
+            // Safety check: ensure the last card in each column is face-up
+            for (let col = 0; col < tableau.length; col++) {
+                if (tableau[col].length > 0) {
+                    tableau[col][tableau[col].length - 1].faceUp = true;
+                }
+            }
+
+            moveHistory = [];
             renderGame();
             updateInfoBox('Гра розпочата! Відкрийте всі картки та зберіть їх за темами у хронологічному порядку.');
         }
@@ -405,6 +438,7 @@
             const targetColumn = tableau[targetColumnIndex];
             
             if (canPlaceOnTableau(draggedCard, targetColumn)) {
+                saveState();
                 const cardIndex = sourceColumn.findIndex(c => c.id === draggedCard.id);
                 const movedCards = sourceColumn.splice(cardIndex);
                 targetColumn.push(...movedCards);
@@ -417,6 +451,7 @@
                 renderGame();
             } else {
                 if (targetColumn.length === 0) {
+                    saveState();
                     updateInfoBox('Картку переміщено у порожню колонку!');
                     const cardIndex = sourceColumn.findIndex(c => c.id === draggedCard.id);
                     const movedCards = sourceColumn.splice(cardIndex);
@@ -445,8 +480,9 @@
             if (canPlaceOnFoundation(draggedCard, theme)) {
                 const sourceColumn = tableau[draggedFrom.index];
                 const cardIndex = sourceColumn.findIndex(c => c.id === draggedCard.id);
-                
+
                 if (cardIndex === sourceColumn.length - 1) {
+                    saveState();
                     sourceColumn.splice(cardIndex, 1);
                     foundation[theme].push(draggedCard);
                     
@@ -594,9 +630,11 @@
 
         document.getElementById('reset-button').addEventListener('click', initializeGame);
         document.getElementById('hint-button').addEventListener('click', showHint);
+        document.getElementById('undo-button').addEventListener('click', undo);
 
         initializeGame();
     </script>
     <script src="../../shared/js/nav.js"></script>
+    <script src="../../shared/js/accessibility.js"></script>
 </body>
 </html>

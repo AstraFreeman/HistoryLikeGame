@@ -22,6 +22,24 @@
     .block {
       display: none;
       margin-bottom: 40px;
+      position: relative;
+    }
+
+    .block-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #f4f6fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: #3b6cff;
+      font-weight: bold;
+      border-radius: 10px;
+      z-index: 5;
     }
 
     .block iframe {
@@ -52,6 +70,7 @@
 
   <!-- Блок 1 -->
   <div id="block1" class="block">
+    <div class="block-overlay" id="overlay1">Завантаження...</div>
     <iframe style="max-width:100%"
       src="https://wordwall.net/uk/embed/1327c2e297884e3587bbc0ef515efd7a?themeId=1&templateId=35&fontStackId=0"
       width="500" height="380" frameborder="0" allowfullscreen>
@@ -63,6 +82,7 @@
 
   <!-- Блок 2 -->
   <div id="block2" class="block">
+    <div class="block-overlay" id="overlay2">Завантаження...</div>
     <iframe style="max-width:100%"
       src="https://wordwall.net/uk/embed/64403347f720426aa9bbc9f513d4d578?themeId=1&templateId=22&fontStackId=0"
       width="500" height="380" frameborder="0" allowfullscreen>
@@ -74,6 +94,7 @@
 
   <!-- Блок 3 -->
   <div id="block3" class="block">
+    <div class="block-overlay" id="overlay3">Завантаження...</div>
     <iframe style="max-width:100%"
       src="https://wordwall.net/uk/embed/8c7a572de6e648b497a3fe132dcfab83?themeId=1&templateId=50&fontStackId=0"
       width="500" height="380" frameborder="0" allowfullscreen>
@@ -86,12 +107,18 @@
 
   <script>
     function openBlock(number) {
-      document.getElementById('block' + number).style.display = 'block';
+      var block = document.getElementById('block' + number);
+      block.style.display = 'block';
+      var overlay = document.getElementById('overlay' + number);
+      if (overlay) overlay.remove();
+      var iframe = block.querySelector('iframe');
+      if (iframe) iframe.src = iframe.src;
     }
 
     // Показуємо перший блок при завантаженні
     openBlock(1);
   </script>
   <script src="../../shared/js/nav.js"></script>
+  <script src="../../shared/js/accessibility.js"></script>
 </body>
 </html>

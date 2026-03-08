@@ -168,6 +168,8 @@
       background: rgba(249, 115, 22, 0.3);
       border-color: var(--color-accent-orange);
       color: var(--color-accent-orange);
+      opacity: 0.5;
+      pointer-events: none;
     }
 
     /* ── Counter panel ── */
@@ -658,13 +660,6 @@
             }
           }
         }
-        // Shuffle
-        for (k = allIngredients.length - 1; k > 0; k--) {
-          var r = Math.floor(Math.random() * (k + 1));
-          var tmp = allIngredients[k];
-          allIngredients[k] = allIngredients[r];
-          allIngredients[r] = tmp;
-        }
         state.allIngredientsPool = allIngredients;
 
         for (i = 0; i < data.menuItems.length; i++) {
@@ -1083,16 +1078,28 @@
         els.endTotal.textContent = state.totalCustomers;
 
         // Rating
-        if (state.served >= 8) {
+        if (state.served >= 10) {
+          els.endTitle.textContent = 'Ідеальна зміна!';
+          els.endTitle.style.webkitTextFillColor = '';
+          els.endTitle.style.color = 'var(--color-accent-green)';
+        } else if (state.served >= 8) {
           els.endTitle.textContent = 'Чудова зміна!';
           els.endTitle.style.webkitTextFillColor = '';
           els.endTitle.style.color = 'var(--color-accent-green)';
-        } else if (state.served >= 5) {
+        } else if (state.served >= 6) {
+          els.endTitle.textContent = 'Добра робота!';
+          els.endTitle.style.webkitTextFillColor = '';
+          els.endTitle.style.color = 'var(--color-accent-blue)';
+        } else if (state.served >= 4) {
           els.endTitle.textContent = 'Непогано!';
           els.endTitle.style.webkitTextFillColor = '';
           els.endTitle.style.color = 'var(--color-accent-orange)';
-        } else {
+        } else if (state.served >= 1) {
           els.endTitle.textContent = 'Потрібно більше практики!';
+          els.endTitle.style.webkitTextFillColor = '';
+          els.endTitle.style.color = 'var(--color-accent-red)';
+        } else {
+          els.endTitle.textContent = 'Спробуйте ще раз!';
           els.endTitle.style.webkitTextFillColor = '';
           els.endTitle.style.color = 'var(--color-accent-red)';
         }
@@ -1150,5 +1157,6 @@
     })();
   </script>
   <script src="../../shared/js/nav.js"></script>
+  <script src="../../shared/js/accessibility.js"></script>
 </body>
 </html>

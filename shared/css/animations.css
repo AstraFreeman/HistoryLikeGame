@@ -117,3 +117,59 @@
 .hover-scale:hover {
   transform: scale(1.05);
 }
+
+/* ── Hover effects for index page ── */
+
+/* Card tilt on hover */
+.card {
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
+  transform-style: preserve-3d;
+  position: relative;
+}
+
+.card:hover {
+  transform: translateY(-6px) perspective(800px) rotateX(2deg) rotateY(-2deg);
+  box-shadow: 0 16px 48px rgba(59, 130, 246, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+/* Button shimmer/glow on hover */
+.btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:hover {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3), 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  transition: left 0.5s ease;
+  pointer-events: none;
+}
+
+.btn:hover::after {
+  left: 100%;
+}
+
+/* Subtle card border glow */
+.card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0), rgba(168, 85, 247, 0));
+  z-index: -1;
+  transition: background var(--transition-base);
+  pointer-events: none;
+}
+
+.card:hover::before {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(168, 85, 247, 0.2));
+}

@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Оборона фортеці: імперський період</title>
+  <link rel="stylesheet" href="../../shared/css/reset.css">
+  <link rel="stylesheet" href="../../shared/css/theme.css">
+  <link rel="stylesheet" href="../../shared/css/animations.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    /* ===== Base ===== */
+    body {
+      overflow: hidden;
+      background: var(--gradient-bg, linear-gradient(135deg, #0f0c29, #302b63, #24243e));
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #fff;
+    }
+
+    #gameContainer {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #gameCanvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: crosshair;
+    }
+
+    .hidden { display: none !important; }
+
+    /* ===== HUD panels ===== */
+    .hud-panel {
+      position: absolute;
+      z-index: 100;
+      pointer-events: none;
+    }
+
+    /* Top-left: stats */
+    #statsPanel {
+      top: 12px;
+      left: 12px;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0,255,136,0.4);
+      border-radius: 12px;
+      padding: 14px 20px;
+      min-width: 180px;
+    }
+    #statsPanel .stat-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 4px 0;
+      font-size: 15px;
+      font-weight: 600;
+    }
+    #statsPanel .stat-label { color: #aaa; }
+    #statsPanel .stat-value { color: #ffd700; min-width: 40px; text-align: right; }
+    .stat-value.gold-val { color: #ffd700; }
+    .stat-value.lives-val { color: #ff6b6b; }
+    .stat-value.wave-val { color: #4ecdc4; }
+    .stat-value.score-val { color: #a78bfa; }
+
+    /* Top-right: tower shop */
+    #shopPanel {
+      top: 12px;
+      right: 12px;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0,255,136,0.4);
+      border-radius: 12px;
+      padding: 14px;
+      pointer-events: all;
+    }
+    #shopPanel h3 {
+      margin: 0 0 10px;
+      font-size: 15px;
+      color: #4ecdc4;
+      text-align: center;
+    }
+    .tower-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      background: rgba(255,255,255,0.07);
+      border: 2px solid transparent;
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-bottom: 8px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tower-btn:hover { border-color: rgba(0,255,136,0.6); background: rgba(255,255,255,0.12); }
+    .tower-btn.selected { border-color: #00ff88; background: rgba(0,255,136,0.15); }
+    .tower-btn .swatch {
+      width: 22px; height: 22px; border-radius: 4px; flex-shrink: 0;
+    }
+    .tower-btn .cost { color: #ffd700; margin-left: auto; }
+
+    /* Bottom-center: wave controls */
+    #waveControls {
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: all;
+      text-align: center;
+    }
+    #startWaveBtn {
+      background: linear-gradient(45deg, #00c853, #00e676);
+      border: none;
+      border-radius: 12px;
+      padding: 14px 36px;
+      font-size: 17px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.25s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 20px rgba(0,200,83,0.4);
+    }
+    #startWaveBtn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(0,200,83,0.6); }
+    #startWaveBtn:disabled { background: #555; box-shadow: none; cursor: default; transform: none; }
+
+    /* Bottom-left: info tooltip */
+    #infoTip {
+      bottom: 20px;
+      left: 12px;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(6px);
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 13px;
+      color: #bbb;
+      max-width: 260px;
+      line-height: 1.5;
+    }
+
+    /* ===== Question overlay ===== */
+    #questionOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.4s ease-out;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    #questionBox {
+      background: linear-gradient(145deg, #1e293b, #334155);
+      border: 2px solid #00ff88;
+      border-radius: 20px;
+      padding: 36px;
+      max-width: 540px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      animation: slideUp 0.4s ease-out;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(40px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    #questionBox h3 {
+      font-size: 14px;
+      color: #4ecdc4;
+      margin-bottom: 16px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    #questionText {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 28px;
+      line-height: 1.45;
+    }
+    #answersContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .answer-btn {
+      background: linear-gradient(45deg, #4338ca, #6d28d9);
+      border: 2px solid transparent;
+      border-radius: 10px;
+      padding: 13px 22px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+    .answer-btn:hover { border-color: #00ff88; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.3); }
+    .answer-btn:focus { outline: 3px solid #00ff88; outline-offset: 2px; }
+    .answer-btn.correct-answer { background: #16a34a; border-color: #22c55e; }
+    .answer-btn.wrong-answer  { background: #dc2626; border-color: #ef4444; }
+
+    #resultMsg {
+      margin-top: 18px;
+      font-size: 16px;
+      font-weight: 700;
+      min-height: 24px;
+    }
+
+    /* ===== Game over / Victory overlay ===== */
+    #endOverlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.92);
+      backdrop-filter: blur(16px);
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.6s ease-out;
+    }
+    #endBox {
+      background: linear-gradient(145deg, #1a202c, #2d3748);
+      border: 3px solid #ff6b6b;
+      border-radius: 24px;
+      padding: 48px;
+      text-align: center;
+      box-shadow: 0 24px 72px rgba(255,107,107,0.35);
+    }
+    #endBox.victory { border-color: #00ff88; box-shadow: 0 24px 72px rgba(0,255,136,0.35); }
+    #endBox h2 { font-size: 40px; margin-bottom: 16px; }
+    #endBox.victory h2 { color: #00ff88; }
+    #endBox:not(.victory) h2 { color: #ff6b6b; }
+    #endBox p { font-size: 20px; margin-bottom: 28px; }
+    #restartBtn {
+      background: linear-gradient(45deg, #ff6b6b, #feca57);
+      border: none;
+      border-radius: 14px;
+      padding: 16px 40px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    #restartBtn:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(255,107,107,0.5); }
+
+    /* ===== Mobile ===== */
+    @media (max-width: 640px) {
+      #statsPanel { padding: 10px 14px; }
+      #statsPanel .stat-row { font-size: 13px; }
+      #shopPanel { padding: 10px; }
+      .tower-btn { font-size: 12px; padding: 6px 10px; }
+      #startWaveBtn { padding: 12px 28px; font-size: 15px; }
+      #questionText { font-size: 17px; }
+      .answer-btn { font-size: 14px; padding: 10px 16px; }
+      #endBox { padding: 32px 24px; }
+      #endBox h2 { font-size: 30px; }
+      #infoTip { display: none; }
+    }
+
+    /* Accessibility: reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body data-section="Імперський період" data-game-title="Оборона фортеці" data-home-url="../../index.html" data-nav="overlay">
+
+  <div id="gameContainer">
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- HUD: stats -->
+    <div id="statsPanel" class="hud-panel">
+      <div class="stat-row"><span class="stat-label">Золото:</span><span id="goldVal" class="stat-value gold-val">100</span></div>
+      <div class="stat-row"><span class="stat-label">Життя:</span><span id="livesVal" class="stat-value lives-val">20</span></div>
+      <div class="stat-row"><span class="stat-label">Хвиля:</span><span id="waveVal" class="stat-value wave-val">0 / 10</span></div>
+      <div class="stat-row"><span class="stat-label">Рахунок:</span><span id="scoreVal" class="stat-value score-val">0</span></div>
+    </div>
+
+    <!-- HUD: tower shop -->
+    <div id="shopPanel" class="hud-panel">
+      <h3>Будівництво</h3>
+      <button class="tower-btn selected" data-tower="basic" title="Базова вежа: стріляє по одному ворогу">
+        <span class="swatch" style="background:#4488ff;"></span>
+        <span>Базова вежа</span>
+        <span class="cost">25</span>
+      </button>
+      <button class="tower-btn" data-tower="splash" title="Розривна вежа: завдає шкоди по площі">
+        <span class="swatch" style="background:#44cc66;"></span>
+        <span>Розривна вежа</span>
+        <span class="cost">50</span>
+      </button>
+      <button class="tower-btn" data-tower="sniper" title="Снайперська вежа: велика дальність та шкода">
+        <span class="swatch" style="background:#ff8844;"></span>
+        <span>Снайперська вежа</span>
+        <span class="cost">75</span>
+      </button>
+    </div>
+
+    <!-- HUD: wave button -->
+    <div id="waveControls" class="hud-panel">
+      <button id="startWaveBtn">Почати хвилю</button>
+    </div>
+
+    <!-- HUD: info -->
+    <div id="infoTip" class="hud-panel">
+      Натисніть на порожню клітинку, щоб побудувати вежу. Обирайте тип вежі у панелі праворуч.
+    </div>
+
+    <!-- Question overlay (hidden) -->
+    <div id="questionOverlay" class="hidden">
+      <div id="questionBox">
+        <h3>Історичне запитання</h3>
+        <div id="questionText"></div>
+        <div id="answersContainer"></div>
+        <div id="resultMsg"></div>
+      </div>
+    </div>
+
+    <!-- End overlay (hidden) -->
+    <div id="endOverlay" class="hidden">
+      <div id="endBox">
+        <h2 id="endTitle"></h2>
+        <p id="endStats"></p>
+        <button id="restartBtn">Грати знову</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  /* ================================================================
+     Оборона фортеці — Tower Defense (Three.js)
+     Період 5: Імперський період (19 ст.)
+     ================================================================ */
+  (function () {
+    'use strict';
+
+    // ── Questions ──────────────────────────────────────────────────
+    var QUESTIONS = [
+      { question: "Хто автор \"Кобзаря\"?", options: ["Тарас Шевченко", "Іван Франко", "Леся Українка", "Панас Мирний"], correct: 0 },
+      { question: "Кирило-Мефодіївське братство засноване у...", options: ["1846", "1840", "1850", "1835"], correct: 0 },
+      { question: "Валуєвський циркуляр заборонив...", options: ["Друк українською мовою", "Козацьке самоврядування", "Церковні братства", "Торгівлю з Європою"], correct: 0 },
+      { question: "Емський указ видано у...", options: ["1876", "1863", "1880", "1870"], correct: 0 },
+      { question: "Хто заснував товариство \"Просвіта\"?", options: ["Олександр Кониський", "Михайло Грушевський", "Іван Франко", "Тарас Шевченко"], correct: 0 },
+      { question: "\"Руська трійця\" — це...", options: ["Шашкевич, Вагилевич, Головацький", "Шевченко, Франко, Леся Українка", "Грушевський, Винниченко, Петлюра", "Котляревський, Квітка, Гулак"], correct: 0 },
+      { question: "Перший ректор Львівського університету-українець?", options: ["Михайло Грушевський", "Іван Франко", "Олександр Барвінський", "Степан Бандера"], correct: 0 },
+      { question: "Громадівський рух виник у...", options: ["1860-х роках", "1840-х роках", "1880-х роках", "1900-х роках"], correct: 0 },
+      { question: "Михайло Драгоманов пропагував...", options: ["Федералізм і демократію", "Монархію", "Анархізм", "Комунізм"], correct: 0 },
+      { question: "Котляревський написав \"Енеїду\" у...", options: ["1798", "1805", "1790", "1810"], correct: 0 },
+      { question: "Головна Руська Рада створена у...", options: ["1848", "1846", "1850", "1840"], correct: 0 },
+      { question: "Шевченка заарештовано за участь у...", options: ["Кирило-Мефодіївському братстві", "Повстанні декабристів", "Польському повстанні", "Гайдамацькому русі"], correct: 0 },
+      { question: "НТШ (Наукове товариство Шевченка) засноване у...", options: ["1873", "1868", "1880", "1890"], correct: 0 },
+      { question: "Іван Франко — автор поеми...", options: ["\"Мойсей\"", "\"Кобзар\"", "\"Енеїда\"", "\"Гайдамаки\""], correct: 0 },
+      { question: "Перша українська газета \"Зоря Галицька\" вийшла у...", options: ["1848", "1840", "1855", "1835"], correct: 0 }
+    ];
+
+    // ── Question Manager ───────────────────────────────────────────
+    function QuestionManager(list) {
+      this.all = list;
+      this.available = [];
+      this.reset();
+    }
+    QuestionManager.prototype.reset = function () {
+      this.available = this.all.slice();
+    };
+    QuestionManager.prototype.next = function () {
+      if (this.available.length === 0) this.reset();
+      var i = Math.floor(Math.random() * this.available.length);
+      return this.available.splice(i, 1)[0];
+    };
+
+    // ── Tower Definitions ──────────────────────────────────────────
+    var TOWER_DEFS = {
+      basic:  { name: 'Базова вежа',      cost: 25, damage: 8,  range: 4.5, fireRate: 1.0, color: 0x4488ff, splash: 0 },
+      splash: { name: 'Розривна вежа',     cost: 50, damage: 5,  range: 3.5, fireRate: 1.5, color: 0x44cc66, splash: 2.0 },
+      sniper: { name: 'Снайперська вежа',  cost: 75, damage: 20, range: 8.0, fireRate: 2.5, color: 0xff8844, splash: 0 }
+    };
+
+    // ── Grid & Path ────────────────────────────────────────────────
+    var GRID_W = 16;
+    var GRID_H = 10;
+    var CELL = 1.0; // world units per cell
+
+    // S-shaped path defined as grid cells [col, row]
+    var PATH_CELLS = [
+      [0,1],[1,1],[2,1],[3,1],[4,1],[5,1],[6,1],[7,1],[8,1],[9,1],
+      [9,2],[9,3],[9,4],
+      [9,5],[8,5],[7,5],[6,5],[5,5],[4,5],[3,5],[2,5],
+      [2,6],[2,7],[2,8],
+      [2,8],[3,8],[4,8],[5,8],[6,8],[7,8],[8,8],[9,8],[10,8],[11,8],[12,8],[13,8],[14,8],[15,8]
+    ];
+
+    // Convert grid coords to world 3D positions (center of cell)
+    function gridToWorld(col, row) {
+      var ox = -GRID_W * CELL / 2 + CELL / 2;
+      var oz = -GRID_H * CELL / 2 + CELL / 2;
+      return new THREE.Vector3(ox + col * CELL, 0, oz + row * CELL);
+    }
+
+    // Waypoints in world coords
+    var WAYPOINTS = PATH_CELLS.map(function (p) { return gridToWorld(p[0], p[1]); });
+
+    // Set of path cell keys for lookup
+    var pathSet = {};
+    PATH_CELLS.forEach(function (p) { pathSet[p[0] + ',' + p[1]] = true; });
+
+    // ── Main Game Class ────────────────────────────────────────────
+    function TowerDefenseGame() {
+      // State
+      this.gold = 100;
+      this.lives = 20;
+      this.score = 0;
+      this.wave = 0;
+      this.maxWaves = 10;
+      this.state = 'idle'; // idle | wave | question | over | victory
+
+      // Three.js
+      this.scene = null;
+      this.camera = null;
+      this.renderer = null;
+      this.raycaster = new THREE.Raycaster();
+      this.mouse = new THREE.Vector2();
+
+      // Entities
+      this.towers = [];
+      this.enemies = [];
+      this.projectiles = [];
+
+      // Grid cells (Three.js planes for clicking)
+      this.cellMeshes = [];
+      this.grid = [];
+
+      // Towers selection
+      this.selectedTower = 'basic';
+
+      // Question
+      this.qm = new QuestionManager(QUESTIONS);
+      this.questionsAnswered = 0;
+      this.wavesSinceQuestion = 0;
+      this.currentQuestion = null;
+
+      // Enemy wave config
+      this.enemiesPerWave = 8;
+      this.enemiesToSpawn = 0;
+      this.spawnTimer = 0;
+      this.spawnInterval = 0.8;
+
+      // Clock
+      this.clock = new THREE.Clock();
+
+      this.init();
+    }
+
+    // ── Initialisation ──────────────────────────────────────────
+    TowerDefenseGame.prototype.init = function () {
+      this.setupScene();
+      this.buildGrid();
+      this.buildPath();
+      this.setupListeners();
+      this.updateHUD();
+      this.animate();
+    };
+
+    TowerDefenseGame.prototype.setupScene = function () {
+      var canvas = document.getElementById('gameCanvas');
+
+      this.scene = new THREE.Scene();
+      this.scene.background = new THREE.Color(0x1a1a2e);
+
+      // Camera
+      var aspect = window.innerWidth / window.innerHeight;
+      this.camera = new THREE.PerspectiveCamera(50, aspect, 0.1, 200);
+      this.camera.position.set(0, 14, 10);
+      this.camera.lookAt(0, 0, 0);
+
+      this.renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+      this.renderer.setSize(window.innerWidth, window.innerHeight);
+      this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      this.renderer.shadowMap.enabled = true;
+
+      // Lights
+      var amb = new THREE.AmbientLight(0x8888aa, 0.6);
+      this.scene.add(amb);
+
+      var dir = new THREE.DirectionalLight(0xffffff, 0.9);
+      dir.position.set(8, 16, 6);
+      dir.castShadow = true;
+      dir.shadow.mapSize.width = 1024;
+      dir.shadow.mapSize.height = 1024;
+      dir.shadow.camera.near = 0.5;
+      dir.shadow.camera.far = 50;
+      dir.shadow.camera.left = -12;
+      dir.shadow.camera.right = 12;
+      dir.shadow.camera.top = 12;
+      dir.shadow.camera.bottom = -12;
+      this.scene.add(dir);
+
+      // Ground plane
+      var gnd = new THREE.Mesh(
+        new THREE.PlaneGeometry(GRID_W * CELL + 4, GRID_H * CELL + 4),
+        new THREE.MeshPhongMaterial({ color: 0x1b3a2a })
+      );
+      gnd.rotation.x = -Math.PI / 2;
+      gnd.position.y = -0.05;
+      gnd.receiveShadow = true;
+      this.scene.add(gnd);
+    };
+
+    TowerDefenseGame.prototype.buildGrid = function () {
+      this.grid = [];
+      for (var c = 0; c < GRID_W; c++) {
+        this.grid[c] = [];
+        for (var r = 0; r < GRID_H; r++) {
+          var isPath = pathSet[c + ',' + r] === true;
+          this.grid[c][r] = isPath ? 'path' : 'empty';
+
+          var color = isPath ? 0x5c4033 : 0x2a5a3a;
+          var mat = new THREE.MeshPhongMaterial({
+            color: color,
+            transparent: true,
+            opacity: isPath ? 0.85 : 0.55
+          });
+          var mesh = new THREE.Mesh(new THREE.PlaneGeometry(CELL * 0.95, CELL * 0.95), mat);
+          var pos = gridToWorld(c, r);
+          mesh.position.set(pos.x, 0.01, pos.z);
+          mesh.rotation.x = -Math.PI / 2;
+          mesh.receiveShadow = true;
+          mesh.userData = { col: c, row: r };
+          this.scene.add(mesh);
+          this.cellMeshes.push(mesh);
+        }
+      }
+    };
+
+    TowerDefenseGame.prototype.buildPath = function () {
+      // Direction arrows every 4 cells
+      for (var i = 0; i < PATH_CELLS.length; i++) {
+        if (i % 4 === 0 && i < PATH_CELLS.length - 1) {
+          var pc = PATH_CELLS[i];
+          var nc = PATH_CELLS[i + 1];
+          var pos = gridToWorld(pc[0], pc[1]);
+          var npos = gridToWorld(nc[0], nc[1]);
+          var arrow = new THREE.Mesh(
+            new THREE.ConeGeometry(0.12, 0.3, 4),
+            new THREE.MeshPhongMaterial({ color: 0xaa7744 })
+          );
+          arrow.position.set(pos.x, 0.2, pos.z);
+          var d = new THREE.Vector3().subVectors(npos, pos).normalize();
+          arrow.lookAt(pos.x + d.x, 0.2, pos.z + d.z);
+          arrow.rotateX(Math.PI / 2);
+          this.scene.add(arrow);
+        }
+      }
+
+      // Start marker
+      var startPos = WAYPOINTS[0];
+      var startMark = new THREE.Mesh(
+        new THREE.RingGeometry(0.3, 0.45, 16),
+        new THREE.MeshPhongMaterial({ color: 0xff4444, side: THREE.DoubleSide })
+      );
+      startMark.rotation.x = -Math.PI / 2;
+      startMark.position.set(startPos.x, 0.05, startPos.z);
+      this.scene.add(startMark);
+
+      // End marker
+      var endPos = WAYPOINTS[WAYPOINTS.length - 1];
+      var endMark = new THREE.Mesh(
+        new THREE.BoxGeometry(0.5, 0.8, 0.5),
+        new THREE.MeshPhongMaterial({ color: 0x2255ff })
+      );
+      endMark.position.set(endPos.x, 0.4, endPos.z);
+      this.scene.add(endMark);
+    };
+
+    // ── Tower placement ─────────────────────────────────────────
+    TowerDefenseGame.prototype.placeTower = function (col, row) {
+      if (this.grid[col][row] !== 'empty') return;
+      var def = TOWER_DEFS[this.selectedTower];
+      if (this.gold < def.cost) return;
+
+      this.gold -= def.cost;
+      this.grid[col][row] = 'tower';
+
+      var group = new THREE.Group();
+      var pos = gridToWorld(col, row);
+      group.position.set(pos.x, 0, pos.z);
+
+      var mesh;
+      if (this.selectedTower === 'basic') {
+        mesh = new THREE.Mesh(
+          new THREE.BoxGeometry(0.6, 0.8, 0.6),
+          new THREE.MeshPhongMaterial({ color: def.color })
+        );
+        mesh.position.y = 0.4;
+      } else if (this.selectedTower === 'splash') {
+        mesh = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.3, 0.35, 0.7, 8),
+          new THREE.MeshPhongMaterial({ color: def.color })
+        );
+        mesh.position.y = 0.35;
+      } else {
+        mesh = new THREE.Mesh(
+          new THREE.ConeGeometry(0.3, 1.0, 6),
+          new THREE.MeshPhongMaterial({ color: def.color })
+        );
+        mesh.position.y = 0.5;
+      }
+      mesh.castShadow = true;
+      group.add(mesh);
+
+      // Base ring
+      var base = new THREE.Mesh(
+        new THREE.RingGeometry(0.32, 0.42, 16),
+        new THREE.MeshPhongMaterial({ color: 0xcccccc, side: THREE.DoubleSide })
+      );
+      base.rotation.x = -Math.PI / 2;
+      base.position.y = 0.02;
+      group.add(base);
+
+      this.scene.add(group);
+
+      this.towers.push({
+        group: group,
+        mesh: mesh,
+        def: { name: def.name, cost: def.cost, damage: def.damage, range: def.range, fireRate: def.fireRate, color: def.color, splash: def.splash },
+        col: col,
+        row: row,
+        type: this.selectedTower,
+        lastShot: 0
+      });
+
+      // Update cell visual
+      for (var i = 0; i < this.cellMeshes.length; i++) {
+        var cm = this.cellMeshes[i];
+        if (cm.userData.col === col && cm.userData.row === row) {
+          cm.material.color.setHex(0x335533);
+          cm.material.opacity = 0.35;
+          break;
+        }
+      }
+
+      this.updateHUD();
+    };
+
+    // ── Enemy spawning ──────────────────────────────────────────
+    TowerDefenseGame.prototype.spawnEnemy = function () {
+      var waveMultiplier = 1 + (this.wave - 1) * 0.15;
+      var hp = Math.round(20 * waveMultiplier);
+      var speed = 1.2 + Math.random() * 0.3 + (this.wave - 1) * 0.05;
+
+      var mat = new THREE.MeshPhongMaterial({ color: 0xdd3333 });
+      var mesh = new THREE.Mesh(new THREE.SphereGeometry(0.25, 10, 10), mat);
+      mesh.castShadow = true;
+
+      var startPos = WAYPOINTS[0];
+      mesh.position.set(startPos.x, 0.3, startPos.z);
+
+      this.scene.add(mesh);
+      this.enemies.push({
+        mesh: mesh,
+        hp: hp,
+        maxHp: hp,
+        speed: speed,
+        wpIndex: 0,
+        alive: true
+      });
+    };
+
+    // ── Update loop ─────────────────────────────────────────────
+    TowerDefenseGame.prototype.animate = function () {
+      var self = this;
+      requestAnimationFrame(function () { self.animate(); });
+      var dt = this.clock.getDelta();
+      if (this.state === 'wave') {
+        this.updateSpawner(dt);
+        this.updateEnemies(dt);
+        this.updateTowers(dt);
+        this.updateProjectiles(dt);
+        this.checkWaveEnd();
+      }
+      // Rotate tower meshes slowly
+      for (var i = 0; i < this.towers.length; i++) {
+        this.towers[i].mesh.rotation.y += dt * 0.5;
+      }
+      this.renderer.render(this.scene, this.camera);
+    };
+
+    TowerDefenseGame.prototype.updateSpawner = function (dt) {
+      if (this.enemiesToSpawn <= 0) return;
+      this.spawnTimer -= dt;
+      if (this.spawnTimer <= 0) {
+        this.spawnEnemy();
+        this.enemiesToSpawn--;
+        this.spawnTimer = this.spawnInterval;
+      }
+    };
+
+    TowerDefenseGame.prototype.updateEnemies = function (dt) {
+      for (var i = this.enemies.length - 1; i >= 0; i--) {
+        var e = this.enemies[i];
+        if (!e.alive) continue;
+
+        var target = WAYPOINTS[e.wpIndex + 1];
+        if (!target) {
+          // Reached end
+          this.lives--;
+          this.removeEnemy(i);
+          this.updateHUD();
+          if (this.lives <= 0) this.endGame(false);
+          continue;
+        }
+
+        var dir = new THREE.Vector3().subVectors(target, e.mesh.position);
+        var dist = dir.length();
+        var step = e.speed * dt;
+
+        if (step >= dist) {
+          e.mesh.position.copy(target);
+          e.wpIndex++;
+        } else {
+          dir.normalize().multiplyScalar(step);
+          e.mesh.position.add(dir);
+        }
+
+        // Color based on HP ratio
+        var ratio = e.hp / e.maxHp;
+        if (ratio > 0.5) {
+          e.mesh.material.color.setHex(0xdd3333);
+        } else if (ratio > 0.25) {
+          e.mesh.material.color.setHex(0xdd8833);
+        } else {
+          e.mesh.material.color.setHex(0xdddd33);
+        }
+      }
+    };
+
+    TowerDefenseGame.prototype.updateTowers = function (dt) {
+      var now = this.clock.elapsedTime;
+      for (var t = 0; t < this.towers.length; t++) {
+        var tower = this.towers[t];
+        if (now - tower.lastShot < tower.def.fireRate) continue;
+
+        var bestEnemy = null;
+        var bestDist = tower.def.range + 0.01;
+        var tPos = tower.group.position;
+
+        for (var e = 0; e < this.enemies.length; e++) {
+          var en = this.enemies[e];
+          if (!en.alive) continue;
+          var d = tPos.distanceTo(en.mesh.position);
+          if (d < bestDist) {
+            bestDist = d;
+            bestEnemy = en;
+          }
+        }
+
+        if (bestEnemy) {
+          this.fireProjectile(tower, bestEnemy);
+          tower.lastShot = now;
+        }
+      }
+    };
+
+    TowerDefenseGame.prototype.fireProjectile = function (tower, target) {
+      var color = tower.def.splash > 0 ? 0x88ff88 : (tower.type === 'sniper' ? 0xffaa44 : 0xffff44);
+      var size = tower.type === 'sniper' ? 0.12 : 0.09;
+      var mesh = new THREE.Mesh(
+        new THREE.SphereGeometry(size, 6, 6),
+        new THREE.MeshPhongMaterial({ color: color, emissive: color, emissiveIntensity: 0.6 })
+      );
+      mesh.position.copy(tower.group.position);
+      mesh.position.y = 0.5;
+      this.scene.add(mesh);
+
+      this.projectiles.push({
+        mesh: mesh,
+        target: target,
+        speed: tower.type === 'sniper' ? 12 : 8,
+        damage: tower.def.damage,
+        splash: tower.def.splash
+      });
+    };
+
+    TowerDefenseGame.prototype.updateProjectiles = function (dt) {
+      for (var i = this.projectiles.length - 1; i >= 0; i--) {
+        var p = this.projectiles[i];
+
+        if (!p.target || !p.target.alive) {
+          this.removeProjectile(i);
+          continue;
+        }
+
+        var dir = new THREE.Vector3().subVectors(p.target.mesh.position, p.mesh.position);
+        var dist = dir.length();
+        var step = p.speed * dt;
+
+        if (step >= dist || dist < 0.3) {
+          this.hitEnemy(p.target, p.damage, p.splash, p.target.mesh.position);
+          this.removeProjectile(i);
+        } else {
+          dir.normalize().multiplyScalar(step);
+          p.mesh.position.add(dir);
+        }
+      }
+    };
+
+    TowerDefenseGame.prototype.hitEnemy = function (enemy, damage, splash, pos) {
+      if (!enemy.alive) return;
+      enemy.hp -= damage;
+      if (enemy.hp <= 0) {
+        this.killEnemy(enemy);
+      }
+
+      // Splash damage
+      if (splash > 0) {
+        for (var i = 0; i < this.enemies.length; i++) {
+          var e = this.enemies[i];
+          if (e === enemy || !e.alive) continue;
+          if (e.mesh.position.distanceTo(pos) <= splash) {
+            e.hp -= Math.round(damage * 0.5);
+            if (e.hp <= 0) this.killEnemy(e);
+          }
+        }
+      }
+    };
+
+    TowerDefenseGame.prototype.killEnemy = function (enemy) {
+      if (!enemy.alive) return;
+      enemy.alive = false;
+      this.score += 10;
+      this.gold += 8;
+      this.updateHUD();
+
+      // Death flash
+      enemy.mesh.material.color.setHex(0xffffff);
+      enemy.mesh.material.emissive = new THREE.Color(0xffffff);
+      enemy.mesh.material.emissiveIntensity = 1;
+      var self = this;
+      setTimeout(function () {
+        var idx = self.enemies.indexOf(enemy);
+        if (idx > -1) self.removeEnemy(idx);
+      }, 120);
+    };
+
+    TowerDefenseGame.prototype.removeEnemy = function (index) {
+      var e = this.enemies[index];
+      this.scene.remove(e.mesh);
+      e.mesh.geometry.dispose();
+      e.mesh.material.dispose();
+      this.enemies.splice(index, 1);
+    };
+
+    TowerDefenseGame.prototype.removeProjectile = function (index) {
+      var p = this.projectiles[index];
+      this.scene.remove(p.mesh);
+      p.mesh.geometry.dispose();
+      p.mesh.material.dispose();
+      this.projectiles.splice(index, 1);
+    };
+
+    TowerDefenseGame.prototype.checkWaveEnd = function () {
+      if (this.enemiesToSpawn > 0) return;
+      if (this.enemies.length > 0) return;
+
+      // Wave cleared
+      this.state = 'idle';
+      this.wavesSinceQuestion++;
+
+      // Question every 2 waves (and at last wave)
+      if (this.wavesSinceQuestion >= 2 || this.wave === this.maxWaves) {
+        this.wavesSinceQuestion = 0;
+        this.showQuestion();
+        return;
+      }
+
+      if (this.wave >= this.maxWaves) {
+        this.endGame(true);
+        return;
+      }
+
+      document.getElementById('startWaveBtn').disabled = false;
+    };
+
+    // ── Waves ───────────────────────────────────────────────────
+    TowerDefenseGame.prototype.startWave = function () {
+      if (this.state !== 'idle') return;
+      this.wave++;
+      this.enemiesPerWave = 6 + this.wave * 2;
+      this.enemiesToSpawn = this.enemiesPerWave;
+      this.spawnTimer = 0;
+      this.spawnInterval = Math.max(0.35, 0.8 - this.wave * 0.03);
+      this.state = 'wave';
+      document.getElementById('startWaveBtn').disabled = true;
+      this.updateHUD();
+    };
+
+    // ── Question System ─────────────────────────────────────────
+    TowerDefenseGame.prototype.showQuestion = function () {
+      this.state = 'question';
+      var q = this.qm.next();
+      this.currentQuestion = q;
+
+      document.getElementById('questionText').textContent = q.question;
+      var container = document.getElementById('answersContainer');
+
+      // Clear previous answers using DOM methods
+      while (container.firstChild) {
+        container.removeChild(container.firstChild);
+      }
+      document.getElementById('resultMsg').textContent = '';
+
+      var self = this;
+      q.options.forEach(function (opt, idx) {
+        var btn = document.createElement('button');
+        btn.className = 'answer-btn';
+        btn.textContent = opt;
+        btn.addEventListener('click', function () {
+          self.answerQuestion(idx, btn, container);
+        });
+        container.appendChild(btn);
+      });
+
+      document.getElementById('questionOverlay').classList.remove('hidden');
+    };
+
+    TowerDefenseGame.prototype.answerQuestion = function (idx, btn, container) {
+      var q = this.currentQuestion;
+      var resultMsg = document.getElementById('resultMsg');
+      var buttons = container.querySelectorAll('.answer-btn');
+
+      // Disable all buttons
+      for (var i = 0; i < buttons.length; i++) {
+        buttons[i].disabled = true;
+        buttons[i].style.pointerEvents = 'none';
+      }
+
+      // Show correct / wrong
+      buttons[q.correct].classList.add('correct-answer');
+      if (idx !== q.correct) {
+        btn.classList.add('wrong-answer');
+        resultMsg.style.color = '#ef4444';
+        resultMsg.textContent = 'Неправильно!';
+      } else {
+        resultMsg.style.color = '#22c55e';
+        resultMsg.textContent = 'Правильно! +30 золота, +1 життя';
+        this.gold += 30;
+        this.lives = Math.min(this.lives + 1, 25);
+        this.score += 25;
+        this.updateHUD();
+      }
+
+      this.questionsAnswered++;
+
+      var self = this;
+      setTimeout(function () {
+        document.getElementById('questionOverlay').classList.add('hidden');
+        self.state = 'idle';
+
+        if (self.wave >= self.maxWaves) {
+          self.endGame(true);
+        } else {
+          document.getElementById('startWaveBtn').disabled = false;
+        }
+      }, 2000);
+    };
+
+    // ── End Game ────────────────────────────────────────────────
+    TowerDefenseGame.prototype.endGame = function (victory) {
+      this.state = victory ? 'victory' : 'over';
+
+      var overlay = document.getElementById('endOverlay');
+      var box = document.getElementById('endBox');
+      var title = document.getElementById('endTitle');
+      var stats = document.getElementById('endStats');
+
+      if (victory) {
+        box.classList.add('victory');
+        title.textContent = 'Перемога!';
+      } else {
+        box.classList.remove('victory');
+        title.textContent = 'Гру завершено';
+      }
+
+      stats.textContent = 'Рахунок: ' + this.score + '  |  Хвиля: ' + this.wave + ' / ' + this.maxWaves;
+      overlay.classList.remove('hidden');
+    };
+
+    TowerDefenseGame.prototype.restart = function () {
+      // Clear enemies
+      while (this.enemies.length) this.removeEnemy(this.enemies.length - 1);
+      // Clear projectiles
+      while (this.projectiles.length) this.removeProjectile(this.projectiles.length - 1);
+      // Clear towers
+      for (var t = 0; t < this.towers.length; t++) {
+        var tw = this.towers[t];
+        this.scene.remove(tw.group);
+        this.grid[tw.col][tw.row] = 'empty';
+        for (var i = 0; i < this.cellMeshes.length; i++) {
+          var cm = this.cellMeshes[i];
+          if (cm.userData.col === tw.col && cm.userData.row === tw.row) {
+            cm.material.color.setHex(0x2a5a3a);
+            cm.material.opacity = 0.55;
+            break;
+          }
+        }
+      }
+      this.towers = [];
+
+      this.gold = 100;
+      this.lives = 20;
+      this.score = 0;
+      this.wave = 0;
+      this.state = 'idle';
+      this.enemiesToSpawn = 0;
+      this.wavesSinceQuestion = 0;
+      this.questionsAnswered = 0;
+      this.qm.reset();
+
+      document.getElementById('endOverlay').classList.add('hidden');
+      document.getElementById('questionOverlay').classList.add('hidden');
+      document.getElementById('startWaveBtn').disabled = false;
+      this.updateHUD();
+    };
+
+    // ── HUD ─────────────────────────────────────────────────────
+    TowerDefenseGame.prototype.updateHUD = function () {
+      document.getElementById('goldVal').textContent = this.gold;
+      document.getElementById('livesVal').textContent = this.lives;
+      document.getElementById('waveVal').textContent = this.wave + ' / ' + this.maxWaves;
+      document.getElementById('scoreVal').textContent = this.score;
+    };
+
+    // ── Input ───────────────────────────────────────────────────
+    TowerDefenseGame.prototype.setupListeners = function () {
+      var self = this;
+
+      // Click to place tower
+      var canvas = document.getElementById('gameCanvas');
+      canvas.addEventListener('click', function (e) { self.onCanvasClick(e); });
+      canvas.addEventListener('touchend', function (e) {
+        e.preventDefault();
+        if (e.changedTouches.length > 0) {
+          var touch = e.changedTouches[0];
+          self.handleClick(touch.clientX, touch.clientY);
+        }
+      });
+
+      // Tower selection buttons
+      var towerBtns = document.querySelectorAll('.tower-btn');
+      towerBtns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          towerBtns.forEach(function (b) { b.classList.remove('selected'); });
+          btn.classList.add('selected');
+          self.selectedTower = btn.dataset.tower;
+        });
+      });
+
+      // Start wave
+      document.getElementById('startWaveBtn').addEventListener('click', function () { self.startWave(); });
+
+      // Restart
+      document.getElementById('restartBtn').addEventListener('click', function () { self.restart(); });
+
+      // Resize
+      window.addEventListener('resize', function () {
+        self.camera.aspect = window.innerWidth / window.innerHeight;
+        self.camera.updateProjectionMatrix();
+        self.renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    };
+
+    TowerDefenseGame.prototype.onCanvasClick = function (e) {
+      this.handleClick(e.clientX, e.clientY);
+    };
+
+    TowerDefenseGame.prototype.handleClick = function (clientX, clientY) {
+      if (this.state === 'question' || this.state === 'over' || this.state === 'victory') return;
+
+      this.mouse.x = (clientX / window.innerWidth) * 2 - 1;
+      this.mouse.y = -(clientY / window.innerHeight) * 2 + 1;
+
+      this.raycaster.setFromCamera(this.mouse, this.camera);
+      var hits = this.raycaster.intersectObjects(this.cellMeshes);
+      if (hits.length > 0) {
+        var data = hits[0].object.userData;
+        this.placeTower(data.col, data.row);
+      }
+    };
+
+    // ── Boot ────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function () {
+      window.towerDefenseGame = new TowerDefenseGame();
+    });
+  })();
+  </script>
+
+  <script src="../../shared/js/nav.js"></script>
+  <script src="../../shared/js/accessibility.js"></script>
+</body>
+</html>

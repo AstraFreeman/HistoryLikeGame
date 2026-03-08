@@ -24,6 +24,7 @@ shared/
     canvas-utils.js           # window.CanvasUtils
     ui-utils.js               # window.UIUtils
     assistant.js              # Помічник-восьминог
+    accessibility.js          # Плаваюча панель налаштувань доступності
   templates/
     quiz-question.html        # Шаблон вікторини
     falling-answer.html       # Шаблон гри з падаючими відповідями
@@ -36,8 +37,10 @@ data/
     bobble-imperial.js
     puzzle-soviet.js
     kafe-independence.js
+  pheniks_2/                  # Зображення пазлів (MZP/PTL/SGD)
 games/
   narrative/                  # Наративні та унікальні ігри
+    tower-defense.html        # Three.js tower defense (Період 5)
   start-pages/               # Вступні сторінки
   quiz-hub/                  # Сітка вікторин
   map/                       # Інтерактивна карта
@@ -101,6 +104,29 @@ window.UIUtils.showNotification(message, duration)
 - `--text-xs` через `--text-4xl`
 - `--game-accent`, `--game-bg` — для кастомізації на рівні сторінки
 
+## Система доступності (`shared/js/accessibility.js`)
+
+IIFE-модуль, що створює плаваючу кнопку-шестеренку та панель налаштувань через `document.createElement` (без innerHTML).
+
+**CSS-класи, що переключаються:**
+- `.theme-light` на `<body>` — світла тема
+- `.font-lg`, `.font-xl` на `<html>` — збільшений / великий шрифт
+- `.reduce-motion` на `<html>` — зменшення анімацій
+- `.high-contrast` на `<html>` — висока контрастність
+
+**localStorage ключі:**
+- `histgame_theme` — `'dark'` або `'light'`
+- `histgame_fontsize` — `'normal'`, `'large'`, `'xlarge'`
+- `histgame_reducemotion` — `'true'` або `'false'`
+- `histgame_highcontrast` — `'true'` або `'false'`
+
+**Підключення:** додайте перед `</body>`:
+```html
+<script src="../../shared/js/accessibility.js"></script>
+```
+
+**Запобігання FOUC:** на `index.html` є ранній `<script>` в `<head>`, що застосовує збережені класи до рендеру.
+
 ## Як додати нову гру
 
 1. Створіть файл даних: `data/games/my-game-data.js`
@@ -122,6 +148,7 @@ window.UIUtils.showNotification(message, duration)
        <script src="../../data/games/my-game-data.js"></script>
        <script>/* Логіка гри */</script>
        <script src="../../shared/js/nav.js"></script>
+       <script src="../../shared/js/accessibility.js"></script>
    </body>
    </html>
    ```

@@ -33,16 +33,20 @@ shared/
     canvas-utils.js           # window.CanvasUtils — canvas helpers
     ui-utils.js               # window.UIUtils — modal/notification helpers
     assistant.js              # Octopus mascot (keyboard movement, GIF states)
+    accessibility.js          # Floating accessibility settings panel
   templates/
     quiz-question.html        # Template for quiz pages, loads data via ?id= param
     falling-answer.html       # Template for falling-answer games, loads data via ?id=
 data/
   quiz/                       # 23 quiz data files (crstm-s-{row}-{col}.js)
   falling/                    # 3 falling-game data files (period-{n}-{name}.js)
+  assistant/                  # Assistant facts database
+  games/                      # Game-specific data files (solitaire, bobble, puzzle, kafe)
 games/
   narrative/                  # Story-driven, interactive, and unique game pages
     masachuchi/               # Apple-catching canvas game (own image/ subdir)
     new-makako-1/             # Falling game variant (own styles.css, script.js)
+    tower-defense.html        # Three.js tower defense game (Period 5)
   start-pages/                # Educational intro pages before games
   quiz-hub/                   # crstm-s-main.html — quiz grid hub
   map/                        # Interactive zoomable historical map
@@ -69,6 +73,7 @@ assets/
 - `window.FallingGame.init(config)` — falling-answer engine
 - `window.CanvasUtils` — canvas helpers
 - `window.UIUtils` — modal/notification helpers
+- `accessibility.js` — auto-injected floating settings panel (theme, font, motion, contrast)
 
 **Navigation** via `nav.js`: reads `data-section`, `data-game-title`, `data-home-url` from `<body>`. Use `data-nav="overlay"` for fullscreen games (floating button), `data-nav="false"` to skip. AR pages use an inline floating `<a>` tag instead.
 
@@ -83,3 +88,15 @@ assets/
 - **Naming:** kebab-case for files and directories
 - **AR pages** depend on CDN-hosted A-Frame and AR.js libraries
 - **Paths from game pages:** Games in `games/*/` use `../../shared/`, `../../assets/` etc.
+
+## Accessibility
+
+`shared/js/accessibility.js` creates a floating gear button on all pages with settings:
+- **Theme:** dark/light (CSS class `.theme-light` on `<body>`)
+- **Font size:** normal/large/xlarge (`.font-lg`, `.font-xl` on `<html>`)
+- **Reduced motion:** (`.reduce-motion` on `<html>`)
+- **High contrast:** (`.high-contrast` on `<html>`)
+
+Persists to localStorage keys: `histgame_theme`, `histgame_fontsize`, `histgame_reducemotion`, `histgame_highcontrast`.
+
+Early theme detection `<script>` in `<head>` of `index.html` prevents FOUC. Uses safe DOM creation methods (no innerHTML).

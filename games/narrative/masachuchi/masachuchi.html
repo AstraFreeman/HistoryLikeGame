@@ -368,9 +368,10 @@
         const images = {
             topLoaded: false,
             downLoaded: false,
+            moveLoaded: false,
             cossackLoaded: false
         };
-        
+
         const imgTop = new Image();
         imgTop.src = './image/vik_top.png';
         imgTop.onload = () => { images.topLoaded = true; };
@@ -380,6 +381,11 @@
         imgDown.src = './image/vik_botom.png';
         imgDown.onload = () => { images.downLoaded = true; };
         imgDown.onerror = () => { images.downLoaded = false; };
+
+        const imgMove = new Image();
+        imgMove.src = './image/vik_move.gif';
+        imgMove.onload = () => { images.moveLoaded = true; };
+        imgMove.onerror = () => { images.moveLoaded = false; };
         
         // 6 вертикальних ліній для падіння яблук (у відсотках)
         const lanes = [0.125, 0.25, 0.375, 0.5, 0.625, 0.875];
@@ -477,42 +483,30 @@
         
         // Малювання каретки
         function drawBasket() {
-            basket.moving = keys['ArrowLeft'] || keys['a'] || keys['A'] || 
+            basket.moving = keys['ArrowLeft'] || keys['a'] || keys['A'] ||
                            keys['ArrowRight'] || keys['d'] || keys['D'];
-            
+
             const x = basket.x * canvas.width;
             const y = basket.y * canvas.height;
             const w = basket.width * canvas.width;
             const h = basket.height * canvas.height;
-            
-            const topHeight = h * 0.33;
-            const downHeight = h - topHeight;
-            
-            // Верхня частина
-            if (images.topLoaded) {
-                ctx.drawImage(imgTop, x - w/2, y, w, topHeight);
-            } else {
-                ctx.fillStyle = '#8B4513';
-                ctx.beginPath();
-                ctx.moveTo(x, y);
-                ctx.lineTo(x - w/2, y + topHeight);
-                ctx.lineTo(x + w/2, y + topHeight);
-                ctx.closePath();
-                ctx.fill();
-                ctx.strokeStyle = '#654321';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-            }
-            
-            // Нижня частина (зона ловлі)
-            if (images.downLoaded) {
-                ctx.drawImage(imgDown, x - w/2, y + topHeight, w, downHeight);
+
+            // Base layer: vik_move.gif when moving, vik_botom.png when still
+            if (basket.moving && images.moveLoaded) {
+                ctx.drawImage(imgMove, x - w/2, y, w, h);
+            } else if (images.downLoaded) {
+                ctx.drawImage(imgDown, x - w/2, y, w, h);
             } else {
                 ctx.fillStyle = '#D2691E';
-                ctx.fillRect(x - w/2, y + topHeight, w, downHeight);
+                ctx.fillRect(x - w/2, y, w, h);
                 ctx.strokeStyle = '#8B4513';
                 ctx.lineWidth = 3;
-                ctx.strokeRect(x - w/2, y + topHeight, w, downHeight);
+                ctx.strokeRect(x - w/2, y, w, h);
+            }
+
+            // Overlay: vik_top.png on top
+            if (images.topLoaded) {
+                ctx.drawImage(imgTop, x - w/2, y, w, h);
             }
         }
         
@@ -668,6 +662,7 @@
         });
     </script>
     <script src="../../../shared/js/nav.js"></script>
+    <script src="../../../shared/js/accessibility.js"></script>
 </body>
 
 </html>

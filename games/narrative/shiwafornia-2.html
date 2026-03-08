@@ -239,9 +239,50 @@
             pointer-events: none;
             animation: confetti 3s ease-out forwards;
         }
+
+        .intro-screen {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        .intro-screen h2 {
+            color: #FFD700;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .difficulty-btn {
+            margin: 8px;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            border: none;
+            color: white;
+            transition: transform 0.3s;
+        }
+
+        .difficulty-btn:hover { transform: scale(1.1); }
+        .diff-easy { background: linear-gradient(135deg, #74b9ff, #0984e3); }
+        .diff-medium { background: linear-gradient(135deg, #ffeaa7, #fdcb6e); color: #2d3436; }
+        .diff-hard { background: linear-gradient(135deg, #ff7675, #d63031); }
     </style>
 </head>
 <body data-section="Стародавня історія" data-game-title="Стародавня історія України" data-home-url="../../index.html">
+    <div class="intro-screen" id="introScreen">
+        <h2>Стародавня історія України</h2>
+        <p style="color:white; margin-bottom:20px;">Оберіть складність:</p>
+        <button class="difficulty-btn diff-easy" id="diffEasy">Легкий</button>
+        <button class="difficulty-btn diff-medium" id="diffMedium">Середній</button>
+        <button class="difficulty-btn diff-hard" id="diffHard">Складний</button>
+    </div>
     <div class="container">
         <h1 id="title">🏺 Стародавня історія України 🏺</h1>
         
@@ -261,6 +302,7 @@
         <div class="message" id="message"></div>
 
         <button class="reset-btn" id="reset">🔄 Почати спочатку</button>
+        <button class="reset-btn" id="newGame" style="display:none;background:linear-gradient(135deg, #55efc4 0%, #00b894 100%);box-shadow:0 4px 15px rgba(0,184,148,0.4);">🎮 Нова гра</button>
     </div>
 
     <script>
@@ -344,6 +386,8 @@
         let nodePositions = [];
         let connections = [];
         let correctNodes = [];
+        let errorTimeout = 1500;
+        let difficulty = 'medium';
 
         function shuffle(array) {
             const arr = [...array];
@@ -490,6 +534,7 @@
                     document.getElementById('message').textContent = '🎉 Вітаємо! Ви пройшли гру! 🎉';
                     disableAllNodes();
                     createConfetti();
+                    document.getElementById('newGame').style.display = 'block';
                 } else {
                     document.getElementById('message').textContent = '✅ Правильно! Продовжуйте!';
                 }
@@ -499,7 +544,7 @@
                 
                 setTimeout(() => {
                     resetGame();
-                }, 1500);
+                }, errorTimeout);
             }
         }
 
@@ -546,7 +591,25 @@
             }
         }
 
-        document.getElementById('reset').addEventListener('click', initGame);
+        function startWithDifficulty(diff) {
+            difficulty = diff;
+            if (diff === 'hard') errorTimeout = 500;
+            else errorTimeout = 1500;
+            document.getElementById('introScreen').style.display = 'none';
+            initGame();
+        }
+
+        document.getElementById('diffEasy').addEventListener('click', function() { startWithDifficulty('easy'); });
+        document.getElementById('diffMedium').addEventListener('click', function() { startWithDifficulty('medium'); });
+        document.getElementById('diffHard').addEventListener('click', function() { startWithDifficulty('hard'); });
+        document.getElementById('newGame').addEventListener('click', function() {
+            document.getElementById('newGame').style.display = 'none';
+            initGame();
+        });
+        document.getElementById('reset').addEventListener('click', function() {
+            document.getElementById('newGame').style.display = 'none';
+            initGame();
+        });
         window.addEventListener('resize', () => {
             setTimeout(() => {
                 drawConnections();
@@ -555,9 +618,8 @@
                 }
             }, 100);
         });
-
-        initGame();
     </script>
     <script src="../../shared/js/nav.js"></script>
+    <script src="../../shared/js/accessibility.js"></script>
 </body>
 </html>

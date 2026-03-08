@@ -234,7 +234,7 @@
   // --- Speech bubble ---
 
   function showSpeechBubble(text, duration) {
-    duration = duration || 4000;
+    duration = duration || 8000;
     var factBox = document.getElementById('factBox');
     if (factBox) {
       factBox.textContent = text;
