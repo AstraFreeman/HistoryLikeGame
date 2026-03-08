@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Пазл</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Unbounded:wght@300;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0d0d0f;
+    --surface: #16161a;
+    --border: #2a2a32;
+    --accent: #e8c97a;
+    --text: #c8c8d0;
+    --cell-size: calc(400px / 3);
+  }
+
+  body {
+    min-height: 100vh;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Unbounded', sans-serif;
+    color: var(--text);
+    gap: 40px;
+    padding: 40px 20px;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 40% at 20% 20%, rgba(232,201,122,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 50% 60% at 80% 80%, rgba(100,80,200,0.05) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  h1 {
+    font-size: clamp(14px, 2vw, 18px);
+    font-weight: 300;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    opacity: 0.7;
+  }
+
+  .game-area {
+    display: flex;
+    align-items: flex-start;
+    gap: 60px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* ── PUZZLE BOARD ── */
+  .board-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .board-label {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    opacity: 0.35;
+  }
+
+  #board {
+    width: 400px;
+    height: 400px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    border: 1px solid var(--border);
+    position: relative;
+    background: var(--surface);
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.03), 0 20px 60px rgba(0,0,0,0.6);
+    /* Allow puzzle tabs to overflow cell boundaries */
+    overflow: visible;
+  }
+
+  .cell {
+    width: var(--cell-size);
+    height: var(--cell-size);
+    border: 1px solid var(--border);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    /* Allow pieces (with tabs) to overflow their cell */
+    overflow: visible;
+  }
+
+  /* z-index by row so pieces in lower rows render on top of upper-row tabs,
+     and pieces in right columns render on top of left-column tabs */
+  .cell[data-index="1"] { z-index: 1; }
+  .cell[data-index="2"] { z-index: 2; }
+  .cell[data-index="3"] { z-index: 3; }
+  .cell[data-index="4"] { z-index: 4; }
+  .cell[data-index="5"] { z-index: 5; }
+  .cell[data-index="6"] { z-index: 6; }
+  .cell[data-index="7"] { z-index: 7; }
+  .cell[data-index="8"] { z-index: 8; }
+  .cell[data-index="9"] { z-index: 9; }
+
+  .cell.drag-over {
+    background: rgba(232,201,122,0.08);
+    border-color: rgba(232,201,122,0.4);
+  }
+
+  .cell-num {
+    font-size: 10px;
+    opacity: 0.15;
+    pointer-events: none;
+    user-select: none;
+    font-weight: 300;
+    letter-spacing: 0.1em;
+  }
+
+  /* ── PIECE TRAY ── */
+  .tray-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  #tray {
+    width: 190px;
+    min-height: 400px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+
+  /* ── PIECES ── */
+  /* In tray: constrained to tray width for preview */
+  #tray .piece {
+    width: calc(var(--cell-size) * 1.5);  /* generous preview box */
+    height: calc(var(--cell-size) * 1.5);
+    cursor: grab;
+    position: relative;
+    flex-shrink: 0;
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: visible;
+  }
+
+  #tray .piece img {
+    /* Let the image breathe at natural size in tray preview */
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  /* On board: piece is positioned absolutely, centered on the cell */
+  .cell .piece {
+    position: absolute;
+    /* Center the piece wrapper on the cell */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 0;   /* zero-footprint anchor — image overflows naturally */
+    height: 0;
+    cursor: grab;
+    pointer-events: none; /* clicks go to cell; img handles visual */
+    overflow: visible;
+    z-index: inherit;
+  }
+
+  .cell .piece img {
+    /* Natural size — PNG already includes tab/socket pixels */
+    width: auto;
+    height: auto;
+    display: block;
+    pointer-events: auto;
+    user-select: none;
+    -webkit-user-drag: none;
+    /* Center image on the zero-size anchor */
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 0;
+    left: 0;
+    /* Snap piece img size to fill exactly 1/3 of the 400px board
+       regardless of original PNG dimensions — use CSS to force the
+       "core" (non-tab) part to be cell-size.
+       We approximate: max-width/height at ~1.6× cell to allow tabs */
+    max-width: calc(var(--cell-size) * 1.7);
+    max-height: calc(var(--cell-size) * 1.7);
+  }
+
+  .cell .piece:hover,
+  #tray .piece:hover {
+    z-index: 20 !important;
+  }
+
+  #tray .piece:hover {
+    transform: scale(1.04);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5), 0 0 0 1px rgba(232,201,122,0.3);
+  }
+
+  .piece.dragging {
+    opacity: 0.3 !important;
+    cursor: grabbing;
+  }
+
+  /* ── SUCCESS OVERLAY ── */
+  #success-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #board.solved #success-overlay {
+    display: flex;
+  }
+
+  #board.solved .cell {
+    border-color: transparent;
+  }
+
+  #success-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: revealImg 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  @keyframes revealImg {
+    from { opacity: 0; transform: scale(1.06); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  /* ── PROGRESS ── */
+  #progress {
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    opacity: 0.4;
+    font-weight: 300;
+  }
+
+  #progress span {
+    color: var(--accent);
+    opacity: 1;
+  }
+
+  /* ── RESET BTN ── */
+  #reset-btn {
+    margin-top: 8px;
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'Unbounded', sans-serif;
+    font-size: 9px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    padding: 8px 20px;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+  }
+
+  #reset-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+</style>
+</head>
+<body>
+
+<h1>Пазл</h1>
+
+<div class="game-area">
+
+  <!-- PIECE TRAY -->
+  <div class="tray-wrapper">
+    <div class="board-label">Деталі</div>
+    <div id="tray"></div>
+    <button id="reset-btn">↺ Скинути</button>
+  </div>
+
+  <!-- BOARD -->
+  <div class="board-wrapper">
+    <div class="board-label">Поле 400 × 400</div>
+    <div id="board">
+      <!-- 9 cells -->
+      <div id="success-overlay">
+        <img id="success-img" src="MZP_0.jpg" alt="Completed">
+      </div>
+    </div>
+    <div id="progress">Розміщено: <span id="placed-count">0</span> / 9</div>
+  </div>
+
+</div>
+
+<script>
+(function () {
+
+  const TOTAL = 9;
+  const board = document.getElementById('board');
+  const tray  = document.getElementById('tray');
+  const placedCountEl = document.getElementById('placed-count');
+
+  // ── Build 9 cells ──────────────────────────────────────────────────────────
+  const cells = [];
+  for (let i = 1; i <= TOTAL; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.dataset.index = i;           // 1-based correct position
+    const num = document.createElement('span');
+    num.className = 'cell-num';
+    num.textContent = i;
+    cell.appendChild(num);
+    board.appendChild(cell);
+    cells.push(cell);
+  }
+
+  // ── Build 9 pieces & shuffle into tray ────────────────────────────────────
+  const pieceOrder = shuffle([1,2,3,4,5,6,7,8,9]);
+
+  function createPiece(idx) {
+    const div = document.createElement('div');
+    div.className = 'piece';
+    div.dataset.piece = idx;
+    const img = document.createElement('img');
+    img.src = `MZP_${idx}.png`;
+    img.alt = `Piece ${idx}`;
+    img.draggable = false;
+    div.appendChild(img);
+    return div;
+  }
+
+  pieceOrder.forEach(idx => {
+    tray.appendChild(createPiece(idx));
+  });
+
+  // ── Drag & Drop ────────────────────────────────────────────────────────────
+  let dragged = null;
+  let dragOrigin = null; // 'tray' | cell element
+
+  document.addEventListener('mousedown', onMouseDown);
+
+  function onMouseDown(e) {
+    const piece = e.target.closest('.piece');
+    if (!piece) return;
+    e.preventDefault();
+
+    dragged = piece;
+    dragOrigin = piece.parentElement;
+
+    // Measure the actual rendered image for ghost sizing
+    const img = piece.querySelector('img');
+    const imgRect = img ? img.getBoundingClientRect() : piece.getBoundingClientRect();
+    const gw = imgRect.width;
+    const gh = imgRect.height;
+
+    // ghost
+    const ghost = document.createElement('div');
+    ghost.id = 'drag-ghost';
+    ghost.style.cssText = `
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      width: ${gw}px;
+      height: ${gh}px;
+      opacity: 0.85;
+      transform: scale(1.06) rotate(-1deg);
+      transform-origin: center center;
+      transition: none;
+      top: 0; left: 0;
+      overflow: visible;
+    `;
+    const ghostImg = document.createElement('img');
+    ghostImg.src = img.src;
+    ghostImg.style.cssText = `width:${gw}px;height:${gh}px;display:block;pointer-events:none;filter:drop-shadow(0 12px 30px rgba(0,0,0,0.7));`;
+    ghost.appendChild(ghostImg);
+    document.body.appendChild(ghost);
+    moveGhost(ghost, e, gw, gh);
+
+    piece.classList.add('dragging');
+
+    function onMouseMove(ev) {
+      moveGhost(ghost, ev, gw, gh);
+
+      // highlight cells
+      cells.forEach(c => c.classList.remove('drag-over'));
+      const target = cellFromPoint(ev.clientX, ev.clientY);
+      if (target) target.classList.add('drag-over');
+    }
+
+    function onMouseUp(ev) {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      ghost.remove();
+      piece.classList.remove('dragging');
+      cells.forEach(c => c.classList.remove('drag-over'));
+
+      const target = cellFromPoint(ev.clientX, ev.clientY);
+
+      if (target) {
+        // if target cell already has a piece, swap
+        const existing = target.querySelector('.piece');
+        if (existing) {
+          dragOrigin.appendChild(existing);
+        }
+        target.appendChild(piece);
+      } else {
+        // return to origin
+        dragOrigin.appendChild(piece);
+      }
+
+      updateProgress();
+    }
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  }
+
+  function moveGhost(ghost, e, w, h) {
+    const gw = w || ghost.offsetWidth;
+    const gh = h || ghost.offsetHeight;
+    ghost.style.left = (e.clientX - gw / 2) + 'px';
+    ghost.style.top  = (e.clientY - gh / 2) + 'px';
+  }
+
+  function cellFromPoint(x, y) {
+    // temporarily hide ghost
+    const ghost = document.getElementById('drag-ghost');
+    if (ghost) ghost.style.display = 'none';
+    const el = document.elementFromPoint(x, y);
+    if (ghost) ghost.style.display = '';
+    if (!el) return null;
+    return el.closest('.cell');
+  }
+
+  // ── Touch support ──────────────────────────────────────────────────────────
+  document.addEventListener('touchstart', onTouchStart, { passive: false });
+
+  function onTouchStart(e) {
+    const piece = e.target.closest('.piece');
+    if (!piece) return;
+    e.preventDefault();
+
+    dragged = piece;
+    dragOrigin = piece.parentElement;
+
+    const img = piece.querySelector('img');
+    const imgRect = img ? img.getBoundingClientRect() : piece.getBoundingClientRect();
+    const gw = imgRect.width;
+    const gh = imgRect.height;
+
+    const ghost = document.createElement('div');
+    ghost.id = 'drag-ghost';
+    ghost.style.cssText = `
+      position: fixed; pointer-events: none; z-index: 9999;
+      width: ${gw}px; height: ${gh}px;
+      opacity: 0.85; transform: scale(1.06) rotate(-1deg);
+      top:0; left:0; overflow:visible;
+    `;
+    const ghostImg = document.createElement('img');
+    ghostImg.src = img.src;
+    ghostImg.style.cssText = `width:${gw}px;height:${gh}px;display:block;pointer-events:none;filter:drop-shadow(0 12px 30px rgba(0,0,0,0.7));`;
+    ghost.appendChild(ghostImg);
+    document.body.appendChild(ghost);
+    piece.classList.add('dragging');
+
+    function onTouchMove(ev) {
+      ev.preventDefault();
+      const t = ev.touches[0];
+      ghost.style.left = (t.clientX - gw / 2) + 'px';
+      ghost.style.top  = (t.clientY - gh / 2) + 'px';
+      cells.forEach(c => c.classList.remove('drag-over'));
+      const target = cellFromTouchPoint(t.clientX, t.clientY);
+      if (target) target.classList.add('drag-over');
+    }
+
+    function onTouchEnd(ev) {
+      document.removeEventListener('touchmove', onTouchMove);
+      document.removeEventListener('touchend', onTouchEnd);
+      ghost.remove();
+      piece.classList.remove('dragging');
+      cells.forEach(c => c.classList.remove('drag-over'));
+
+      const t = ev.changedTouches[0];
+      const target = cellFromTouchPoint(t.clientX, t.clientY);
+
+      if (target) {
+        const existing = target.querySelector('.piece');
+        if (existing) dragOrigin.appendChild(existing);
+        target.appendChild(piece);
+      } else {
+        dragOrigin.appendChild(piece);
+      }
+
+      updateProgress();
+    }
+
+    document.addEventListener('touchmove', onTouchMove, { passive: false });
+    document.addEventListener('touchend', onTouchEnd);
+  }
+
+  function cellFromTouchPoint(x, y) {
+    const ghost = document.getElementById('drag-ghost');
+    if (ghost) ghost.style.display = 'none';
+    const el = document.elementFromPoint(x, y);
+    if (ghost) ghost.style.display = '';
+    if (!el) return null;
+    return el.closest('.cell');
+  }
+
+  // ── Progress & Win check ───────────────────────────────────────────────────
+  function updateProgress() {
+    let placed = 0;
+    let solved = true;
+
+    cells.forEach((cell, i) => {
+      const piece = cell.querySelector('.piece');
+      if (piece) {
+        placed++;
+        if (parseInt(piece.dataset.piece) !== i + 1) solved = false;
+      } else {
+        solved = false;
+      }
+    });
+
+    placedCountEl.textContent = placed;
+
+    if (placed === TOTAL && solved) {
+      setTimeout(() => {
+        board.classList.add('solved');
+      }, 300);
+    }
+  }
+
+  // ── Reset ──────────────────────────────────────────────────────────────────
+  document.getElementById('reset-btn').addEventListener('click', () => {
+    board.classList.remove('solved');
+    // remove all pieces from cells back to tray
+    cells.forEach(cell => {
+      const p = cell.querySelector('.piece');
+      if (p) tray.appendChild(p);
+    });
+    // re-shuffle tray children
+    const pieces = [...tray.querySelectorAll('.piece')];
+    shuffle(pieces).forEach(p => tray.appendChild(p));
+    placedCountEl.textContent = 0;
+  });
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+
+})();
+</script>
+</body>
+</html>
