@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Мем Tower Defense</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="ui">
+            <div id="gameInfo">
+                <div id="score">Рахунок: <span id="scoreValue">0</span></div>
+                <div id="enemiesKilled">Вбито ворогів: <span id="killedValue">0</span></div>
+                <div id="towerStats">
+                    <div>Сила вежі: <span id="towerPower">10</span></div>
+                    <div>Швидкість стрільби: <span id="fireRate">1.0</span>с</div>
+                </div>
+            </div>
+            <div id="controls">
+                <p>Використовуйте стрілки для переміщення камери</p>
+                <p>Вбивайте ворогів, щоб відкрити мем-питання!</p>
+            </div>
+        </div>
+        
+        <canvas id="gameCanvas"></canvas>
+        
+        <!-- Question Panel (Hidden by default) -->
+        <div id="questionPanel" class="hidden">
+            <div id="questionContent">
+                <div id="questionImage">
+                    <img id="questionImg" src="" alt="Мем питання">
+                </div>
+                <div id="questionText"></div>
+                <div id="answers">
+                    <button class="answer-btn" data-answer="0"></button>
+                    <button class="answer-btn" data-answer="1"></button>
+                    <button class="answer-btn" data-answer="2"></button>
+                </div>
+                <div id="questionResult" class="hidden"></div>
+            </div>
+        </div>
+        
+        <!-- Game Over Panel -->
+        <div id="gameOverPanel" class="hidden">
+            <div id="gameOverContent">
+                <h2>Гра закінчена!</h2>
+                <p>Фінальний рахунок: <span id="finalScore">0</span></p>
+                <button id="restartBtn">Почати заново</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="Questions.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
