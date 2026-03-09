@@ -138,6 +138,7 @@
             box-shadow: 0 0 0 1px rgba(255,255,255,0.03), 0 20px 60px rgba(0,0,0,0.6);
             overflow: visible;
             border-radius: var(--radius-sm);
+            margin: 0 auto;
         }
 
         .cell {
@@ -186,8 +187,8 @@
         }
 
         #tray {
-            width: 200px;
-            min-height: 400px;
+            width: 240px;
+            min-height: 600px;
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: var(--radius-sm);
@@ -502,7 +503,7 @@
             }
 
             #tray {
-                width: min(85vw, 360px);
+                width: min(90vw, 400px);
                 min-height: auto;
                 flex-direction: row;
                 flex-wrap: wrap;
@@ -696,16 +697,30 @@
                 tray.removeChild(tray.firstChild);
             }
 
-            var order = shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+            // Build ALL 27 pieces from all 3 sets
+            var allPieceData = [];
+            PUZZLES.forEach(function(p) {
+                for (var i = 1; i <= 9; i++) {
+                    allPieceData.push({
+                        piece: i,
+                        prefix: p.prefix,
+                        setId: p.id,
+                        name: p.name
+                    });
+                }
+            });
 
-            order.forEach(function (idx) {
+            var order = shuffle(allPieceData);
+
+            order.forEach(function (pd) {
                 var div = document.createElement('div');
                 div.className = 'piece';
-                div.dataset.piece = String(idx);
+                div.dataset.piece = String(pd.piece);
+                div.dataset.set = pd.setId;
 
                 var img = document.createElement('img');
-                img.src = '../../data/games/pheniks_2/' + puzzle.prefix + '_' + idx + '.png';
-                img.alt = puzzle.name + ' — фрагмент ' + idx;
+                img.src = '../../data/games/pheniks_2/' + pd.prefix + '_' + pd.piece + '.png';
+                img.alt = pd.name + ' — фрагмент ' + pd.piece;
                 img.draggable = false;
                 div.appendChild(img);
                 tray.appendChild(div);
@@ -910,12 +925,15 @@
         function updateProgress() {
             var placed = 0;
             var solved = true;
+            var currentPuzzle = PUZZLES[currentPuzzleIndex];
 
             cells.forEach(function (cell, i) {
                 var piece = cell.querySelector('.piece');
                 if (piece) {
                     placed++;
-                    if (parseInt(piece.dataset.piece, 10) !== i + 1) {
+                    var pieceNum = parseInt(piece.dataset.piece, 10);
+                    var pieceSet = piece.dataset.set;
+                    if (pieceSet !== currentPuzzle.id || pieceNum !== i + 1) {
                         solved = false;
                     }
                 } else {

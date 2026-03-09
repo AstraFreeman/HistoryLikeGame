@@ -250,6 +250,19 @@
                 padding: 10px;
             }
         }
+        .rose-btn {
+            position: absolute;
+            cursor: pointer;
+            z-index: 50;
+            border: none;
+            background: none;
+            padding: 0;
+            transition: transform 0.3s, opacity 0.3s;
+            display: none;
+        }
+        .rose-btn img { width: 100%; height: auto; }
+        .rose-btn:hover { transform: scale(1.1); }
+        .rose-btn.visible { display: block; }
     </style>
 </head>
 <body data-section="Вступ" data-game-title="Block buster" data-home-url="../../index.html">
@@ -258,11 +271,13 @@
             <div class="game-area">
                 <canvas id="gameCanvas"></canvas>
                 <div class="controls">
-                    <button id="startButton">Старт</button>
+                    <button id="startButton">Почати</button>
                     <button id="stopButton">Стоп</button>
                 </div>
                 <img id="winImage" class="win-image" src="../../assets/images/cngrt.png" alt="Зображення перемоги">
+                <a id="homeBtn" href="../../index.html" style="display:none;margin-top:15px;padding:12px 30px;font-size:18px;background:linear-gradient(135deg,#00d4ff,#0095dd);color:white;border:2px solid #00ffff;border-radius:8px;text-decoration:none;font-weight:bold;box-shadow:0 0 10px rgba(0,255,255,0.5);transition:all 0.3s;">На головну</a>
             </div>
+            <button class="rose-btn" id="roseBtn" style="position:fixed;left:10px;top:50%;transform:translateY(-50%);width:60px;z-index:50;"><img src="../../assets/images/rose.png" alt="Троянда"></button>
             
             <!-- Sidebar for desktop -->
             <div class="sidebar">
@@ -290,7 +305,7 @@
             { text: "Собор Святого Юра", answer: "Львів", image: "../../assets/images/new_mak_3.jpg" },
             { text: "Харків", answer: "Покровський собор", image: "../../assets/images/new_mak_4.jpg" },
             { text: "Київ", answer: "Андріївська церква", image: "../../assets/images/new_mak_5.jpg" },
-            { text: "Троїцька соборна церква", answer: "Новомосковськ", image: "../../assets/images/new_mak_6.jpg" }
+            { text: "Троїцька соборна церква", answer: "Самар", image: "../../assets/images/new_mak_6.jpg" }
         ];
 
         let currentQuestionIndex = 0;
@@ -369,6 +384,23 @@
 
         let gameInterval = null;
         let gamePaused = false;
+        let bounceCount = 0;
+        let bounceWindowStart = Date.now();
+
+        function trackBounce() {
+            bounceCount++;
+            if (Date.now() - bounceWindowStart > 2000) {
+                bounceCount = 1;
+                bounceWindowStart = Date.now();
+            }
+            if (bounceCount > 10) {
+                ball.x = canvas.width / 2;
+                ball.y = canvas.height / 2;
+                ball.dy = -4;
+                ball.dx = 4;
+                bounceCount = 0;
+            }
+        }
 
         // Create Blocks
         const blocks = [];
@@ -420,21 +452,31 @@
             });
         }
 
-        // 🎯 Update Ball Movement
+        // Update Ball Movement
         function updateBall() {
             if (!ball.isMoving) return;
             ball.x += ball.dx;
             ball.y += ball.dy;
 
-            if (ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) ball.dx *= -1;
-            if (ball.y - ball.radius < 0) ball.dy *= -1;
+            if (ball.x + ball.radius > canvas.width || ball.x - ball.radius < 0) { ball.dx *= -1; trackBounce(); }
+            if (ball.y - ball.radius < 0) { ball.dy *= -1; trackBounce(); }
             if (ball.y + ball.radius > canvas.height) restartGame();
 
-            if (ball.x > paddle.x && ball.x < paddle.x + paddle.width && ball.y + ball.radius > paddle.y) reflectBall(ball, paddle);
+            if (ball.x > paddle.x && ball.x < paddle.x + paddle.width && ball.y + ball.radius > paddle.y) { reflectBall(ball, paddle); trackBounce(); }
 
             blocks.forEach(block => {
-                if (block.isActive && ball.x > block.x && ball.x < block.x + block.width && ball.y - ball.radius < block.y + block.height && ball.y + ball.radius > block.y) {
-                    ball.dy *= -1;
+                if (block.isActive && ball.x + ball.radius > block.x && ball.x - ball.radius < block.x + block.width && ball.y - ball.radius < block.y + block.height && ball.y + ball.radius > block.y) {
+                    // Calculate overlap on each side
+                    var overlapLeft = (ball.x + ball.radius) - block.x;
+                    var overlapRight = (block.x + block.width) - (ball.x - ball.radius);
+                    var overlapTop = (ball.y + ball.radius) - block.y;
+                    var overlapBottom = (block.y + block.height) - (ball.y - ball.radius);
+                    var minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+                    if (minOverlap === overlapLeft || minOverlap === overlapRight) {
+                        ball.dx *= -1;
+                    } else {
+                        ball.dy *= -1;
+                    }
                     const elements = getElements();
                     if (block.questionIndex === currentQuestionIndex) {
                         block.isActive = false;
@@ -446,6 +488,8 @@
                             winImage.style.display = 'block';
                             elements.infoField.textContent = 'Вітаємо, ви перемогли!';
                             clearInterval(gameInterval);
+                            clearInterval(roseInterval);
+                            document.getElementById('homeBtn').style.display = 'inline-block';
                         }
                     } else {
                         elements.infoField.textContent = "Це не правильна відповідь!";
@@ -457,6 +501,7 @@
         // 🔄 Restart Game
         function restartGame() {
             clearInterval(gameInterval);
+            clearInterval(roseInterval);
             var overlay = document.createElement('div');
             overlay.className = 'game-over-overlay';
             var h2 = document.createElement('h2');
@@ -485,10 +530,11 @@
                 const elements = getElements();
                 elements.infoField.textContent = 'Гра запущена!';
                 gameInterval = setInterval(() => { updateBall(); render(); }, 16);
+                roseInterval = setInterval(tryShowRose, 15000);
             }
         });
 
-        // ⏸ Pause Button (Fix)
+        // Pause Button
         document.getElementById('stopButton').addEventListener('click', () => {
             const elements = getElements();
             if (gamePaused) {
@@ -499,9 +545,38 @@
                 elements.infoField.textContent = 'Гру зупинено.';
             }
             gamePaused = !gamePaused;
+            document.getElementById('stopButton').textContent = gamePaused ? 'Почати' : 'Стоп';
         });
 
-        // 🖱 Paddle Movement
+        // Rose bonus
+        let roseInterval = null;
+        let roseVisible = false;
+
+        function tryShowRose() {
+            if (gamePaused || roseVisible) return;
+            if (Math.random() < 0.25) {
+                document.getElementById('roseBtn').classList.add('visible');
+                roseVisible = true;
+            }
+        }
+
+        document.getElementById('roseBtn').addEventListener('click', function() {
+            var activeBlocks = blocks.filter(function(b) { return b.isActive; });
+            var toRemove = activeBlocks.sort(function() { return Math.random() - 0.5; }).slice(0, 2);
+            toRemove.forEach(function(b) { b.isActive = false; });
+            document.getElementById('roseBtn').classList.remove('visible');
+            roseVisible = false;
+            if (blocks.every(function(b) { return !b.isActive; })) {
+                winImage.style.display = 'block';
+                var elements = getElements();
+                elements.infoField.textContent = 'Вітаємо, ви перемогли!';
+                clearInterval(gameInterval);
+                clearInterval(roseInterval);
+                document.getElementById('homeBtn').style.display = 'inline-block';
+            }
+        });
+
+        // Paddle Movement
         canvas.addEventListener('mousemove', e => {
             const rect = canvas.getBoundingClientRect();
             paddle.x = Math.min(Math.max(e.clientX - rect.left - paddle.width / 2, 0), canvas.width - paddle.width);

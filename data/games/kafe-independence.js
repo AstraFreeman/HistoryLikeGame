@@ -38,15 +38,15 @@ window.KAFE_DATA = {
     }
   ],
   customers: [
-    { name: "Пані Софія", patience: 30, order: "independence" },
-    { name: "Пан Богдан", patience: 25, order: "constitution" },
-    { name: "Панна Оленка", patience: 35, order: "orange" },
-    { name: "Пан Тарас", patience: 20, order: "dignity" },
-    { name: "Пані Леся", patience: 30, order: "culture" },
-    { name: "Пан Михайло", patience: 25, order: "independence" },
-    { name: "Панна Марія", patience: 30, order: "constitution" },
-    { name: "Пан Іван", patience: 20, order: "orange" },
-    { name: "Пані Ганна", patience: 35, order: "dignity" },
-    { name: "Пан Олександр", patience: 25, order: "culture" }
+    { name: "Пані Софія", patience: 45, order: "independence" },
+    { name: "Пан Богдан", patience: 40, order: "constitution" },
+    { name: "Панна Оленка", patience: 55, order: "orange" },
+    { name: "Пан Тарас", patience: 35, order: "dignity" },
+    { name: "Пані Леся", patience: 45, order: "culture" },
+    { name: "Пан Михайло", patience: 40, order: "independence" },
+    { name: "Панна Марія", patience: 45, order: "constitution" },
+    { name: "Пан Іван", patience: 35, order: "orange" },
+    { name: "Пані Ганна", patience: 55, order: "dignity" },
+    { name: "Пан Олександр", patience: 40, order: "culture" }
   ]
 };

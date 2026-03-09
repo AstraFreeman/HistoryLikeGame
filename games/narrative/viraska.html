@@ -105,6 +105,15 @@
     </p>
   </div>
 
+  <div id="offlineFallback" style="display:none; text-align:center; padding:40px 20px;">
+    <div style="background:rgba(239,68,68,0.1); border:2px solid rgba(239,68,68,0.3); border-radius:12px; padding:30px; max-width:500px; margin:0 auto;">
+      <h2 style="color:#ef4444; margin-bottom:15px;">Потрібне підключення до інтернету</h2>
+      <p style="color:#666; margin-bottom:20px;">Ця гра використовує зовнішні ресурси Wordwall, які потребують активного інтернет-з'єднання.</p>
+      <p style="color:#666;">Перевірте підключення та перезавантажте сторінку.</p>
+      <button onclick="location.reload()" style="margin-top:20px; padding:10px 20px; font-size:16px; cursor:pointer; border:none; border-radius:8px; background:#3b6cff; color:white;">Спробувати знову</button>
+    </div>
+  </div>
+
   <script>
     function openBlock(number) {
       var block = document.getElementById('block' + number);
@@ -115,8 +124,17 @@
       if (iframe) iframe.src = iframe.src;
     }
 
-    // Показуємо перший блок при завантаженні
-    openBlock(1);
+    // Check for internet connectivity
+    if (!navigator.onLine || window.location.protocol === 'file:') {
+      document.getElementById('offlineFallback').style.display = 'block';
+    } else {
+      openBlock(1);
+    }
+
+    window.addEventListener('online', function () {
+      document.getElementById('offlineFallback').style.display = 'none';
+      openBlock(1);
+    });
   </script>
   <script src="../../shared/js/nav.js"></script>
   <script src="../../shared/js/accessibility.js"></script>

@@ -12,6 +12,9 @@
   var currentState = 'idle'; // 'idle' | 'move' | 'dance'
   var moveTimeout = null;
   var basePath = 'assets/images/';
+  var keyHoldStart = 0;
+  var musicPlaying = false;
+  var sugarAudio = null;
 
   // Pre-cached Image objects to prevent GIF flicker
   var cachedImages = {};
@@ -121,6 +124,33 @@
         // Check secret triggers after movement
         checkSecretTriggers();
       }
+
+      // Track arrow key hold for music
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].indexOf(event.key) !== -1) {
+          if (keyHoldStart === 0) {
+              keyHoldStart = Date.now();
+          }
+          if (Date.now() - keyHoldStart >= 5000 && !musicPlaying) {
+              try {
+                  var musicPath = basePath.replace('images/', 'music/') + 'sugar_slowed.mp3';
+                  if (!musicPath.includes('music/')) {
+                      musicPath = basePath + '../music/sugar_slowed.mp3';
+                  }
+                  sugarAudio = new Audio(musicPath);
+                  sugarAudio.play().catch(function() {});
+                  musicPlaying = true;
+                  sugarAudio.addEventListener('ended', function() {
+                      musicPlaying = false;
+                  });
+              } catch(e) { /* audio unavailable */ }
+          }
+      }
+    });
+
+    document.addEventListener('keyup', function(event) {
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].indexOf(event.key) !== -1) {
+            keyHoldStart = 0;
+        }
     });
   }
 
@@ -220,6 +250,9 @@
     if (triggered) {
       saveSecrets();
       showSpeechBubble(triggered.message, 5000);
+      if (getDiscoveredSecretsCount() === 3) {
+          setTimeout(function() { showPasswordInput(); }, 5500);
+      }
     }
   }
 
@@ -296,6 +329,71 @@
 
   function isAssistantMoving() {
     return currentState === 'move';
+  }
+
+  function showPasswordInput() {
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:10000;backdrop-filter:blur(8px);';
+
+    var label = document.createElement('p');
+    label.textContent = 'Введіть пароль';
+    label.style.cssText = 'color:#ffd700;font-size:24px;margin-bottom:15px;font-weight:bold;';
+    overlay.appendChild(label);
+
+    var hint = document.createElement('p');
+    hint.textContent = 'Підказка: Люблю історію';
+    hint.style.cssText = 'color:#aaa;font-size:16px;margin-bottom:20px;';
+    overlay.appendChild(hint);
+
+    var input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = 'Пароль...';
+    input.style.cssText = 'padding:12px 20px;font-size:18px;border-radius:8px;border:2px solid #ffd700;background:rgba(255,255,255,0.1);color:white;text-align:center;width:280px;';
+    overlay.appendChild(input);
+
+    var msg = document.createElement('p');
+    msg.style.cssText = 'color:#ff6b6b;font-size:14px;margin-top:10px;min-height:20px;';
+    overlay.appendChild(msg);
+
+    var btnRow = document.createElement('div');
+    btnRow.style.cssText = 'display:flex;gap:12px;margin-top:15px;';
+
+    var submitBtn = document.createElement('button');
+    submitBtn.textContent = 'Підтвердити';
+    submitBtn.style.cssText = 'padding:12px 30px;font-size:16px;background:linear-gradient(135deg,#ffd700,#ffa500);border:none;border-radius:8px;color:#2d3748;font-weight:bold;cursor:pointer;';
+
+    var closeBtn = document.createElement('button');
+    closeBtn.textContent = 'Закрити';
+    closeBtn.style.cssText = 'padding:12px 30px;font-size:16px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);border-radius:8px;color:white;cursor:pointer;';
+
+    btnRow.appendChild(submitBtn);
+    btnRow.appendChild(closeBtn);
+    overlay.appendChild(btnRow);
+
+    submitBtn.addEventListener('click', function() {
+        if (input.value === 'L0v3 H1sT0r') {
+            try { localStorage.setItem('histgame_christmas_unlocked', 'true'); } catch(e) {}
+            msg.style.color = '#22c55e';
+            msg.textContent = 'Правильно! Різдвяний розділ розблоковано!';
+            // Try to reveal Christmas section if on index page
+            var christmasSection = document.getElementById('christmas-section');
+            if (christmasSection) christmasSection.style.display = '';
+            setTimeout(function() { overlay.remove(); }, 2000);
+        } else {
+            msg.style.color = '#ff6b6b';
+            msg.textContent = 'Невірний пароль. Спробуйте ще раз.';
+            input.value = '';
+        }
+    });
+
+    closeBtn.addEventListener('click', function() { overlay.remove(); });
+
+    input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') submitBtn.click();
+    });
+
+    document.body.appendChild(overlay);
+    setTimeout(function() { input.focus(); }, 100);
   }
 
   window.initAssistant = initAssistant;

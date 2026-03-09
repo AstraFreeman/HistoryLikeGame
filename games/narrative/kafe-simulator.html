@@ -172,6 +172,11 @@
       pointer-events: none;
     }
 
+    .ingredient-btn.used {
+      border-color: var(--color-accent-green);
+      box-shadow: 0 0 6px rgba(34, 197, 94, 0.3);
+    }
+
     /* ── Counter panel ── */
     .counter-panel {
       display: flex;
@@ -597,7 +602,8 @@
         customerInterval: null,
         patienceInterval: null,
         factsLearned: [],
-        allIngredientsPool: []
+        allIngredientsPool: [],
+        usedIngredients: []
       };
 
       /* ── DOM refs ── */
@@ -743,6 +749,10 @@
 
           if (inSlot) {
             btn.classList.add('selected');
+          }
+
+          if (state.usedIngredients.indexOf(ingName) !== -1) {
+              btn.classList.add('used');
           }
 
           btn.addEventListener('click', (function (ingredient) {
@@ -968,6 +978,13 @@
           state.score += 100;
           state.served++;
 
+          // Record used ingredients
+          for (var k = 0; k < state.assembledIngredients.length; k++) {
+              if (state.assembledIngredients[k] && state.usedIngredients.indexOf(state.assembledIngredients[k]) === -1) {
+                  state.usedIngredients.push(state.assembledIngredients[k]);
+              }
+          }
+
           var firstCard = els.customerQueue.querySelector('.customer-card.first');
           if (firstCard) {
             firstCard.classList.add('happy');
@@ -1046,6 +1063,7 @@
         state.assembledIngredients = [null, null, null];
         state.selectedMenuItem = null;
         state.factsLearned = [];
+        state.usedIngredients = [];
 
         els.gameTitle.textContent = data.title;
         buildMenu();

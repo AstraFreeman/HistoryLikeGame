@@ -273,6 +273,39 @@
         .diff-easy { background: linear-gradient(135deg, #74b9ff, #0984e3); }
         .diff-medium { background: linear-gradient(135deg, #ffeaa7, #fdcb6e); color: #2d3436; }
         .diff-hard { background: linear-gradient(135deg, #ff7675, #d63031); }
+
+        .rose-btn {
+            position: fixed;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            z-index: 50;
+            border: none;
+            background: none;
+            padding: 0;
+            width: 60px;
+            transition: transform 0.3s, opacity 0.3s;
+            display: none;
+        }
+        .rose-btn img { width: 100%; height: auto; }
+        .rose-btn:hover { transform: translateY(-50%) scale(1.1); }
+        .rose-btn.visible { display: block; }
+        .rose-uses {
+            position: absolute;
+            bottom: -5px;
+            right: -5px;
+            background: #ff6b6b;
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body data-section="Стародавня історія" data-game-title="Стародавня історія України" data-home-url="../../index.html">
@@ -283,6 +316,7 @@
         <button class="difficulty-btn diff-medium" id="diffMedium">Середній</button>
         <button class="difficulty-btn diff-hard" id="diffHard">Складний</button>
     </div>
+    <button class="rose-btn" id="roseBtn"><img src="../../assets/images/rose.png" alt="Троянда"><span class="rose-uses" id="roseUses">3</span></button>
     <div class="container">
         <h1 id="title">🏺 Стародавня історія України 🏺</h1>
         
@@ -388,6 +422,8 @@
         let correctNodes = [];
         let errorTimeout = 1500;
         let difficulty = 'medium';
+        let roseUsesLeft = 3;
+        let totalVictories = parseInt(sessionStorage.getItem('shiwafornia_victories') || '0');
 
         function shuffle(array) {
             const arr = [...array];
@@ -448,6 +484,10 @@
                     }
                 });
             });
+
+            roseUsesLeft = 3;
+            document.getElementById('roseUses').textContent = roseUsesLeft;
+            document.getElementById('roseBtn').classList.add('visible');
 
             setTimeout(drawConnections, 100);
         }
@@ -535,6 +575,12 @@
                     disableAllNodes();
                     createConfetti();
                     document.getElementById('newGame').style.display = 'block';
+                    document.getElementById('roseBtn').classList.remove('visible');
+                    totalVictories++;
+                    sessionStorage.setItem('shiwafornia_victories', totalVictories);
+                    if (totalVictories >= 3) {
+                        showWin3Overlay();
+                    }
                 } else {
                     document.getElementById('message').textContent = '✅ Правильно! Продовжуйте!';
                 }
@@ -591,12 +637,41 @@
             }
         }
 
+        function showWin3Overlay() {
+            var overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:10000;';
+            var img = document.createElement('img');
+            img.src = '../../assets/images/win_3.png';
+            img.alt = 'Перемога';
+            img.style.cssText = 'max-width:80%;max-height:50vh;border-radius:15px;box-shadow:0 0 40px rgba(255,215,0,0.5);margin-bottom:20px;';
+            img.onerror = function() { this.style.display = 'none'; };
+            overlay.appendChild(img);
+            var title = document.createElement('h1');
+            title.textContent = 'Супер перемога! 3 гри пройдено!';
+            title.style.cssText = 'color:#ffd700;font-size:32px;text-shadow:2px 2px 4px rgba(0,0,0,0.5);margin-bottom:20px;text-align:center;';
+            overlay.appendChild(title);
+            var homeLink = document.createElement('a');
+            homeLink.href = '../../index.html';
+            homeLink.textContent = 'На головну';
+            homeLink.style.cssText = 'display:inline-block;padding:15px 40px;font-size:20px;background:linear-gradient(135deg,#55efc4,#00b894);border:none;border-radius:12px;color:#2d3748;font-weight:bold;text-decoration:none;cursor:pointer;box-shadow:0 5px 20px rgba(0,0,0,0.5);';
+            overlay.appendChild(homeLink);
+            var closeBtn = document.createElement('button');
+            closeBtn.textContent = 'Продовжити';
+            closeBtn.style.cssText = 'margin-top:15px;padding:12px 30px;font-size:16px;background:rgba(255,255,255,0.2);border:2px solid white;border-radius:25px;color:white;cursor:pointer;';
+            closeBtn.addEventListener('click', function() { overlay.remove(); });
+            overlay.appendChild(closeBtn);
+            document.body.appendChild(overlay);
+        }
+
         function startWithDifficulty(diff) {
             difficulty = diff;
             if (diff === 'hard') errorTimeout = 500;
             else errorTimeout = 1500;
             document.getElementById('introScreen').style.display = 'none';
             initGame();
+            roseUsesLeft = 3;
+            document.getElementById('roseUses').textContent = roseUsesLeft;
+            document.getElementById('roseBtn').classList.add('visible');
         }
 
         document.getElementById('diffEasy').addEventListener('click', function() { startWithDifficulty('easy'); });
@@ -609,6 +684,28 @@
         document.getElementById('reset').addEventListener('click', function() {
             document.getElementById('newGame').style.display = 'none';
             initGame();
+        });
+        document.getElementById('roseBtn').addEventListener('click', function() {
+            if (roseUsesLeft <= 0 || currentStep >= currentScenario.sequence.length) return;
+
+            var correctName = currentScenario.sequence[currentStep].name;
+            var nodes = document.querySelectorAll('.node');
+            nodes.forEach(function(node) {
+                if (node.dataset.text === correctName) {
+                    node.style.boxShadow = '0 0 30px 10px gold';
+                    node.style.borderColor = 'gold';
+                    setTimeout(function() {
+                        node.style.boxShadow = '';
+                        node.style.borderColor = '';
+                    }, 2000);
+                }
+            });
+
+            roseUsesLeft--;
+            document.getElementById('roseUses').textContent = roseUsesLeft;
+            if (roseUsesLeft <= 0) {
+                document.getElementById('roseBtn').classList.remove('visible');
+            }
         });
         window.addEventListener('resize', () => {
             setTimeout(() => {

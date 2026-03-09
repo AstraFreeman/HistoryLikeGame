@@ -37,9 +37,11 @@ shared/
   templates/
     quiz-question.html        # Template for quiz pages, loads data via ?id= param
     falling-answer.html       # Template for falling-answer games, loads data via ?id=
+    timeline-sort.html        # Template for timeline sorting games, loads data via ?id=
 data/
   quiz/                       # 23 quiz data files (crstm-s-{row}-{col}.js)
-  falling/                    # 3 falling-game data files (period-{n}-{name}.js)
+  falling/                    # 8 falling-game data files (period-{n}-{name}.js)
+  timeline/                   # 4 timeline-sort data files (period-{n}-{name}.js)
   assistant/                  # Assistant facts database
   games/                      # Game-specific data files (solitaire, bobble, puzzle, kafe)
 games/
@@ -71,13 +73,14 @@ assets/
 **Shared JS modules** attach APIs to `window.*`:
 - `window.QuizGame.init(config)` — quiz engine
 - `window.FallingGame.init(config)` — falling-answer engine
+- `window.TimelineGame.init(config)` — chronological sorting engine
 - `window.CanvasUtils` — canvas helpers
 - `window.UIUtils` — modal/notification helpers
 - `accessibility.js` — auto-injected floating settings panel (theme, font, motion, contrast)
 
 **Navigation** via `nav.js`: reads `data-section`, `data-game-title`, `data-home-url` from `<body>`. Use `data-nav="overlay"` for fullscreen games (floating button), `data-nav="false"` to skip. AR pages use an inline floating `<a>` tag instead.
 
-**Quiz template system:** `shared/templates/quiz-question.html?id=1-1` dynamically loads `data/quiz/crstm-s-1-1.js` which sets `window.QUIZ_DATA`. Same pattern for falling games.
+**Quiz template system:** `shared/templates/quiz-question.html?id=1-1` dynamically loads `data/quiz/crstm-s-1-1.js` which sets `window.QUIZ_DATA`. Same pattern for falling games (`window.FALLING_DATA`) and timeline games (`window.TIMELINE_DATA`).
 
 **CSS theming:** `theme.css` defines CSS custom properties. Pages can override with `--game-accent`, `--game-bg` etc. Dark glassmorphism base with vibrant accents.
 

@@ -491,20 +491,21 @@
             const w = basket.width * canvas.width;
             const h = basket.height * canvas.height;
 
-            // Base layer: vik_move.gif when moving, vik_botom.png when still
+            // Bottom layer: vik_move.gif when moving, vik_botom.png when still
+            // Draw at y + h/2 so top edge aligns with center of combined sprite
             if (basket.moving && images.moveLoaded) {
-                ctx.drawImage(imgMove, x - w/2, y, w, h);
+                ctx.drawImage(imgMove, x - w/2, y + h/2, w, h);
             } else if (images.downLoaded) {
-                ctx.drawImage(imgDown, x - w/2, y, w, h);
+                ctx.drawImage(imgDown, x - w/2, y + h/2, w, h);
             } else {
                 ctx.fillStyle = '#D2691E';
-                ctx.fillRect(x - w/2, y, w, h);
+                ctx.fillRect(x - w/2, y + h/2, w, h);
                 ctx.strokeStyle = '#8B4513';
                 ctx.lineWidth = 3;
-                ctx.strokeRect(x - w/2, y, w, h);
+                ctx.strokeRect(x - w/2, y + h/2, w, h);
             }
 
-            // Overlay: vik_top.png on top
+            // Top layer: vik_top.png drawn on top at normal position
             if (images.topLoaded) {
                 ctx.drawImage(imgTop, x - w/2, y, w, h);
             }

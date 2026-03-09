@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Хронологія</title>
+  <link rel="stylesheet" href="../../shared/css/reset.css">
+  <link rel="stylesheet" href="../../shared/css/theme.css">
+  <link rel="stylesheet" href="../../shared/css/layout.css">
+  <link rel="stylesheet" href="../../shared/css/components.css">
+  <link rel="stylesheet" href="../../shared/css/animations.css">
+  <link rel="stylesheet" href="../../shared/css/responsive.css">
+  <style>
+    .timeline-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 var(--space-md);
+    }
+    .timeline-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-md);
+      margin-bottom: var(--space-sm);
+      background: var(--glass-bg);
+      border: 2px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      cursor: grab;
+      user-select: none;
+      transition: transform 0.15s, border-color 0.3s, background 0.3s;
+    }
+    .timeline-item:hover { transform: scale(1.01); }
+    .timeline-item:active { cursor: grabbing; }
+    .timeline-item.dragging {
+      opacity: 0.4;
+      transform: scale(0.98);
+    }
+    .timeline-item.drag-over {
+      border-color: var(--color-accent-orange);
+      background: rgba(249, 115, 22, 0.1);
+    }
+    .timeline-item.selected {
+      border-color: var(--color-accent-blue);
+      background: rgba(59, 130, 246, 0.1);
+      box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
+    }
+    .timeline-item.correct {
+      border-color: var(--color-accent-green);
+      background: rgba(34, 197, 94, 0.1);
+    }
+    .timeline-item.incorrect {
+      border-color: var(--color-accent-red, #ef4444);
+      background: rgba(239, 68, 68, 0.1);
+      animation: shake 0.4s ease;
+    }
+    .timeline-item.hint-flash {
+      border-color: var(--color-accent-purple);
+      background: rgba(168, 85, 247, 0.15);
+      animation: pulse 0.5s ease 3;
+    }
+    .timeline-handle {
+      font-size: var(--text-lg);
+      opacity: 0.4;
+      flex-shrink: 0;
+    }
+    .timeline-text {
+      flex: 1;
+      font-size: var(--text-base);
+      color: var(--color-text-primary);
+      font-weight: 500;
+    }
+    .timeline-year {
+      font-size: var(--text-sm);
+      font-weight: 700;
+      color: var(--color-accent-orange);
+      flex-shrink: 0;
+      min-width: 80px;
+      text-align: right;
+    }
+    .timeline-clone {
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+      border-color: var(--color-accent-orange);
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .round-name {
+      text-align: center;
+      color: var(--color-text-secondary);
+      font-size: var(--text-lg);
+      margin-bottom: var(--space-md);
+    }
+  </style>
+</head>
+<body data-section="" data-game-title="Хронологія" data-home-url="../../index.html">
+
+  <h1 id="gameTitle" class="section-title" style="margin-top:var(--space-lg);">Хронологія</h1>
+  <p id="roundName" class="round-name"></p>
+
+  <div class="stats-panel" style="max-width:500px; margin:0 auto var(--space-md);">
+    <div class="stat-item">
+      <span class="stat-label">Раунд</span>
+      <span class="stat-value"><span id="round">1</span> / <span id="totalRounds">1</span></span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Рахунок</span>
+      <span class="stat-value" id="score">0</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Спроби</span>
+      <span class="stat-value" id="attempts">0</span>
+    </div>
+  </div>
+
+  <div class="timeline-container" id="eventList" role="list" aria-label="Перетягніть події у правильному хронологічному порядку"></div>
+
+  <div class="controls-panel" style="max-width:500px; margin:var(--space-md) auto;">
+    <button class="btn btn-primary" id="checkBtn">Перевірити</button>
+    <button class="btn btn-secondary" id="hintBtn">Підказка</button>
+    <button class="btn btn-ghost" id="resetBtn">Скинути</button>
+  </div>
+
+  <script src="../../shared/js/nav.js"></script>
+  <script src="../../shared/js/timeline-engine.js"></script>
+  <script>
+    (function () {
+      var params = new URLSearchParams(window.location.search);
+      var id = params.get('id') || 'period-6-revolution';
+      var scriptEl = document.createElement('script');
+      scriptEl.src = '../../data/timeline/' + id + '.js';
+      scriptEl.onload = function () { initGame(); };
+      scriptEl.onerror = function () {
+        document.getElementById('eventList').textContent =
+          'Не вдалося завантажити дані гри (id=' + id + ')';
+      };
+      document.head.appendChild(scriptEl);
+
+      function initGame() {
+        var data = window.TIMELINE_DATA;
+        if (!data) return;
+
+        if (data.title) {
+          document.getElementById('gameTitle').textContent = data.title;
+          document.title = data.title;
+          document.body.setAttribute('data-game-title', data.title);
+        }
+        if (data.section) {
+          document.body.setAttribute('data-section', data.section);
+        }
+
+        TimelineGame.init({
+          rounds: data.rounds,
+          title: data.title
+        });
+      }
+    })();
+  </script>
+  <script src="../../shared/js/accessibility.js"></script>
+</body>
+</html>

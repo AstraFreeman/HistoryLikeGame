@@ -227,6 +227,23 @@
             font-size: 11px;
             font-weight: bold;
         }
+        .rose-btn {
+            position: fixed;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            z-index: 50;
+            border: none;
+            background: none;
+            padding: 0;
+            width: 60px;
+            transition: transform 0.3s, opacity 0.3s;
+            display: none;
+        }
+        .rose-btn img { width: 100%; height: auto; }
+        .rose-btn:hover { transform: translateY(-50%) scale(1.1); }
+        .rose-btn.visible { display: block; }
     </style>
 </head>
 <body data-section="Ігри" data-game-title="Пасянс" data-home-url="../../index.html">
@@ -259,7 +276,10 @@
         <button id="reset-button">🔄 Нова гра</button>
         <button id="hint-button">💡 Підказка</button>
         <button id="undo-button">↩ Скасувати</button>
+        <button id="disable-hints-btn">Вимкнути підказки</button>
     </div>
+
+    <button class="rose-btn" id="roseBtn"><img src="../../assets/images/rose.png" alt="Троянда"></button>
 
     <script>
         const cards = [
@@ -599,13 +619,40 @@
             const totalInFoundation = Object.values(foundation).reduce((sum, arr) => sum + arr.length, 0);
             if (totalInFoundation === cards.length) {
                 updateInfoBox('🎉 Вітаємо! Ви зібрали всі картки у правильному хронологічному порядку! Ви знаєте історію України! 🇺🇦');
+                showWinOverlay();
             }
         }
 
+        function showWinOverlay() {
+            var overlay = document.createElement('div');
+            overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:10000;';
+            var img = document.createElement('img');
+            img.src = '../../assets/images/win_1.png';
+            img.alt = 'Перемога';
+            img.style.cssText = 'max-width:80%;max-height:50vh;border-radius:15px;box-shadow:0 0 40px rgba(255,215,0,0.5);margin-bottom:20px;';
+            img.onerror = function() { this.style.display = 'none'; };
+            overlay.appendChild(img);
+            var title = document.createElement('h1');
+            title.textContent = 'Вітаємо! Ви перемогли!';
+            title.style.cssText = 'color:#ffd700;font-size:36px;text-shadow:2px 2px 4px rgba(0,0,0,0.5);margin-bottom:20px;';
+            overlay.appendChild(title);
+            var homeLink = document.createElement('a');
+            homeLink.href = '../../index.html';
+            homeLink.textContent = 'На головну';
+            homeLink.style.cssText = 'display:inline-block;padding:15px 40px;font-size:20px;background:linear-gradient(135deg,#667eea,#764ba2);border:none;border-radius:12px;color:white;font-weight:bold;text-decoration:none;cursor:pointer;box-shadow:0 5px 20px rgba(0,0,0,0.5);transition:all 0.3s ease;';
+            overlay.appendChild(homeLink);
+            document.body.appendChild(overlay);
+        }
+
         function showHint() {
+            if (!hintsEnabled) {
+                updateInfoBox('Підказки вимкнено. Натисніть "Увімкнути підказки" щоб їх увімкнути.');
+                return;
+            }
+
             let hint = 'Підказка: ';
             let found = false;
-            
+
             for (let i = 0; i < tableau.length; i++) {
                 const column = tableau[i];
                 if (column.length > 0) {
@@ -620,17 +667,79 @@
                     }
                 }
             }
-            
+
             if (!found) {
                 hint += 'Спробуйте перемістити картки між колонками, щоб відкрити закриті картки! Шукайте картки з порядком 1 для початку збирання у фундаменті.';
             }
-            
+
             updateInfoBox(hint);
+
+            // Show centered hint overlay
+            if (hintsEnabled) {
+                var hintOverlay = document.createElement('div');
+                hintOverlay.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(173,216,230,0.5);color:black;padding:20px 30px;border-radius:15px;font-size:16px;font-weight:bold;max-width:80%;text-align:center;z-index:9999;backdrop-filter:blur(4px);';
+                hintOverlay.textContent = hint.replace('Підказка: ', '');
+                document.body.appendChild(hintOverlay);
+                setTimeout(function() {
+                    if (hintOverlay.parentNode) hintOverlay.parentNode.removeChild(hintOverlay);
+                }, 3000);
+            }
         }
+
+        let hintsEnabled = true;
 
         document.getElementById('reset-button').addEventListener('click', initializeGame);
         document.getElementById('hint-button').addEventListener('click', showHint);
         document.getElementById('undo-button').addEventListener('click', undo);
+
+        document.getElementById('disable-hints-btn').addEventListener('click', function() {
+            hintsEnabled = !hintsEnabled;
+            this.textContent = hintsEnabled ? 'Вимкнути підказки' : 'Увімкнути підказки';
+        });
+
+        let roseInterval = null;
+        let roseVisible = false;
+
+        function tryShowRose() {
+            if (roseVisible) return;
+            if (Math.random() < 0.25) {
+                document.getElementById('roseBtn').classList.add('visible');
+                roseVisible = true;
+            }
+        }
+
+        document.getElementById('roseBtn').addEventListener('click', function() {
+            // Find first top card that can go to foundation
+            var moved = false;
+            for (var i = 0; i < tableau.length; i++) {
+                var column = tableau[i];
+                if (column.length > 0) {
+                    var topCard = column[column.length - 1];
+                    if (topCard.faceUp && canPlaceOnFoundation(topCard, topCard.theme)) {
+                        saveState();
+                        column.pop();
+                        foundation[topCard.theme].push(topCard);
+                        if (column.length > 0) {
+                            column[column.length - 1].faceUp = true;
+                        }
+                        renderGame();
+                        checkWin();
+                        moved = true;
+                        break;
+                    }
+                }
+            }
+            if (!moved) {
+                // Flash dim effect
+                var gc = document.getElementById('game-container');
+                gc.style.filter = 'brightness(0.3)';
+                setTimeout(function() { gc.style.filter = ''; }, 500);
+            }
+            document.getElementById('roseBtn').classList.remove('visible');
+            roseVisible = false;
+        });
+
+        roseInterval = setInterval(tryShowRose, 15000);
 
         initializeGame();
     </script>

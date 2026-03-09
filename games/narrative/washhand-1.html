@@ -601,12 +601,67 @@
                 font-size: 24px;
             }
         }
+        #intro-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 5000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #fff;
+            padding: 20px;
+        }
+        #intro-overlay p {
+            font-size: 20px;
+            max-width: 600px;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        #intro-start-btn {
+            padding: 20px 50px;
+            font-size: 24px;
+            background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+        }
+        #intro-start-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 30px rgba(78, 205, 196, 0.6);
+        }
+
+        .rose-btn {
+            position: absolute;
+            cursor: pointer;
+            z-index: 50;
+            border: none;
+            background: none;
+            padding: 0;
+            transition: transform 0.3s, opacity 0.3s;
+            display: none;
+        }
+        .rose-btn img { width: 100%; height: auto; }
+        .rose-btn:hover { transform: scale(1.1); }
+        .rose-btn.visible { display: block; }
     </style>
 </head>
 <body data-nav="overlay" data-home-url="../../index.html">
     <div id="canvas-container"></div>
-    
+
+    <div id="intro-overlay">
+        <p>Маєте подолати мета-ворогів з історії України. Співставляйте період (вгорі) із трьома наборами дат. Спочатку «Зарядити» потім «Постріл»</p>
+        <button id="intro-start-btn">Розпочати</button>
+    </div>
+
     <div id="ui-overlay">
+        <button class="rose-btn" id="roseBtn" style="top: 80px; left: 20px; width: 60px;"><img src="../../assets/images/rose.png" alt="Троянда"></button>
         <div id="game-title" class="ui-element">
             ⚔️ ХРОНОБІЙ: Історична битва за послідовність
         </div>
@@ -641,7 +696,7 @@
             
             <div id="controls">
                 <button id="charge-btn" class="btn">⚡ ЗАРЯДИТИ</button>
-                <button id="fire-btn" class="btn" disabled>🎯 ВІДСТРІЛИТИ</button>
+                <button id="fire-btn" class="btn" disabled>🎯 Постріл</button>
                 <button id="reset-btn" class="btn">🔄 СКИНУТИ</button>
             </div>
         </div>
@@ -659,6 +714,7 @@
         <img src="../../assets/images/Kyiv.jpg" alt="Київ" onerror="this.style.display='none'">
         <p>Ви пройшли всі 3 рівні та захистили історію України!</p>
         <button id="restart-game-btn">Почати заново</button>
+        <a href="../../index.html" style="display:inline-block;margin-top:20px;padding:15px 40px;font-size:20px;background:linear-gradient(135deg,#ffd700,#ffa500);border:none;border-radius:12px;color:#2d3748;font-weight:bold;text-decoration:none;cursor:pointer;box-shadow:0 5px 20px rgba(0,0,0,0.5);transition:all 0.3s ease;">На головну</a>
     </div>
 
     <script>
@@ -893,6 +949,7 @@
             renderEvents();
             renderSequenceSlots();
             updateUI();
+            if (Math.random() < 0.1) { document.getElementById('roseBtn').classList.add('visible'); } else { document.getElementById('roseBtn').classList.remove('visible'); }
         }
 
         function shuffle(array) {
@@ -1080,7 +1137,7 @@
                 document.getElementById('fire-btn').disabled = false;
                 
                 animateCharging();
-                showFeedback(accuracy, "ЗБРОЮ ЗАРЯДЖЕНО! ✅", `Послідовність правильна!\nЗаряджено для знищення ворога з періоду: ${currentScenario.name}\nНатисніть 'ВІДСТРІЛИТИ' для атаки!`, false);
+                showFeedback(accuracy, "ЗБРОЮ ЗАРЯДЖЕНО! ✅", `Послідовність правильна!\nЗаряджено для знищення ворога з періоду: ${currentScenario.name}\nНатисніть 'Постріл' для атаки!`, false);
             } else {
                 const hint = getDetailedHint(filledSlots, currentScenario);
                 showFeedback(accuracy, "ПОМИЛКА В ПОСЛІДОВНОСТІ ⚠️",
@@ -1209,7 +1266,11 @@
 
         function fireWeapon() {
             if (!gameState.charged) return;
-            
+
+            document.getElementById('collapsible-content').classList.add('collapsed');
+            document.getElementById('toggle-text').textContent = '🔼 Розгорнути панель';
+            isPanelCollapsed = true;
+
             playSound('shoot');
             
             if (!currentEnemy) {
@@ -1292,6 +1353,11 @@
                 } else {
                     showFeedback(5, `ВОРОГА ЗНИЩЕНО! 🎯`, `Ви знищили ворога з періоду: ${targetEnemy.userData.name}\nПереходимо до наступного рівня!`, false);
                     gameState.awaitingNextLevel = true; // Встановлюємо прапорець тут
+                    setTimeout(() => {
+                        document.getElementById('collapsible-content').classList.remove('collapsed');
+                        document.getElementById('toggle-text').textContent = '🔽 Згорнути панель';
+                        isPanelCollapsed = false;
+                    }, 500);
                 }
             }, 1500);
             // === КІНЕЦЬ ЗМІНИ ===
@@ -1346,6 +1412,7 @@
             renderEvents();
             renderSequenceSlots();
             updateUI();
+            if (Math.random() < 0.1) { document.getElementById('roseBtn').classList.add('visible'); } else { document.getElementById('roseBtn').classList.remove('visible'); }
         }
 
         function resetGame() {
@@ -1468,9 +1535,38 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
-        // Запуск гри
-        initThree();
-        initGame();
+        // Rose button click handler
+        document.getElementById('roseBtn').addEventListener('click', function() {
+            var setId = gameState.currentEnemySetId;
+            if (!setId) return;
+            var correctEvents = allEvents.filter(function(e) { return e.setId === setId; }).sort(function(a, b) { return a.year - b.year; });
+            var toPlace = correctEvents.slice(0, 4);
+            // Clear current sequence
+            clearSequencePanel();
+            renderSequenceSlots();
+            // Place events
+            var slots = document.querySelectorAll('.sequence-slot');
+            toPlace.forEach(function(evt, i) {
+                sequenceSlots[i] = evt.id;
+                availableEvents = availableEvents.filter(function(e) { return e.id !== evt.id; });
+                var card = document.createElement('div');
+                card.className = 'event-card set-' + evt.setId + ' in-sequence';
+                card.textContent = evt.text;
+                card.draggable = false;
+                while (slots[i].firstChild) { slots[i].removeChild(slots[i].firstChild); }
+                slots[i].appendChild(card);
+                slots[i].classList.add('filled');
+            });
+            renderEvents();
+            document.getElementById('roseBtn').classList.remove('visible');
+        });
+
+        // Intro overlay — defer game start until dismissed
+        document.getElementById('intro-start-btn').addEventListener('click', function() {
+            document.getElementById('intro-overlay').style.display = 'none';
+            initThree();
+            initGame();
+        });
     </script>
     <script src="../../shared/js/nav.js"></script>
     <script src="../../shared/js/accessibility.js"></script>
