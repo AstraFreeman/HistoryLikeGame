@@ -1,0 +1,2 @@
+[     529ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8004/favicon.ico:0
+[   56822ms] [ERROR] Failed to load resource: the server responded with a status of 404 (File not found) @ http://localhost:8004/games/narrative/level1.jpg:0
