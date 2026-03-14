@@ -6,9 +6,11 @@
   <title>Карта де Боплана</title>
   <link rel="stylesheet" href="../../shared/css/reset.css">
   <link rel="stylesheet" href="../../shared/css/theme.css">
+  <link rel="stylesheet" href="../../shared/css/layout.css">
+  <link rel="stylesheet" href="../../shared/css/components.css">
   <link rel="stylesheet" href="../../shared/css/animations.css">
+  <link rel="stylesheet" href="../../shared/css/responsive.css">
   <style>
-    /* Стилі для контейнера з картою */
     html, body {
       margin: 0;
       padding: 0;
@@ -17,8 +19,8 @@
 
     .map-container {
       position: relative;
-      width: 100vw; /* Повна ширина вікна */
-      height: 100vh; /* Повна висота вікна */
+      width: 100vw;
+      height: 100vh;
       overflow: hidden;
     }
 
@@ -34,27 +36,44 @@
       display: block;
     }
 
+    /* Pin markers */
     .map-button {
       position: absolute;
-      background-color: #f2acac;
-      color: white;
-      padding: 10px 15px;
-      border: rgb(254, 160, 160);
-      border-radius: 5px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      background: none;
+      border: none;
       cursor: pointer;
-      font-size: 14px;
-      transition: background-color 0.3s;
+      z-index: 10;
+      text-decoration: none;
+      transition: transform 0.2s;
     }
-
     .map-button:hover {
-      background-color: #050505;
+      transform: scale(1.15);
+    }
+    .map-pin {
+      width: 28px;
+      height: 28px;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      background: var(--gradient-primary);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+    }
+    .map-label {
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur));
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      padding: 4px 10px;
+      font-size: var(--text-sm);
+      color: var(--color-text-primary);
+      white-space: nowrap;
+      box-shadow: var(--glass-shadow);
     }
 
-    #btn1 { top: 25%; left: 25%; }
-    #btn2 { top: 50%; left: 60%; }
-    #btn3 { top: 70%; left: 30%; }
-
-    /* Плаваюча кнопка */
+    /* Floating controls */
     .floating-button {
       position: fixed;
       z-index: 1000;
@@ -71,7 +90,6 @@
       cursor: pointer;
       transition: background-color 0.3s, transform 0.3s;
     }
-
     .floating-button:hover {
       background-color: rgba(0, 0, 0, 0.9);
       transform: scale(1.1);
@@ -85,11 +103,67 @@
     .move-right { bottom: 85px; right: 20px; }
     .fullscreen { top: 20px; right: 20px; }
 
+    /* Info panel */
+    .info-toggle {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1100;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--glass-border);
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur));
+      color: var(--color-text-primary);
+      font-size: 22px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--glass-shadow);
+      transition: transform 0.2s;
+    }
+    .info-toggle:hover {
+      transform: scale(1.1);
+    }
+    .info-panel {
+      position: fixed;
+      top: 74px;
+      left: 20px;
+      z-index: 1100;
+      max-width: 360px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur));
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      box-shadow: var(--glass-shadow);
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      font-size: var(--text-sm);
+    }
+    .info-panel h3 {
+      margin: 0 0 var(--space-sm);
+      font-size: var(--text-lg);
+      color: var(--color-text-primary);
+      font-weight: 700;
+    }
+    .info-panel p {
+      margin: 0;
+    }
+    .info-hidden {
+      display: none;
+    }
+
     @media (max-width: 768px) {
       .floating-button {
         width: 40px;
         height: 40px;
         font-size: 16px;
+      }
+      .info-panel {
+        max-width: calc(100vw - 80px);
       }
     }
 
@@ -99,52 +173,94 @@
         height: 35px;
         font-size: 14px;
       }
-
-      .map-button {
-        font-size: 12px;
-        padding: 8px 10px;
+      .map-label {
+        font-size: 11px;
+        padding: 3px 7px;
+      }
+      .info-toggle {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
       }
     }
   </style>
 </head>
-<body data-nav="overlay" data-home-url="../../index.html">
+<body data-section="Козацька доба" data-game-title="Карта де Боплана" data-nav="overlay" data-home-url="../../index.html">
 
   <div class="map-container" id="mapContainer">
-    <!-- Весь контент всередині, який масштабуватиметься разом -->
     <div class="map-content" id="mapContent">
-      <!-- Карта -->
-      <img src="../../assets/map/2-4.jpg" alt="Map" class="map-image">
+      <img src="../../assets/map/2-4.jpg" alt="Карта Гійома де Боплана — карта українських земель XVII століття" class="map-image">
 
-      <!-- Кнопки на різних точках карти -->
-      <a href="../narrative/taxes-1.html" target="_blank">
-        <button id="btn1" class="map-button">Точка 1</button>
+      <a href="../narrative/taxes-1.html" class="map-button" style="top:25%;left:25%;">
+        <span class="map-pin"></span>
+        <span class="map-label">Литовська спадщина</span>
       </a>
 
-      <button id="btn2" class="map-button" disabled style="opacity:0.4;cursor:default;">Точка 2</button>
+      <a href="../../shared/templates/timeline-sort.html?id=period-4-kozaky" class="map-button" style="top:50%;left:60%;">
+        <span class="map-pin"></span>
+        <span class="map-label">Козацька хронологія</span>
+      </a>
 
-      <button id="btn3" class="map-button" disabled style="opacity:0.4;cursor:default;">Точка 3</button>
+      <a href="../start-pages/new-makako-start-2.html" class="map-button" style="top:70%;left:30%;">
+        <span class="map-pin"></span>
+        <span class="map-label">Міжнародні договори</span>
+      </a>
     </div>
   </div>
 
-  <!-- Плаваючі кнопки -->
+  <!-- Floating controls -->
   <button class="floating-button zoom-in" onclick="zoomIn()">+</button>
   <button class="floating-button zoom-out" onclick="zoomOut()">-</button>
-  <button class="floating-button move-up" onclick="moveDown()">↑</button>
-  <button class="floating-button move-down" onclick="moveUp()">↓</button>
-  <button class="floating-button move-left" onclick="moveRight()">←</button>
-  <button class="floating-button move-right" onclick="moveLeft()">→</button>
-  <button class="floating-button fullscreen" onclick="toggleFullscreen()">⤢</button>
+  <button class="floating-button move-up" onclick="moveDown()">&#8593;</button>
+  <button class="floating-button move-down" onclick="moveUp()">&#8595;</button>
+  <button class="floating-button move-left" onclick="moveRight()">&#8592;</button>
+  <button class="floating-button move-right" onclick="moveLeft()">&#8594;</button>
+  <button class="floating-button fullscreen" onclick="toggleFullscreen()">&#10530;</button>
 
   <script>
-    let scale = 1;
-    let offsetX = 0, offsetY = 0;
-    let isDragging = false;
-    let startX, startY;
-    let initialScale = 1;
-    let initialDistance = 0;
+    // ── Info panel (DOM-created, no innerHTML) ──────────────────────
+    (function () {
+      var toggle = document.createElement('button');
+      toggle.className = 'info-toggle';
+      toggle.setAttribute('aria-label', 'Інформація про карту');
+      toggle.textContent = '\u24D8';
+      document.body.appendChild(toggle);
 
-    const mapContent = document.getElementById('mapContent');
-    const mapContainer = document.getElementById('mapContainer');
+      var panel = document.createElement('div');
+      panel.className = 'info-panel info-hidden';
+      var heading = document.createElement('h3');
+      heading.textContent = 'Карта Гійома де Боплана';
+      panel.appendChild(heading);
+      var text = document.createElement('p');
+      text.textContent = 'Гійом Левассер де Боплан (1595\u20131685) \u2014 французький інженер та картограф на службі Речі Посполитої у 1630\u20131648 рр. Його карта \u00ABDelineatio Generalis\u00BB \u2014 одна з найдетальніших ранніх карт українських земель, що зафіксувала географію козацької України напередодні повстання Хмельницького.';
+      panel.appendChild(text);
+      document.body.appendChild(panel);
+
+      toggle.addEventListener('click', function () {
+        panel.classList.toggle('info-hidden');
+      });
+    })();
+
+    // ── Prevent drag handler from swallowing marker clicks ─────────
+    document.querySelectorAll('.map-button').forEach(function (btn) {
+      btn.addEventListener('mousedown', function (e) {
+        e.stopPropagation();
+      });
+      btn.addEventListener('touchstart', function (e) {
+        e.stopPropagation();
+      });
+    });
+
+    // ── Map zoom / pan ─────────────────────────────────────────────
+    var scale = 1;
+    var offsetX = 0, offsetY = 0;
+    var isDragging = false;
+    var startX, startY;
+    var initialScale = 1;
+    var initialDistance = 0;
+
+    var mapContent = document.getElementById('mapContent');
+    var mapContainer = document.getElementById('mapContainer');
 
     function zoomIn() {
       scale += 0.1;
@@ -159,7 +275,7 @@
     }
 
     function updateTransform() {
-      mapContent.style.transform = `scale(${scale}) translate(${offsetX}px, ${offsetY}px)`;
+      mapContent.style.transform = 'scale(' + scale + ') translate(' + offsetX + 'px, ' + offsetY + 'px)';
     }
 
     function moveUp() { offsetY -= 20; updateTransform(); }
@@ -167,14 +283,14 @@
     function moveLeft() { offsetX -= 20; updateTransform(); }
     function moveRight() { offsetX += 20; updateTransform(); }
 
-    mapContainer.addEventListener('mousedown', (event) => {
+    mapContainer.addEventListener('mousedown', function (event) {
       isDragging = true;
       startX = event.clientX - offsetX;
       startY = event.clientY - offsetY;
       mapContainer.style.cursor = 'grabbing';
     });
 
-    mapContainer.addEventListener('mousemove', (event) => {
+    mapContainer.addEventListener('mousemove', function (event) {
       if (isDragging) {
         offsetX = event.clientX - startX;
         offsetY = event.clientY - startY;
@@ -182,12 +298,12 @@
       }
     });
 
-    mapContainer.addEventListener('mouseup', () => {
+    mapContainer.addEventListener('mouseup', function () {
       isDragging = false;
       mapContainer.style.cursor = 'default';
     });
 
-    mapContainer.addEventListener('touchstart', (event) => {
+    mapContainer.addEventListener('touchstart', function (event) {
       if (event.touches.length === 1) {
         isDragging = true;
         startX = event.touches[0].clientX - offsetX;
@@ -199,30 +315,30 @@
       }
     });
 
-    mapContainer.addEventListener('touchmove', (event) => {
+    mapContainer.addEventListener('touchmove', function (event) {
       if (isDragging && event.touches.length === 1) {
         offsetX = event.touches[0].clientX - startX;
         offsetY = event.touches[0].clientY - startY;
         updateTransform();
       } else if (event.touches.length === 2) {
-        const newDistance = getDistance(event.touches[0], event.touches[1]);
-        const scaleChange = newDistance / initialDistance;
+        var newDistance = getDistance(event.touches[0], event.touches[1]);
+        var scaleChange = newDistance / initialDistance;
         scale = initialScale * scaleChange;
         updateTransform();
       }
     });
 
-    mapContainer.addEventListener('touchend', () => {
+    mapContainer.addEventListener('touchend', function () {
       isDragging = false;
     });
 
     function getDistance(touch1, touch2) {
-      const deltaX = touch2.clientX - touch1.clientX;
-      const deltaY = touch2.clientY - touch1.clientY;
+      var deltaX = touch2.clientX - touch1.clientX;
+      var deltaY = touch2.clientY - touch1.clientY;
       return Math.sqrt(deltaX * deltaX + deltaY * deltaY);
     }
 
-    mapContainer.addEventListener('wheel', (event) => {
+    mapContainer.addEventListener('wheel', function (event) {
       event.preventDefault();
       if (event.deltaY < 0) {
         zoomIn();
@@ -231,24 +347,25 @@
       }
     });
 
-    mapContainer.addEventListener('mouseenter', () => {
+    mapContainer.addEventListener('mouseenter', function () {
       document.body.style.overflow = 'hidden';
     });
 
-    mapContainer.addEventListener('mouseleave', () => {
+    mapContainer.addEventListener('mouseleave', function () {
       document.body.style.overflow = '';
     });
 
     function toggleFullscreen() {
       if (!document.fullscreenElement) {
-        mapContainer.requestFullscreen().catch(err => {
-          alert(`Не вдалося увійти у повноекранний режим: ${err.message}`);
+        mapContainer.requestFullscreen().catch(function (err) {
+          alert('Не вдалося увійти у повноекранний режим: ' + err.message);
         });
       } else {
         document.exitFullscreen();
       }
     }
   </script>
-    <script src="../../shared/js/nav.js"></script>
+  <script src="../../shared/js/nav.js"></script>
+  <script src="../../shared/js/accessibility.js"></script>
 </body>
 </html>
