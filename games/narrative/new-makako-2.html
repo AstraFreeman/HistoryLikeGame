@@ -529,6 +529,7 @@
                         getNextQuestion();
 
                         if (blocks.every(b => !b.isActive)) {
+                            if (window.HLGAnalytics) HLGAnalytics.endSession({score: currentQuestionIndex, won: true});
                             winImage.style.display = 'block';
                             elements.infoField.textContent = 'Вітаємо, ви перемогли!';
                             clearInterval(gameInterval);
@@ -569,6 +570,7 @@
         // 🎮 Start Button
         document.getElementById('startButton').addEventListener('click', () => {
             if (!gameInterval) {
+                if (window.HLGAnalytics) HLGAnalytics.startSession('new-makako-2');
                 ball.isMoving = true;
                 getNextQuestion();
                 const elements = getElements();
@@ -611,6 +613,7 @@
             document.getElementById('roseBtn').classList.remove('visible');
             roseVisible = false;
             if (blocks.every(function(b) { return !b.isActive; })) {
+                if (window.HLGAnalytics) HLGAnalytics.endSession({score: currentQuestionIndex, won: true});
                 winImage.style.display = 'block';
                 var elements = getElements();
                 elements.infoField.textContent = 'Вітаємо, ви перемогли!';
@@ -630,6 +633,7 @@
         render();
     </script>
     <script src="../../shared/js/nav.js"></script>
+    <script src="../../shared/js/analytics.js"></script>
     <script src="../../shared/js/accessibility.js"></script>
 </body>
 </html>

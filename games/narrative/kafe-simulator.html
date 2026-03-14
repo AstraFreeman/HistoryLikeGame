@@ -1051,6 +1051,7 @@
 
       /* ── Game lifecycle ── */
       function startGame() {
+        if (window.HLGAnalytics) HLGAnalytics.startSession('kafe-simulator');
         els.introScreen.classList.add('hidden');
         els.endScreen.classList.add('hidden');
         els.gameUI.style.display = 'flex';
@@ -1082,6 +1083,7 @@
       }
 
       function endGame() {
+        if (window.HLGAnalytics) HLGAnalytics.endSession({ score: state.score, won: state.score > 0 });
         state.gameRunning = false;
         clearInterval(state.customerInterval);
         clearInterval(state.patienceInterval);
@@ -1175,6 +1177,7 @@
     })();
   </script>
   <script src="../../shared/js/nav.js"></script>
+  <script src="../../shared/js/analytics.js"></script>
   <script src="../../shared/js/accessibility.js"></script>
 </body>
 </html>

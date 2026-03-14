@@ -585,6 +585,7 @@
         
         // Завершення гри
         function endGame() {
+            if (window.HLGAnalytics) HLGAnalytics.endSession({score: score, won: caughtCorrect >= 15});
             document.getElementById('ratingMessage').textContent = getRating(score);
             document.getElementById('gameOver').style.display = 'flex';
         }
@@ -681,12 +682,14 @@
         document.getElementById('startButton').addEventListener('click', () => {
             document.getElementById('introScreen').style.display = 'none';
             gameStarted = true;
+            if (window.HLGAnalytics) HLGAnalytics.startSession('masachuchi');
             lastTime = Date.now();
             showCategoryAlert();
             gameLoop();
         });
     </script>
     <script src="../../../shared/js/nav.js"></script>
+    <script src="../../../shared/js/analytics.js"></script>
     <script src="../../../shared/js/accessibility.js"></script>
 </body>
 

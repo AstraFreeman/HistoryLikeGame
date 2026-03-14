@@ -174,6 +174,33 @@ window.FALLING_DATA = { ... };
 ```
 Посилання: `shared/templates/falling-answer.html?id={n}-{name}`
 
+## Аналітика (`shared/js/analytics.js`)
+
+Легка, приватна аналітика навчальних сесій. Дані в `localStorage` (ключ: `histgame_analytics`). Без мережевих запитів.
+
+### API: `window.HLGAnalytics`
+```js
+HLGAnalytics.startSession('module-id');  // почати (авто з ?id= або pathname)
+HLGAnalytics.endSession({ score: 12, won: true, attempts: 3 }); // зберегти
+HLGAnalytics.getSessions();       // масив записів
+HLGAnalytics.getOverview();       // { totalSessions, totalTime, uniqueModules }
+HLGAnalytics.exportCSV();         // рядок CSV
+HLGAnalytics.downloadFile('csv'); // завантажити файл
+HLGAnalytics.sendToTeacher();     // mailto: з CSV
+HLGAnalytics.renderDashboard(id); // міні-картка
+HLGAnalytics.renderExport(id);    // повна таблиця + кнопки
+HLGAnalytics.clearAll();          // очистити з підтвердженням
+```
+
+### Інтеграція
+1. Додайте `<script src="../../shared/js/analytics.js"></script>` перед accessibility.js
+2. Додайте 2 рядки:
+```js
+if (window.HLGAnalytics) HLGAnalytics.startSession('my-game');
+// ...при завершенні:
+if (window.HLGAnalytics) HLGAnalytics.endSession({ score: s, won: true });
+```
+
 ## Конвенції
 - Файли: kebab-case (`my-game.html`, `my-data.js`)
 - Мова UI: українська, тільки перше слово з великої літери

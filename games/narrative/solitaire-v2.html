@@ -533,6 +533,7 @@
             }
 
             function initializeGame() {
+                if (window.HLGAnalytics) HLGAnalytics.startSession('solitaire-v2');
                 var shuffled = shuffle(cards);
                 tableau = [];
                 for (var c = 0; c < 7; c++) {
@@ -897,6 +898,7 @@
                     total += foundation[keys[i]].length;
                 }
                 if (total === cards.length) {
+                    if (window.HLGAnalytics) HLGAnalytics.endSession({score: total, won: true});
                     document.getElementById('win-overlay').classList.add('active');
                 }
             }
@@ -953,6 +955,7 @@
         })();
     </script>
     <script src="../../shared/js/nav.js"></script>
+    <script src="../../shared/js/analytics.js"></script>
     <script src="../../shared/js/accessibility.js"></script>
 </body>
 </html>

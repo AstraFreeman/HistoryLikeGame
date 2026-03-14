@@ -289,6 +289,12 @@
                 <div id="miniGameContainer" style="max-width:450px;margin:0 auto;text-align:center;"></div>
             </section>
 
+            <!-- Analytics dashboard -->
+            <section class="ar-section">
+                <h2 class="section-title" style="margin-top:0;">Моя аналітика</h2>
+                <div id="analyticsDashboard"></div>
+            </section>
+
             <section class="ar-section">
                 <h2 class="section-title" style="margin-top:0;">AR-ігри</h2>
                 <div class="card-grid">
@@ -330,6 +336,7 @@
             <footer style="margin-top: var(--space-2xl); padding-top: var(--space-lg); border-top: 1px solid var(--glass-border); text-align: center;">
                 <a href="docs/guide.html" class="btn btn-ghost btn-sm">Посібник гравця</a>
                 <a href="docs/dev-guide.html" class="btn btn-ghost btn-sm">Посібник розробника</a>
+                <a href="docs/analytics.html" class="btn btn-ghost btn-sm">Аналітика</a>
             </footer>
 
             <img src="assets/images/Sprut_Idle.gif" alt="Помічник" id="octopus" class="assistant">
@@ -756,6 +763,10 @@
                 }
             });
         })();
+    </script>
+    <script src="shared/js/analytics.js"></script>
+    <script>
+        if (window.HLGAnalytics) HLGAnalytics.renderDashboard('analyticsDashboard');
     </script>
     <script src="shared/js/accessibility.js"></script>
 </body>

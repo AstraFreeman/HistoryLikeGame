@@ -44,6 +44,7 @@
   }
 
   function init(config) {
+    if (window.HLGAnalytics) HLGAnalytics.startSession();
     var questions = config.questions || [];
     var password = config.password || '';
     var blockId = config.passwordBlockId || 'passwordBlock';
@@ -82,12 +83,14 @@
     }
 
     if (allCorrect) {
+      if (window.HLGAnalytics) HLGAnalytics.endSession({ score: 1, won: true });
       var block = document.getElementById(cfg.blockId);
       var display = document.getElementById(cfg.displayId);
       if (display) display.textContent = cfg.password;
       if (block) block.style.display = 'block';
       return true;
     } else {
+      if (window.HLGAnalytics) HLGAnalytics.endSession({ score: 0, won: false });
       alert('\u041D\u0435 \u0432\u0441\u0456 \u0432\u0456\u0434\u043F\u043E\u0432\u0456\u0434\u0456 \u043F\u0440\u0430\u0432\u0438\u043B\u044C\u043D\u0456. \u0421\u043F\u0440\u043E\u0431\u0443\u0439\u0442\u0435 \u0449\u0435 \u0440\u0430\u0437!');
       return false;
     }

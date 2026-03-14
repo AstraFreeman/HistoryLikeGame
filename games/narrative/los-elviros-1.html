@@ -401,6 +401,7 @@
         }
 
         function initializeGame() {
+            if (window.HLGAnalytics) HLGAnalytics.startSession('los-elviros-1');
             const shuffled = shuffle(cards);
             tableau = Array(7).fill(null).map(() => []);
             foundation = {
@@ -664,6 +665,7 @@
         function checkWin() {
             const totalInFoundation = Object.values(foundation).reduce((sum, arr) => sum + arr.length, 0);
             if (totalInFoundation === cards.length) {
+                if (window.HLGAnalytics) HLGAnalytics.endSession({score: totalInFoundation, won: true});
                 updateInfoBox('🎉 Вітаємо! Ви зібрали всі картки у правильному хронологічному порядку! Ви знаєте історію України! 🇺🇦');
                 showWinOverlay();
             }
@@ -790,6 +792,7 @@
         initializeGame();
     </script>
     <script src="../../shared/js/nav.js"></script>
+    <script src="../../shared/js/analytics.js"></script>
     <script src="../../shared/js/accessibility.js"></script>
 </body>
 </html>

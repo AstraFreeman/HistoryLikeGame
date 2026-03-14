@@ -120,3 +120,25 @@ Every game page that loads `accessibility.js` has either:
 The `.reduce-motion` rule in `theme.css` uses `!important` to globally kill animations/transitions.
 
 **Out of scope:** AR pages (`ar/`) and standalone data games (`data/games/Yove_3/`) do not load `accessibility.js`.
+
+## Analytics
+
+`shared/js/analytics.js` provides lightweight, private learning analytics stored in `localStorage` (key: `histgame_analytics`). No network requests, cookies, or personal identifiers.
+
+**API:** `window.HLGAnalytics`
+- `startSession(moduleId)` — begin tracking (moduleId auto-resolved from `?id=` or pathname)
+- `endSession({score, won, attempts})` — save session record
+- `cancelSession()` — discard without saving
+- `getSessions()` / `getOverview()` / `getModuleSummary(id)` — read data
+- `exportJSON()` / `exportCSV()` / `downloadFile(format)` — export
+- `sendToTeacher()` — mailto: with CSV data
+- `renderDashboard(containerId)` — mini stats card (used on index.html)
+- `renderExport(containerId)` — full table + export buttons (used on docs/analytics.html)
+- `clearAll()` — delete all data with confirmation
+
+**Integration:** Shared engines (quiz-engine.js, game-engine.js, timeline-engine.js) call `startSession`/`endSession` automatically. Custom games add 2 lines each. All calls guarded by `if (window.HLGAnalytics)`.
+
+**Data format:** Compact keys for storage efficiency (~120 bytes/record):
+```json
+{"m":"period-5-imperium","t0":1710400000000,"dt":45200,"a":3,"s":12,"w":true}
+```

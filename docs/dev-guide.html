@@ -462,6 +462,56 @@ window.UIUtils.showNotification(message, duration)</code></pre>
             <p>Посилання: <code class="inline-code">shared/templates/falling-answer.html?id={n}-{name}</code></p>
         </section>
 
+        <!-- Аналітика -->
+        <section class="doc-section" id="analytics">
+            <h2>Аналітика (<code class="inline-code">shared/js/analytics.js</code>)</h2>
+            <p>Легка, приватна аналітика навчальних сесій. Дані зберігаються тільки в <code class="inline-code">localStorage</code> (ключ: <code class="inline-code">histgame_analytics</code>). Жодних мережевих запитів.</p>
+
+            <h3>API: <code class="inline-code">window.HLGAnalytics</code></h3>
+<pre><code>// Почати сесію (moduleId авто з ?id= або pathname)
+HLGAnalytics.startSession('module-id');
+
+// Завершити сесію
+HLGAnalytics.endSession({ score: 12, won: true, attempts: 3 });
+
+// Отримати дані
+HLGAnalytics.getSessions();      // масив записів
+HLGAnalytics.getOverview();      // { totalSessions, totalTime, uniqueModules }
+HLGAnalytics.getModuleSummary(id); // { plays, avgScore, avgTime, bestScore }
+
+// Експорт
+HLGAnalytics.exportJSON();
+HLGAnalytics.exportCSV();
+HLGAnalytics.downloadFile('csv');
+HLGAnalytics.sendToTeacher();    // mailto: з CSV
+
+// UI
+HLGAnalytics.renderDashboard('containerId'); // міні-картка
+HLGAnalytics.renderExport('containerId');    // повна таблиця
+HLGAnalytics.clearAll();                     // очистити з підтвердженням</code></pre>
+
+            <h3>Інтеграція в нову гру</h3>
+            <div class="doc-step">
+                <div class="step-num">1</div>
+                <div class="step-content">
+                    <p>Додайте <code class="inline-code">&lt;script src="../../shared/js/analytics.js"&gt;&lt;/script&gt;</code> перед accessibility.js</p>
+                </div>
+            </div>
+            <div class="doc-step">
+                <div class="step-num">2</div>
+                <div class="step-content">
+                    <p>Додайте 2 рядки у код гри:</p>
+<pre><code>// На старті гри:
+if (window.HLGAnalytics) HLGAnalytics.startSession('my-game');
+
+// При завершенні:
+if (window.HLGAnalytics) HLGAnalytics.endSession({
+  score: playerScore, won: isVictory
+});</code></pre>
+                </div>
+            </div>
+        </section>
+
         <!-- Конвенції -->
         <section class="doc-section" id="conventions">
             <h2>Конвенції</h2>
@@ -481,6 +531,7 @@ window.UIUtils.showNotification(message, duration)</code></pre>
     </div>
 
     <script src="../shared/js/nav.js"></script>
+    <script src="../shared/js/analytics.js"></script>
     <script src="../shared/js/accessibility.js"></script>
 </body>
 </html>

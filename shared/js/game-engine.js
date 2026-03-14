@@ -117,6 +117,7 @@
   }
 
   function startGame() {
+    if (window.HLGAnalytics) HLGAnalytics.startSession();
     resetGame();
     if (els.input) {
       els.input.disabled = false;
@@ -245,6 +246,7 @@
   }
 
   function endGame(isWin) {
+    if (window.HLGAnalytics) HLGAnalytics.endSession({ score: score, won: isWin });
     clearInterval(gameInterval);
     clearInterval(dropInterval);
     activeQuestions.forEach(function (q) { q.element.remove(); });

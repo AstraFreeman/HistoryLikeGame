@@ -58,6 +58,7 @@
     score = 0;
     attempts = 0;
     loadRound();
+    if (window.HLGAnalytics) HLGAnalytics.startSession();
   }
 
   function loadRound() {
@@ -469,6 +470,7 @@
   }
 
   function showFinalResult() {
+    if (window.HLGAnalytics) HLGAnalytics.endSession({ score: score, won: true, attempts: attempts });
     if (!els.container) return;
     els.container.textContent = '';
 
