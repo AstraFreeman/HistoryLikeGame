@@ -35,7 +35,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: var(--text-lg);
       color: #3b6cff;
       font-weight: bold;
       border-radius: 10px;
@@ -50,7 +50,7 @@
     button {
       margin-top: 20px;
       padding: 10px 20px;
-      font-size: 16px;
+      font-size: var(--text-base);
       cursor: pointer;
       border: none;
       border-radius: 8px;
@@ -60,6 +60,17 @@
 
     button:hover {
       background: #2f55cc;
+    }
+
+    /* ── Accessibility: high contrast ── */
+    .high-contrast button {
+        border: 2px solid #1a1a2e;
+    }
+    .high-contrast .block iframe {
+        border: 3px solid #1a1a2e;
+    }
+    .high-contrast .block-overlay {
+        border: 2px solid #3b6cff;
     }
   </style>
 </head>
@@ -110,7 +121,7 @@
       <h2 style="color:#ef4444; margin-bottom:15px;">Потрібне підключення до інтернету</h2>
       <p style="color:#666; margin-bottom:20px;">Ця гра використовує зовнішні ресурси Wordwall, які потребують активного інтернет-з'єднання.</p>
       <p style="color:#666;">Перевірте підключення та перезавантажте сторінку.</p>
-      <button onclick="location.reload()" style="margin-top:20px; padding:10px 20px; font-size:16px; cursor:pointer; border:none; border-radius:8px; background:#3b6cff; color:white;">Спробувати знову</button>
+      <button onclick="location.reload()" style="margin-top:20px; padding:10px 20px; font-size:var(--text-base); cursor:pointer; border:none; border-radius:8px; background:#3b6cff; color:white;">Спробувати знову</button>
     </div>
   </div>
 

@@ -60,7 +60,7 @@
             border-radius: 5px;
             cursor: pointer;
             z-index: 4;
-            font-size: 16px;
+            font-size: var(--text-base);
         }
 
         .hidden {
@@ -87,18 +87,18 @@
             border: none;
             cursor: pointer;
             text-align: center;
-            font-size: 14px;
+            font-size: var(--text-sm);
         }
 
         /* Медіа-запити для мобільних пристроїв */
         @media (max-width: 768px) {
             .btn {
-                font-size: 14px;
+                font-size: var(--text-sm);
                 padding: 8px 16px;
             }
 
             .buttons a, .buttons button {
-                font-size: 12px;
+                font-size: var(--text-xs);
                 padding: 8px 16px;
             }
 
@@ -109,7 +109,7 @@
 
         @media (max-width: 480px) {
             .btn {
-                font-size: 12px;
+                font-size: var(--text-xs);
                 padding: 6px 12px;
             }
 
@@ -118,9 +118,28 @@
             }
 
             .buttons a, .buttons button {
-                font-size: 10px;
+                font-size: var(--text-xs);
                 padding: 6px 12px;
             }
+        }
+
+        /* ── Accessibility: light theme ── */
+        body.theme-light {
+            background-color: #f0f0eb;
+        }
+        body.theme-light .btn {
+            background-color: #22885a;
+        }
+        body.theme-light .buttons a,
+        body.theme-light .buttons button {
+            background-color: #4a90d9;
+        }
+
+        /* ── Accessibility: high contrast ── */
+        .high-contrast .btn,
+        .high-contrast .buttons a,
+        .high-contrast .buttons button {
+            border: 2px solid rgba(255, 255, 255, 0.6);
         }
     </style>
 </head>

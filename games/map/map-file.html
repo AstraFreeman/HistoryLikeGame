@@ -86,7 +86,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 18px;
+      font-size: var(--text-lg);
       cursor: pointer;
       transition: background-color 0.3s, transform 0.3s;
     }
@@ -116,7 +116,7 @@
       background: var(--glass-bg);
       backdrop-filter: blur(var(--glass-blur));
       color: var(--color-text-primary);
-      font-size: 22px;
+      font-size: var(--text-2xl);
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -160,7 +160,7 @@
       .floating-button {
         width: 40px;
         height: 40px;
-        font-size: 16px;
+        font-size: var(--text-base);
       }
       .info-panel {
         max-width: calc(100vw - 80px);
@@ -171,17 +171,38 @@
       .floating-button {
         width: 35px;
         height: 35px;
-        font-size: 14px;
+        font-size: var(--text-sm);
       }
       .map-label {
-        font-size: 11px;
+        font-size: var(--text-xs);
         padding: 3px 7px;
       }
       .info-toggle {
         width: 36px;
         height: 36px;
-        font-size: 18px;
+        font-size: var(--text-lg);
       }
+    }
+
+    /* ── Accessibility: light theme ── */
+    body.theme-light .floating-button {
+      background-color: rgba(255, 255, 255, 0.9);
+      color: #1a1a2e;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    }
+    body.theme-light .floating-button:hover {
+      background-color: rgba(255, 255, 255, 1);
+    }
+
+    /* ── Accessibility: high contrast ── */
+    .high-contrast .floating-button {
+      border: 2px solid rgba(255, 255, 255, 0.6);
+    }
+    .high-contrast .info-toggle {
+      border-width: 2px;
+    }
+    .high-contrast .info-panel {
+      border-width: 2px;
     }
   </style>
 </head>

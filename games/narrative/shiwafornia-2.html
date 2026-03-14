@@ -39,7 +39,7 @@
             color: #ff6b6b;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
-            font-size: 28px;
+            font-size: var(--text-3xl);
         }
 
         .progress-bar {
@@ -68,7 +68,7 @@
             color: white;
             padding: 15px 25px;
             border-radius: 15px;
-            font-size: 18px;
+            font-size: var(--text-lg);
             font-weight: bold;
             text-align: center;
             margin: 10px 0;
@@ -98,7 +98,7 @@
             border: 3px solid #ff7675;
             border-radius: 12px;
             padding: 15px 10px;
-            font-size: 14px;
+            font-size: var(--text-sm);
             font-weight: bold;
             color: #2d3436;
             cursor: pointer;
@@ -204,7 +204,7 @@
 
         .message {
             text-align: center;
-            font-size: 20px;
+            font-size: var(--text-xl);
             margin: 15px 0;
             color: #2d3436;
             min-height: 30px;
@@ -216,7 +216,7 @@
             color: white;
             border: none;
             padding: 12px 30px;
-            font-size: 16px;
+            font-size: var(--text-base);
             font-weight: bold;
             border-radius: 25px;
             cursor: pointer;
@@ -253,14 +253,14 @@
 
         .intro-screen h2 {
             color: #FFD700;
-            font-size: 28px;
+            font-size: var(--text-3xl);
             margin-bottom: 20px;
         }
 
         .difficulty-btn {
             margin: 8px;
             padding: 12px 30px;
-            font-size: 16px;
+            font-size: var(--text-base);
             font-weight: bold;
             border-radius: 25px;
             cursor: pointer;
@@ -291,6 +291,32 @@
         .rose-btn img { width: 100%; height: auto; }
         .rose-btn:hover { transform: translateY(-50%) scale(1.1); }
         .rose-btn.visible { display: block; }
+
+        /* ── Accessibility: light theme ── */
+        body.theme-light .intro-screen {
+            background: rgba(255, 255, 255, 0.95);
+            color: #1a1a2e;
+        }
+        body.theme-light .intro-screen h2 { color: #b8860b; }
+        body.theme-light .intro-screen p { color: #333; }
+
+        /* ── Accessibility: high contrast ── */
+        .high-contrast .node {
+            border-width: 4px;
+        }
+        .high-contrast .container {
+            border-width: 4px;
+        }
+        .high-contrast .endpoint {
+            border-width: 4px;
+        }
+        .high-contrast .reset-btn {
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+        .high-contrast .difficulty-btn {
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
         .rose-uses {
             position: absolute;
             bottom: -5px;
@@ -303,7 +329,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
+            font-size: var(--text-sm);
             font-weight: bold;
         }
     </style>
@@ -648,16 +674,16 @@
             overlay.appendChild(img);
             var title = document.createElement('h1');
             title.textContent = 'Супер перемога! 3 гри пройдено!';
-            title.style.cssText = 'color:#ffd700;font-size:32px;text-shadow:2px 2px 4px rgba(0,0,0,0.5);margin-bottom:20px;text-align:center;';
+            title.style.cssText = 'color:#ffd700;font-size:var(--text-3xl);text-shadow:2px 2px 4px rgba(0,0,0,0.5);margin-bottom:20px;text-align:center;';
             overlay.appendChild(title);
             var homeLink = document.createElement('a');
             homeLink.href = '../../index.html';
             homeLink.textContent = 'На головну';
-            homeLink.style.cssText = 'display:inline-block;padding:15px 40px;font-size:20px;background:linear-gradient(135deg,#55efc4,#00b894);border:none;border-radius:12px;color:#2d3748;font-weight:bold;text-decoration:none;cursor:pointer;box-shadow:0 5px 20px rgba(0,0,0,0.5);';
+            homeLink.style.cssText = 'display:inline-block;padding:15px 40px;font-size:var(--text-xl);background:linear-gradient(135deg,#55efc4,#00b894);border:none;border-radius:12px;color:#2d3748;font-weight:bold;text-decoration:none;cursor:pointer;box-shadow:0 5px 20px rgba(0,0,0,0.5);';
             overlay.appendChild(homeLink);
             var closeBtn = document.createElement('button');
             closeBtn.textContent = 'Продовжити';
-            closeBtn.style.cssText = 'margin-top:15px;padding:12px 30px;font-size:16px;background:rgba(255,255,255,0.2);border:2px solid white;border-radius:25px;color:white;cursor:pointer;';
+            closeBtn.style.cssText = 'margin-top:15px;padding:12px 30px;font-size:var(--text-base);background:rgba(255,255,255,0.2);border:2px solid white;border-radius:25px;color:white;cursor:pointer;';
             closeBtn.addEventListener('click', function() { overlay.remove(); });
             overlay.appendChild(closeBtn);
             document.body.appendChild(overlay);

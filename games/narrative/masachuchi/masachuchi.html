@@ -225,6 +225,30 @@
         #startButton:active {
             transform: scale(0.98);
         }
+
+        /* ── Accessibility: light theme ── */
+        body.theme-light {
+            background: linear-gradient(135deg, #e8e8e3 0%, #ddd8d0 100%);
+        }
+        body.theme-light #scoreBoard {
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+        body.theme-light #startScreen {
+            background: rgba(255, 255, 255, 0.92);
+            color: #1a1a2e;
+        }
+
+        /* ── Accessibility: high contrast ── */
+        .high-contrast #gameContainer {
+            border-width: 5px;
+        }
+        .high-contrast #scoreBoard,
+        .high-contrast #currentCategory {
+            border: 2px solid #1a1a2e;
+        }
+        .high-contrast #startButton {
+            border: 3px solid #1a1a2e;
+        }
     </style>
 </head>
 <body data-nav="overlay" data-home-url="../../../index.html">

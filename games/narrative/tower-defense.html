@@ -59,7 +59,7 @@
       justify-content: space-between;
       align-items: center;
       margin: 4px 0;
-      font-size: 15px;
+      font-size: var(--text-sm);
       font-weight: 600;
     }
     #statsPanel .stat-label { color: #aaa; }
@@ -82,7 +82,7 @@
     }
     #shopPanel h3 {
       margin: 0 0 10px;
-      font-size: 15px;
+      font-size: var(--text-sm);
       color: #4ecdc4;
       text-align: center;
     }
@@ -97,7 +97,7 @@
       padding: 8px 12px;
       margin-bottom: 8px;
       color: #fff;
-      font-size: 13px;
+      font-size: var(--text-sm);
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
@@ -122,7 +122,7 @@
       border: none;
       border-radius: 12px;
       padding: 14px 36px;
-      font-size: 17px;
+      font-size: var(--text-lg);
       font-weight: 700;
       color: #fff;
       cursor: pointer;
@@ -142,7 +142,7 @@
       backdrop-filter: blur(6px);
       border-radius: 8px;
       padding: 10px 16px;
-      font-size: 13px;
+      font-size: var(--text-sm);
       color: #bbb;
       max-width: 260px;
       line-height: 1.5;
@@ -179,14 +179,14 @@
     }
 
     #questionBox h3 {
-      font-size: 14px;
+      font-size: var(--text-sm);
       color: #4ecdc4;
       margin-bottom: 16px;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
     #questionText {
-      font-size: 20px;
+      font-size: var(--text-xl);
       font-weight: 700;
       margin-bottom: 28px;
       line-height: 1.45;
@@ -201,7 +201,7 @@
       border: 2px solid transparent;
       border-radius: 10px;
       padding: 13px 22px;
-      font-size: 16px;
+      font-size: var(--text-base);
       font-weight: 600;
       color: #fff;
       cursor: pointer;
@@ -214,7 +214,7 @@
 
     #resultMsg {
       margin-top: 18px;
-      font-size: 16px;
+      font-size: var(--text-base);
       font-weight: 700;
       min-height: 24px;
     }
@@ -240,16 +240,16 @@
       box-shadow: 0 24px 72px rgba(255,107,107,0.35);
     }
     #endBox.victory { border-color: #00ff88; box-shadow: 0 24px 72px rgba(0,255,136,0.35); }
-    #endBox h2 { font-size: 40px; margin-bottom: 16px; }
+    #endBox h2 { font-size: var(--text-4xl); margin-bottom: 16px; }
     #endBox.victory h2 { color: #00ff88; }
     #endBox:not(.victory) h2 { color: #ff6b6b; }
-    #endBox p { font-size: 20px; margin-bottom: 28px; }
+    #endBox p { font-size: var(--text-xl); margin-bottom: 28px; }
     #restartBtn {
       background: linear-gradient(45deg, #ff6b6b, #feca57);
       border: none;
       border-radius: 14px;
       padding: 16px 40px;
-      font-size: 18px;
+      font-size: var(--text-lg);
       font-weight: 700;
       color: #fff;
       cursor: pointer;
@@ -262,14 +262,13 @@
     /* ===== Mobile ===== */
     @media (max-width: 640px) {
       #statsPanel { padding: 10px 14px; }
-      #statsPanel .stat-row { font-size: 13px; }
       #shopPanel { padding: 10px; }
-      .tower-btn { font-size: 12px; padding: 6px 10px; }
-      #startWaveBtn { padding: 12px 28px; font-size: 15px; }
-      #questionText { font-size: 17px; }
-      .answer-btn { font-size: 14px; padding: 10px 16px; }
+      .tower-btn { font-size: var(--text-xs); padding: 6px 10px; }
+      #startWaveBtn { padding: 12px 28px; font-size: var(--text-sm); }
+      #questionText { font-size: var(--text-lg); }
+      .answer-btn { font-size: var(--text-sm); padding: 10px 16px; }
       #endBox { padding: 32px 24px; }
-      #endBox h2 { font-size: 30px; }
+      #endBox h2 { font-size: var(--text-3xl); }
       #infoTip { display: none; }
     }
 
@@ -279,6 +278,82 @@
         animation-duration: 0.01ms !important;
         transition-duration: 0.01ms !important;
       }
+    }
+
+    /* ── Accessibility: light theme ── */
+    body.theme-light {
+      background: linear-gradient(135deg, #e8e8e3 0%, #f0f0eb 100%);
+      color: #1a1a2e;
+    }
+    body.theme-light #statsPanel {
+      background: rgba(255, 255, 255, 0.92);
+      border-color: #22885a;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    body.theme-light #statsPanel .stat-label { color: #555; }
+    body.theme-light #statsPanel .stat-value { color: #1a1a2e; }
+    body.theme-light .stat-value.gold-val { color: #b8860b; }
+    body.theme-light .stat-value.lives-val { color: #cc3333; }
+    body.theme-light .stat-value.wave-val { color: #1a8a7a; }
+    body.theme-light .stat-value.score-val { color: #6b5bce; }
+    body.theme-light #shopPanel {
+      background: rgba(255, 255, 255, 0.92);
+      border-color: #22885a;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    body.theme-light #shopPanel h3 { color: #1a8a7a; }
+    body.theme-light .tower-btn {
+      background: rgba(0, 0, 0, 0.05);
+      color: #1a1a2e;
+    }
+    body.theme-light .tower-btn:hover { background: rgba(0, 0, 0, 0.1); }
+    body.theme-light .tower-btn.selected { background: rgba(34, 136, 90, 0.15); border-color: #22885a; }
+    body.theme-light .tower-btn .cost { color: #b8860b; }
+    body.theme-light #startWaveBtn {
+      box-shadow: 0 4px 15px rgba(0, 200, 83, 0.3);
+    }
+    body.theme-light #infoTip {
+      background: rgba(255, 255, 255, 0.9);
+      color: #555;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+    body.theme-light #questionBox {
+      background: linear-gradient(145deg, #f0f0eb, #e0e0db);
+      color: #1a1a2e;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+    }
+    body.theme-light #questionBox h3 { color: #1a8a7a; }
+    body.theme-light .answer-btn {
+      background: linear-gradient(45deg, #5548da, #7d38e9);
+      color: #fff;
+    }
+    body.theme-light #resultMsg { color: #1a1a2e; }
+    body.theme-light #endBox {
+      background: linear-gradient(145deg, #f0f0eb, #e0e0db);
+      color: #1a1a2e;
+      box-shadow: 0 24px 72px rgba(0, 0, 0, 0.15);
+    }
+
+    /* ── Accessibility: high contrast ── */
+    .high-contrast #statsPanel,
+    .high-contrast #shopPanel,
+    .high-contrast #infoTip {
+      border-width: 3px;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    .high-contrast .tower-btn {
+      border-width: 2px;
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+    .high-contrast .answer-btn {
+      border: 2px solid rgba(255, 255, 255, 0.5);
+    }
+    .high-contrast #questionBox {
+      border-width: 3px;
+    }
+    .high-contrast #endBox {
+      border-width: 4px;
     }
   </style>
 </head>

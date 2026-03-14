@@ -103,3 +103,20 @@ assets/
 Persists to localStorage keys: `histgame_theme`, `histgame_fontsize`, `histgame_reducemotion`, `histgame_highcontrast`.
 
 Early theme detection `<script>` in `<head>` of `index.html` prevents FOUC. Uses safe DOM creation methods (no innerHTML).
+
+### Font scaling compliance
+
+All `font-size` declarations in game files use `var(--text-*)` CSS custom properties from `theme.css` (not hardcoded `px`). This ensures the A/A+/A++ font size toggle works everywhere. The `--text-*` variables use `rem`+`clamp()`, which scale with the root font-size set by `.font-lg` (120%) / `.font-xl` (140%).
+
+**Exception:** Canvas API `ctx.font` requires absolute `px` values — these are left as-is in `new-makako-2.html`, `masachuchi.html`, `bobble-shooter.html`.
+
+### Theme & contrast compliance
+
+Every game page that loads `accessibility.js` has either:
+- CSS custom properties from `theme.css` for colors (e.g. `var(--gradient-bg)`, `var(--color-text-primary)`) — automatically responds to `.theme-light`, OR
+- Explicit `body.theme-light { ... }` overrides in its `<style>` block for game-specific dark elements, AND
+- `.high-contrast` overrides for thicker borders and reduced transparency
+
+The `.reduce-motion` rule in `theme.css` uses `!important` to globally kill animations/transitions.
+
+**Out of scope:** AR pages (`ar/`) and standalone data games (`data/games/Yove_3/`) do not load `accessibility.js`.

@@ -337,22 +337,22 @@
 
     var label = document.createElement('p');
     label.textContent = 'Введіть пароль';
-    label.style.cssText = 'color:#ffd700;font-size:24px;margin-bottom:15px;font-weight:bold;';
+    label.style.cssText = 'color:#ffd700;font-size:var(--text-2xl);margin-bottom:15px;font-weight:bold;';
     overlay.appendChild(label);
 
     var hint = document.createElement('p');
     hint.textContent = 'Підказка: Люблю історію';
-    hint.style.cssText = 'color:#aaa;font-size:16px;margin-bottom:20px;';
+    hint.style.cssText = 'color:#aaa;font-size:var(--text-base);margin-bottom:20px;';
     overlay.appendChild(hint);
 
     var input = document.createElement('input');
     input.type = 'text';
     input.placeholder = 'Пароль...';
-    input.style.cssText = 'padding:12px 20px;font-size:18px;border-radius:8px;border:2px solid #ffd700;background:rgba(255,255,255,0.1);color:white;text-align:center;width:280px;';
+    input.style.cssText = 'padding:12px 20px;font-size:var(--text-lg);border-radius:8px;border:2px solid #ffd700;background:rgba(255,255,255,0.1);color:white;text-align:center;width:280px;';
     overlay.appendChild(input);
 
     var msg = document.createElement('p');
-    msg.style.cssText = 'color:#ff6b6b;font-size:14px;margin-top:10px;min-height:20px;';
+    msg.style.cssText = 'color:#ff6b6b;font-size:var(--text-sm);margin-top:10px;min-height:20px;';
     overlay.appendChild(msg);
 
     var btnRow = document.createElement('div');
@@ -360,11 +360,11 @@
 
     var submitBtn = document.createElement('button');
     submitBtn.textContent = 'Підтвердити';
-    submitBtn.style.cssText = 'padding:12px 30px;font-size:16px;background:linear-gradient(135deg,#ffd700,#ffa500);border:none;border-radius:8px;color:#2d3748;font-weight:bold;cursor:pointer;';
+    submitBtn.style.cssText = 'padding:12px 30px;font-size:var(--text-base);background:linear-gradient(135deg,#ffd700,#ffa500);border:none;border-radius:8px;color:#2d3748;font-weight:bold;cursor:pointer;';
 
     var closeBtn = document.createElement('button');
     closeBtn.textContent = 'Закрити';
-    closeBtn.style.cssText = 'padding:12px 30px;font-size:16px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);border-radius:8px;color:white;cursor:pointer;';
+    closeBtn.style.cssText = 'padding:12px 30px;font-size:var(--text-base);background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3);border-radius:8px;color:white;cursor:pointer;';
 
     btnRow.appendChild(submitBtn);
     btnRow.appendChild(closeBtn);

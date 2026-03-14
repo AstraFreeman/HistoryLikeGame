@@ -71,7 +71,7 @@
 
         button {
             padding: 12px 24px;
-            font-size: 18px;
+            font-size: var(--text-lg);
             background: linear-gradient(135deg, #00d4ff 0%, #0095dd 100%);
             color: white;
             border: 2px solid #00ffff;
@@ -115,7 +115,7 @@
             padding: 15px;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
             color: #00ffff;
-            font-size: 18px;
+            font-size: var(--text-lg);
             border: 2px solid #00ffff;
             border-radius: 8px;
             text-align: center;
@@ -197,11 +197,11 @@
 
             button {
                 padding: 10px 20px;
-                font-size: 16px;
+                font-size: var(--text-base);
             }
 
             .info {
-                font-size: 16px;
+                font-size: var(--text-base);
             }
         }
 
@@ -219,14 +219,14 @@
 
         .game-over-overlay h2 {
             color: #00ffff;
-            font-size: 32px;
+            font-size: var(--text-3xl);
             margin-bottom: 20px;
             text-shadow: 0 0 20px rgba(0,255,255,0.5);
         }
 
         .game-over-overlay button {
             padding: 14px 36px;
-            font-size: 18px;
+            font-size: var(--text-lg);
             font-weight: bold;
             background: linear-gradient(135deg, #00d4ff 0%, #0095dd 100%);
             color: white;
@@ -242,11 +242,11 @@
 
             button {
                 padding: 8px 16px;
-                font-size: 14px;
+                font-size: var(--text-sm);
             }
 
             .info {
-                font-size: 14px;
+                font-size: var(--text-sm);
                 padding: 10px;
             }
         }
@@ -263,6 +263,50 @@
         .rose-btn img { width: 100%; height: auto; }
         .rose-btn:hover { transform: scale(1.1); }
         .rose-btn.visible { display: block; }
+
+        /* ── Accessibility: light theme ── */
+        body.theme-light {
+            background: linear-gradient(135deg, #e8e8e3 0%, #f0f0eb 100%);
+            color: #1a1a2e;
+        }
+        body.theme-light canvas {
+            border-color: #0088aa;
+            background: linear-gradient(180deg, #dde8f0 0%, #c8d8e8 100%);
+            box-shadow: 0 0 15px rgba(0, 136, 170, 0.3), inset 0 0 30px rgba(0, 136, 170, 0.05);
+        }
+        body.theme-light button {
+            background: linear-gradient(135deg, #00b4d8 0%, #0095bb 100%);
+            border-color: #0088aa;
+            box-shadow: 0 0 8px rgba(0, 136, 170, 0.3);
+            text-shadow: none;
+        }
+        body.theme-light .info {
+            background: rgba(255, 255, 255, 0.92);
+            color: #0077aa;
+            border-color: #0088aa;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            text-shadow: none;
+        }
+        body.theme-light .game-over-overlay {
+            background: rgba(255, 255, 255, 0.92);
+        }
+        body.theme-light .game-over-overlay h2 {
+            color: #0077aa;
+            text-shadow: none;
+        }
+
+        /* ── Accessibility: high contrast ── */
+        .high-contrast canvas {
+            border-width: 4px;
+        }
+        .high-contrast .info {
+            border-width: 3px;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
+        }
+        .high-contrast button {
+            border-width: 3px;
+        }
     </style>
 </head>
 <body data-section="Вступ" data-game-title="Block buster" data-home-url="../../index.html">
@@ -275,7 +319,7 @@
                     <button id="stopButton">Стоп</button>
                 </div>
                 <img id="winImage" class="win-image" src="../../assets/images/cngrt.png" alt="Зображення перемоги">
-                <a id="homeBtn" href="../../index.html" style="display:none;margin-top:15px;padding:12px 30px;font-size:18px;background:linear-gradient(135deg,#00d4ff,#0095dd);color:white;border:2px solid #00ffff;border-radius:8px;text-decoration:none;font-weight:bold;box-shadow:0 0 10px rgba(0,255,255,0.5);transition:all 0.3s;">На головну</a>
+                <a id="homeBtn" href="../../index.html" style="display:none;margin-top:15px;padding:12px 30px;font-size:var(--text-lg);background:linear-gradient(135deg,#00d4ff,#0095dd);color:white;border:2px solid #00ffff;border-radius:8px;text-decoration:none;font-weight:bold;box-shadow:0 0 10px rgba(0,255,255,0.5);transition:all 0.3s;">На головну</a>
             </div>
             <button class="rose-btn" id="roseBtn" style="position:fixed;left:10px;top:50%;transform:translateY(-50%);width:60px;z-index:50;"><img src="../../assets/images/rose.png" alt="Троянда"></button>
             
