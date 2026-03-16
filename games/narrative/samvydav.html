@@ -1,0 +1,1529 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Самвидав — підпільна преса</title>
+  <link rel="stylesheet" href="../../shared/css/reset.css">
+  <link rel="stylesheet" href="../../shared/css/theme.css">
+  <link rel="stylesheet" href="../../shared/css/components.css">
+  <link rel="stylesheet" href="../../shared/css/animations.css">
+  <style>
+    :root {
+      --game-accent: #4a7c59;
+      --samv-green: #4a7c59;
+      --samv-green-light: #6aaa7a;
+      --samv-brown: #8b6914;
+      --samv-paper: #c8b87a;
+      --samv-ink: #1a2a1a;
+      --samv-danger: #b33a3a;
+      --samv-warn: #c17f24;
+      --samv-safe: #3a7a3a;
+    }
+
+    /* ── Base ── */
+    body {
+      background: linear-gradient(160deg, #0d160d 0%, #1a2318 50%, #131a0f 100%);
+      min-height: 100vh;
+      font-family: var(--font-body);
+    }
+
+    /* ── Light theme overrides ── */
+    body.theme-light {
+      background: linear-gradient(160deg, #e8e0cc 0%, #f0e8d0 50%, #e4dcbf 100%);
+      --color-text-primary: #2a1a0a;
+      --color-text-secondary: #5a4030;
+      --color-text-muted: #8a7060;
+      --glass-bg: rgba(0, 0, 0, 0.05);
+      --glass-border: rgba(0, 0, 0, 0.15);
+    }
+
+    body.theme-light .samv-wrap {
+      background: transparent;
+    }
+
+    body.theme-light .suspicion-bar-fill {
+      filter: none;
+    }
+
+    body.theme-light .log-entry {
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.12);
+    }
+
+    body.theme-light .doc-btn,
+    body.theme-light .contact-btn {
+      background: rgba(0, 0, 0, 0.04);
+      border-color: rgba(0, 0, 0, 0.12);
+    }
+
+    body.theme-light .doc-btn:hover,
+    body.theme-light .contact-btn:hover {
+      background: rgba(74, 124, 89, 0.12);
+    }
+
+    body.theme-light .action-card {
+      background: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0, 0, 0, 0.12);
+    }
+
+    /* ── High contrast ── */
+    .high-contrast .doc-btn,
+    .high-contrast .contact-btn,
+    .high-contrast .action-card,
+    .high-contrast .game-panel,
+    .high-contrast .suspicion-bar-wrap {
+      border-width: 2px !important;
+      backdrop-filter: none !important;
+    }
+
+    /* ── Screen overlay ── */
+    .screen-overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: var(--z-overlay);
+      padding: var(--space-md);
+    }
+
+    .screen-overlay.hidden {
+      display: none;
+    }
+
+    .screen-card {
+      background: linear-gradient(135deg, #1a2318 0%, #0d160d 100%);
+      border: 1px solid rgba(74, 124, 89, 0.4);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl);
+      max-width: 640px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 16px 64px rgba(0, 0, 0, 0.6), 0 0 40px rgba(74, 124, 89, 0.1);
+    }
+
+    body.theme-light .screen-card {
+      background: linear-gradient(135deg, #f0e8d0 0%, #e4dcbf 100%);
+      border-color: rgba(74, 124, 89, 0.5);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    }
+
+    .screen-card h2 {
+      font-size: var(--text-3xl);
+      font-weight: 700;
+      color: var(--samv-green-light);
+      margin-bottom: var(--space-lg);
+      letter-spacing: 0.03em;
+    }
+
+    body.theme-light .screen-card h2 {
+      color: var(--samv-green);
+    }
+
+    .screen-card .subtitle {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-md);
+      font-style: italic;
+    }
+
+    .screen-card p {
+      color: var(--color-text-secondary);
+      line-height: 1.75;
+      margin-bottom: var(--space-md);
+      font-size: var(--text-base);
+    }
+
+    .screen-card strong {
+      color: var(--samv-green-light);
+    }
+
+    body.theme-light .screen-card strong {
+      color: var(--samv-green);
+    }
+
+    .intro-rule {
+      border: none;
+      border-top: 1px solid rgba(74, 124, 89, 0.3);
+      margin: var(--space-lg) 0;
+    }
+
+    /* ── Action pills on intro ── */
+    .action-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+    }
+
+    .action-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      padding: var(--space-xs) var(--space-md);
+      border-radius: var(--radius-full);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      border: 1px solid;
+    }
+
+    .pill-print  { background: rgba(74, 124, 89, 0.2); border-color: var(--samv-green); color: var(--samv-green-light); }
+    .pill-dist   { background: rgba(139, 105, 20, 0.2); border-color: var(--samv-brown); color: var(--samv-paper); }
+    .pill-hide   { background: rgba(58, 122, 58, 0.15); border-color: #3a7a3a; color: #7aba7a; }
+
+    body.theme-light .pill-print  { color: #2a6a3a; }
+    body.theme-light .pill-dist   { color: #6a4a0a; }
+    body.theme-light .pill-hide   { color: #1a5a1a; }
+
+    /* ── Game wrapper ── */
+    .samv-wrap {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: var(--space-md);
+      gap: var(--space-md);
+    }
+
+    /* ── Header ── */
+    .game-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      padding: var(--space-md) var(--space-lg);
+      background: rgba(10, 20, 10, 0.7);
+      border: 1px solid rgba(74, 124, 89, 0.25);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(var(--glass-blur));
+    }
+
+    body.theme-light .game-header {
+      background: rgba(255, 255, 255, 0.6);
+      border-color: rgba(74, 124, 89, 0.35);
+    }
+
+    .game-header h1 {
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      color: var(--samv-green-light);
+      letter-spacing: 0.04em;
+    }
+
+    body.theme-light .game-header h1 {
+      color: var(--samv-green);
+    }
+
+    .header-stats {
+      display: flex;
+      gap: var(--space-xl);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .header-stat {
+      text-align: center;
+    }
+
+    .header-stat-label {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .header-stat-value {
+      font-size: var(--text-xl);
+      font-weight: 700;
+      color: var(--samv-green-light);
+    }
+
+    body.theme-light .header-stat-value {
+      color: var(--samv-green);
+    }
+
+    /* ── Suspicion bar ── */
+    .suspicion-wrap {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+
+    .suspicion-label {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .suspicion-bar-wrap {
+      width: 160px;
+      height: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-full);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      overflow: hidden;
+    }
+
+    body.theme-light .suspicion-bar-wrap {
+      background: rgba(0, 0, 0, 0.08);
+      border-color: rgba(0, 0, 0, 0.15);
+    }
+
+    .suspicion-bar-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      transition: width var(--transition-base), background-color var(--transition-base);
+      background: var(--samv-safe);
+    }
+
+    .suspicion-bar-fill.level-medium { background: #c8a020; }
+    .suspicion-bar-fill.level-high   { background: var(--samv-warn); }
+    .suspicion-bar-fill.level-danger { background: var(--samv-danger); }
+
+    .suspicion-pct {
+      font-size: var(--text-xs);
+      font-weight: 600;
+      color: var(--samv-safe);
+      white-space: nowrap;
+      min-width: 36px;
+    }
+
+    .suspicion-pct.level-medium { color: #c8a020; }
+    .suspicion-pct.level-high   { color: var(--samv-warn); }
+    .suspicion-pct.level-danger { color: var(--samv-danger); }
+
+    /* ── Main layout ── */
+    .game-layout {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr 0.9fr;
+      gap: var(--space-md);
+      flex: 1;
+    }
+
+    /* ── Panels ── */
+    .game-panel {
+      background: rgba(10, 20, 10, 0.55);
+      border: 1px solid rgba(74, 124, 89, 0.2);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      backdrop-filter: blur(var(--glass-blur));
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      min-height: 400px;
+    }
+
+    body.theme-light .game-panel {
+      background: rgba(255, 255, 255, 0.5);
+      border-color: rgba(74, 124, 89, 0.25);
+    }
+
+    .panel-title {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--samv-green-light);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: var(--space-xs);
+      padding-bottom: var(--space-xs);
+      border-bottom: 1px solid rgba(74, 124, 89, 0.2);
+    }
+
+    body.theme-light .panel-title {
+      color: var(--samv-green);
+    }
+
+    /* ── Document buttons ── */
+    .doc-btn {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      padding: var(--space-sm) var(--space-md);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(74, 124, 89, 0.18);
+      border-radius: var(--radius-md);
+      color: var(--color-text-primary);
+      font-size: var(--text-sm);
+      text-align: left;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      gap: 2px;
+    }
+
+    .doc-btn:hover:not(:disabled) {
+      background: rgba(74, 124, 89, 0.15);
+      border-color: var(--samv-green);
+    }
+
+    .doc-btn:disabled {
+      opacity: 0.4;
+      cursor: default;
+    }
+
+    .doc-btn.distributed {
+      border-color: var(--samv-green);
+      background: rgba(74, 124, 89, 0.12);
+    }
+
+    .doc-btn-title {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--color-text-primary);
+    }
+
+    .doc-btn-meta {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+    }
+
+    .doc-badge {
+      display: inline-block;
+      font-size: var(--text-xs);
+      padding: 1px 6px;
+      border-radius: var(--radius-full);
+      background: rgba(74, 124, 89, 0.25);
+      color: var(--samv-green-light);
+      border: 1px solid rgba(74, 124, 89, 0.4);
+      margin-left: var(--space-xs);
+    }
+
+    body.theme-light .doc-badge {
+      color: var(--samv-green);
+    }
+
+    /* ── Action cards ── */
+    .action-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(74, 124, 89, 0.15);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+    }
+
+    .action-card-title {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--samv-green-light);
+      margin-bottom: var(--space-sm);
+    }
+
+    body.theme-light .action-card-title {
+      color: var(--samv-green);
+    }
+
+    /* ── Contact buttons ── */
+    .contact-btn {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: var(--space-sm) var(--space-md);
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(74, 124, 89, 0.18);
+      border-radius: var(--radius-md);
+      color: var(--color-text-primary);
+      font-size: var(--text-sm);
+      text-align: left;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      margin-bottom: var(--space-xs);
+      min-height: 44px;
+    }
+
+    .contact-btn:hover:not(:disabled) {
+      background: rgba(139, 105, 20, 0.15);
+      border-color: var(--samv-brown);
+    }
+
+    .contact-btn:disabled {
+      opacity: 0.35;
+      cursor: default;
+    }
+
+    .contact-risk {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: var(--radius-full);
+      white-space: nowrap;
+    }
+
+    .risk-low    { background: rgba(58, 122, 58, 0.25); color: #7aba7a; border: 1px solid #3a7a3a; }
+    .risk-medium { background: rgba(200, 160, 32, 0.25); color: #e0c040; border: 1px solid #c8a020; }
+    .risk-high   { background: rgba(193, 127, 36, 0.25); color: #e09040; border: 1px solid #c17f24; }
+    .risk-danger { background: rgba(179, 58, 58, 0.25); color: #e07070; border: 1px solid #b33a3a; }
+
+    /* ── Action buttons (Print/Distribute/Hide) ── */
+    .action-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+      margin-top: var(--space-sm);
+    }
+
+    .btn-print {
+      background: rgba(74, 124, 89, 0.2);
+      border: 1px solid var(--samv-green);
+      color: var(--samv-green-light);
+    }
+
+    .btn-print:hover:not(:disabled) {
+      background: rgba(74, 124, 89, 0.35);
+    }
+
+    .btn-distribute {
+      background: rgba(139, 105, 20, 0.2);
+      border: 1px solid var(--samv-brown);
+      color: var(--samv-paper);
+    }
+
+    .btn-distribute:hover:not(:disabled) {
+      background: rgba(139, 105, 20, 0.35);
+    }
+
+    .btn-hide {
+      background: rgba(30, 60, 30, 0.4);
+      border: 1px solid #3a5a3a;
+      color: #7aba7a;
+    }
+
+    .btn-hide:hover:not(:disabled) {
+      background: rgba(30, 60, 30, 0.6);
+    }
+
+    body.theme-light .btn-print  { color: #2a6a3a; }
+    body.theme-light .btn-distribute { color: #6a4a0a; }
+    body.theme-light .btn-hide   { color: #1a5a1a; }
+
+    /* ── Turn indicator ── */
+    .turn-indicator {
+      text-align: center;
+      padding: var(--space-sm);
+      background: rgba(74, 124, 89, 0.1);
+      border: 1px solid rgba(74, 124, 89, 0.2);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+    }
+
+    .turn-night {
+      font-weight: 700;
+      color: var(--samv-green-light);
+      font-size: var(--text-base);
+    }
+
+    body.theme-light .turn-night { color: var(--samv-green); }
+
+    /* ── Selected item display ── */
+    .selected-display {
+      padding: var(--space-sm) var(--space-md);
+      background: rgba(74, 124, 89, 0.08);
+      border: 1px dashed rgba(74, 124, 89, 0.3);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+    }
+
+    /* ── Log panel ── */
+    .log-list {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+      max-height: 340px;
+    }
+
+    .log-entry {
+      padding: var(--space-xs) var(--space-sm);
+      background: rgba(255, 255, 255, 0.03);
+      border-left: 3px solid rgba(74, 124, 89, 0.3);
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      font-size: var(--text-xs);
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+    }
+
+    .log-entry.log-print   { border-left-color: var(--samv-green); }
+    .log-entry.log-dist    { border-left-color: var(--samv-brown); }
+    .log-entry.log-hide    { border-left-color: #3a7a3a; }
+    .log-entry.log-warn    { border-left-color: var(--samv-danger); }
+    .log-entry.log-success { border-left-color: var(--samv-green-light); }
+
+    .log-night {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: var(--space-xs) 0;
+    }
+
+    /* ── End screen specifics ── */
+    .end-verdict {
+      font-size: var(--text-4xl);
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: var(--space-lg);
+    }
+
+    .end-verdict.win  { color: var(--samv-green-light); }
+    .end-verdict.lose { color: var(--samv-danger); }
+
+    body.theme-light .end-verdict.win { color: var(--samv-green); }
+
+    .end-stats {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-xl);
+      margin: var(--space-lg) 0;
+      flex-wrap: wrap;
+    }
+
+    .end-stat {
+      text-align: center;
+    }
+
+    .end-stat-value {
+      font-size: var(--text-3xl);
+      font-weight: 700;
+      color: var(--samv-green-light);
+    }
+
+    body.theme-light .end-stat-value { color: var(--samv-green); }
+
+    .end-stat-label {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+    }
+
+    .docs-summary {
+      margin-top: var(--space-lg);
+    }
+
+    .docs-summary h3 {
+      font-size: var(--text-lg);
+      color: var(--samv-green-light);
+      margin-bottom: var(--space-md);
+    }
+
+    body.theme-light .docs-summary h3 { color: var(--samv-green); }
+
+    .doc-fact {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(74, 124, 89, 0.18);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      margin-bottom: var(--space-sm);
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+
+    body.theme-light .doc-fact {
+      background: rgba(0, 0, 0, 0.03);
+    }
+
+    .doc-fact strong {
+      color: var(--samv-green-light);
+      display: block;
+      margin-bottom: var(--space-xs);
+    }
+
+    body.theme-light .doc-fact strong { color: var(--samv-green); }
+
+    .doc-fact .doc-year {
+      color: var(--samv-paper);
+      font-size: var(--text-xs);
+      margin-bottom: var(--space-xs);
+    }
+
+    body.theme-light .doc-fact .doc-year { color: var(--samv-brown); }
+
+    /* ── Typewriter effect ── */
+    @keyframes blink-cursor {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .cursor-blink::after {
+      content: '_';
+      animation: blink-cursor 1s step-end infinite;
+      color: var(--samv-green-light);
+    }
+
+    /* ── Modal overlay for doc/contact info ── */
+    .info-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: var(--z-modal);
+      padding: var(--space-md);
+    }
+
+    .info-modal.hidden { display: none; }
+
+    .info-modal-card {
+      background: #1a2318;
+      border: 1px solid rgba(74, 124, 89, 0.5);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5);
+    }
+
+    body.theme-light .info-modal-card {
+      background: #f0e8d0;
+      border-color: rgba(74, 124, 89, 0.5);
+    }
+
+    .info-modal-card h3 {
+      font-size: var(--text-lg);
+      color: var(--samv-green-light);
+      margin-bottom: var(--space-sm);
+    }
+
+    body.theme-light .info-modal-card h3 { color: var(--samv-green); }
+
+    .info-modal-card p {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      line-height: 1.7;
+    }
+
+    .info-modal-card .info-year {
+      font-size: var(--text-xs);
+      color: var(--samv-paper);
+      margin-bottom: var(--space-sm);
+    }
+
+    body.theme-light .info-modal-card .info-year { color: var(--samv-brown); }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .game-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .game-panel {
+        min-height: auto;
+      }
+
+      .log-list {
+        max-height: 200px;
+      }
+
+      .suspicion-bar-wrap {
+        width: 100px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .samv-wrap {
+        padding: var(--space-sm);
+      }
+
+      .game-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .header-stats {
+        gap: var(--space-md);
+      }
+
+      .end-stats {
+        gap: var(--space-md);
+      }
+
+      .screen-card {
+        padding: var(--space-lg);
+      }
+    }
+  </style>
+</head>
+<body data-section="Радянський період" data-game-title="Самвидав" data-home-url="../../index.html" data-nav="overlay">
+
+  <!-- ── Intro screen ── -->
+  <div id="introScreen" class="screen-overlay">
+    <div class="screen-card">
+      <h2>Самвидав</h2>
+      <p class="subtitle">Київ, 1965–1973 рр. Епоха шістдесятників та перших репресій.</p>
+
+      <p>Ви — підпільний активіст. Ваше завдання: <strong>надрукувати та розповсюдити заборонені тексти</strong> — поезію, правозахисні збірки, журнали — перш ніж КДБ вас знайде.</p>
+
+      <p>Кожна ніч — один хід. За ніч можна виконати одну дію:</p>
+
+      <div class="action-pills">
+        <span class="action-pill pill-print">&#128221; Друкувати</span>
+        <span class="action-pill pill-dist">&#128467; Розповсюдити</span>
+        <span class="action-pill pill-hide">&#128065; Ховатися</span>
+      </div>
+
+      <hr class="intro-rule">
+
+      <p><strong>Друкувати</strong> — виберіть документ і надрукуйте його на машинці. Підвищує підозрілість на 5–10 пунктів.</p>
+      <p><strong>Розповсюдити</strong> — передайте надрукований текст контакту. Підозрілість зростає залежно від ризику контакту. Документ має бути надруковано заздалегідь!</p>
+      <p><strong>Ховатися</strong> — не виходьте з дому, дайте КДБ охолонути. Знижує підозрілість на 15 пунктів.</p>
+
+      <hr class="intro-rule">
+
+      <p>Якщо <strong>підозрілість сягне 100</strong> — арешт. Розповсюдьте всі <strong>6 документів</strong>, щоб перемогти. Натискайте на документи та контакти, щоб дізнатися більше.</p>
+
+      <button class="btn btn-accent btn-lg" id="startBtn" style="margin-top: var(--space-md);">Розпочати підпільну роботу</button>
+    </div>
+  </div>
+
+  <!-- ── Arrest screen ── -->
+  <div id="arrestScreen" class="screen-overlay hidden">
+    <div class="screen-card">
+      <div class="end-verdict lose">Арешт!</div>
+      <p style="text-align:center; color: var(--color-text-secondary); margin-bottom: var(--space-lg);">КДБ вас знайшов. Підозрілість сягнула критичного рівня.</p>
+
+      <div class="end-stats">
+        <div class="end-stat">
+          <div class="end-stat-value" id="arrestDocsCount">0</div>
+          <div class="end-stat-label">Документів розповсюджено</div>
+        </div>
+        <div class="end-stat">
+          <div class="end-stat-value" id="arrestNights">0</div>
+          <div class="end-stat-label">Ночей у підпіллі</div>
+        </div>
+        <div class="end-stat">
+          <div class="end-stat-value" id="arrestContacts">0</div>
+          <div class="end-stat-label">Унікальних контактів</div>
+        </div>
+      </div>
+
+      <div class="docs-summary" id="arrestDocsSummary"></div>
+
+      <div style="display:flex; gap: var(--space-md); flex-wrap:wrap; margin-top: var(--space-lg);">
+        <button class="btn btn-accent" id="arrestRestartBtn">Спробувати знову</button>
+        <a href="../../index.html" class="btn btn-secondary">На головну</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Win screen ── -->
+  <div id="winScreen" class="screen-overlay hidden">
+    <div class="screen-card">
+      <div class="end-verdict win">Свобода слова!</div>
+      <p style="text-align:center; color: var(--color-text-secondary); margin-bottom: var(--space-lg);">Усі 6 документів розповсюджено. Самвидав живе!</p>
+
+      <div class="end-stats">
+        <div class="end-stat">
+          <div class="end-stat-value" id="winNights">0</div>
+          <div class="end-stat-label">Ночей</div>
+        </div>
+        <div class="end-stat">
+          <div class="end-stat-value" id="winContacts">0</div>
+          <div class="end-stat-label">Контактів охоплено</div>
+        </div>
+        <div class="end-stat">
+          <div class="end-stat-value" id="winSuspicion">0</div>
+          <div class="end-stat-label">Підозрілість наприкінці</div>
+        </div>
+      </div>
+
+      <div class="docs-summary" id="winDocsSummary"></div>
+
+      <div style="display:flex; gap: var(--space-md); flex-wrap:wrap; margin-top: var(--space-lg);">
+        <button class="btn btn-accent" id="winRestartBtn">Грати ще раз</button>
+        <a href="../../index.html" class="btn btn-secondary">На головну</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Info modal ── -->
+  <div id="infoModal" class="info-modal hidden" role="dialog" aria-modal="true">
+    <div class="info-modal-card">
+      <h3 id="infoModalTitle"></h3>
+      <div class="info-year" id="infoModalYear"></div>
+      <p id="infoModalText"></p>
+      <button class="btn btn-secondary btn-sm" id="infoModalClose" style="margin-top: var(--space-md);">Закрити</button>
+    </div>
+  </div>
+
+  <!-- ── Game UI ── -->
+  <div class="samv-wrap" id="gameUI" style="display:none;">
+
+    <!-- Header -->
+    <div class="game-header">
+      <h1 class="cursor-blink">Самвидав</h1>
+      <div class="header-stats">
+        <div class="header-stat">
+          <span class="header-stat-label">Ніч</span>
+          <span class="header-stat-value" id="nightDisplay">1</span>
+        </div>
+        <div class="header-stat">
+          <span class="header-stat-label">Розповсюджено</span>
+          <span class="header-stat-value" id="distDisplay">0/6</span>
+        </div>
+        <div class="suspicion-wrap">
+          <span class="suspicion-label">КДБ</span>
+          <div class="suspicion-bar-wrap" aria-label="Рівень підозрілості">
+            <div class="suspicion-bar-fill" id="suspicionBar" style="width:0%;" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+          </div>
+          <span class="suspicion-pct" id="suspicionPct">0%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main layout -->
+    <div class="game-layout">
+
+      <!-- Left: Documents library -->
+      <div class="game-panel" id="docsPanel">
+        <div class="panel-title">&#128221; Бібліотека самвидаву</div>
+        <div id="docsList"></div>
+      </div>
+
+      <!-- Center: Action console -->
+      <div class="game-panel" id="actionPanel">
+        <div class="panel-title">&#9997; Консоль дій</div>
+
+        <div class="turn-indicator">
+          Ніч <span class="turn-night" id="actionNight">1</span> — оберіть одну дію
+        </div>
+
+        <!-- Print action -->
+        <div class="action-card">
+          <div class="action-card-title">&#128221; Друкувати документ</div>
+          <div class="selected-display" id="selectedDocDisplay">Жодного документа не обрано</div>
+          <div class="action-row">
+            <button class="btn btn-sm btn-print" id="printBtn" disabled>Друкувати (+5–10 КДБ)</button>
+          </div>
+        </div>
+
+        <!-- Distribute action -->
+        <div class="action-card">
+          <div class="action-card-title">&#128467; Розповсюдити через контакт</div>
+          <div id="contactsList"></div>
+          <div class="selected-display" id="selectedContactDisplay" style="margin-top: var(--space-xs);">Жодного контакту не обрано</div>
+          <div class="action-row">
+            <button class="btn btn-sm btn-distribute" id="distBtn" disabled>Розповсюдити</button>
+          </div>
+        </div>
+
+        <!-- Hide action -->
+        <div class="action-card">
+          <div class="action-card-title">&#128065; Ховатися вдома</div>
+          <p style="font-size: var(--text-xs); color: var(--color-text-muted); margin-bottom: var(--space-sm);">Не виходьте з дому цієї ночі. Підозрілість знизиться на 15.</p>
+          <div class="action-row">
+            <button class="btn btn-sm btn-hide" id="hideBtn">Ховатися (–15 КДБ)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Activity log -->
+      <div class="game-panel" id="logPanel">
+        <div class="panel-title">&#128196; Хроніка подій</div>
+        <div class="log-list" id="logList" aria-live="polite" aria-label="Хроніка подій"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      'use strict';
+
+      /* ── Inline fallback data (mirrors samvydav-data.json) ── */
+      var FALLBACK_DATA = {
+        documents: [
+          { id: 'stus-palimpsesty', title: '«Палімпсести» Василя Стуса', author: 'Василь Стус', year: 1971, detail: 'Збірка віршів, написаних у таборах. Стус — один із найвидатніших українських поетів ХХ ст., загинув у таборі Кучино в 1985 р.' },
+          { id: 'chornovil-lykho', title: '«Лихо з розуму» В\'ячеслава Чорновола', author: 'В\'ячеслав Чорновіл', year: 1967, detail: 'Збірка документів про порушення законності при арештах інтелігенції. Чорновіл став одним із лідерів правозахисного руху.' },
+          { id: 'dziuba-internatsionalizm', title: '«Інтернаціоналізм чи русифікація?» Івана Дзюби', author: 'Іван Дзюба', year: 1965, detail: 'Фундаментальне дослідження русифікації в Україні. Адресовано керівництву КПУ, розповсюджувалося самвидавом.' },
+          { id: 'ukrainskyi-visnyk', title: '«Український вісник» (підпільний журнал)', author: 'Редколегія', year: 1970, detail: 'Самвидавний журнал, заснований Чорноволом. Публікував матеріали про порушення прав людини, українську культуру.' },
+          { id: 'symonenko-bereh', title: '«Берег чекань» Василя Симоненка', author: 'Василь Симоненко', year: 1965, detail: 'Поетична збірка, видана посмертно. Симоненко помер у 28 років. Його рядок «Україно, ти моя молитва» став крилатим.' },
+          { id: 'svitlychny-hratka', title: 'Вірші Івана Світличного', author: 'Іван Світличний', year: 1973, detail: 'Літературознавець, поет, неформальний лідер шістдесятників. Засуджений до 7 років таборів за «антирадянську агітацію».' }
+        ],
+        contacts: [
+          { id: 'student', name: 'Олег (студент КДУ)', risk: 15, detail: 'Студенти університету — основна аудиторія самвидаву. Ризик середній: куратори факультетів стежать.' },
+          { id: 'worker', name: 'Ганна (працівниця заводу)', risk: 10, detail: 'Робітники менш контрольовані, але менш зацікавлені. Низький ризик, низька ефективність розповсюдження.' },
+          { id: 'intellectual', name: 'Професор Іваненко', risk: 20, detail: 'Інтелігенція — під постійним наглядом КДБ. Високий ризик, але найефективніше розповсюдження.' },
+          { id: 'clergy', name: 'Отець Андрій (УГКЦ)', risk: 25, detail: 'Греко-католицька церква заборонена з 1946 р. Контакт із підпільним священиком — найнебезпечніший, але церква має мережу довіри.' },
+          { id: 'journalist', name: 'Маркус (кореспондент Reuters)', risk: 30, detail: 'Іноземні журналісти можуть передати інформацію на Захід. Найвищий ризик (КДБ стежить за всіма іноземцями), але максимальний ефект.' }
+        ]
+      };
+
+      /* ── State ── */
+      var data = null;
+      var state = {
+        night: 1,
+        suspicion: 0,
+        printed: {},       // docId → true if printed (not yet distributed)
+        distributed: {},   // docId → contactId
+        contactsReached: {},
+        selectedDocId: null,
+        selectedContactId: null,
+        log: [],
+        gameOver: false
+      };
+
+      /* ── DOM refs ── */
+      var els = {
+        introScreen: document.getElementById('introScreen'),
+        arrestScreen: document.getElementById('arrestScreen'),
+        winScreen: document.getElementById('winScreen'),
+        gameUI: document.getElementById('gameUI'),
+        startBtn: document.getElementById('startBtn'),
+        arrestRestartBtn: document.getElementById('arrestRestartBtn'),
+        winRestartBtn: document.getElementById('winRestartBtn'),
+        nightDisplay: document.getElementById('nightDisplay'),
+        actionNight: document.getElementById('actionNight'),
+        distDisplay: document.getElementById('distDisplay'),
+        suspicionBar: document.getElementById('suspicionBar'),
+        suspicionPct: document.getElementById('suspicionPct'),
+        docsList: document.getElementById('docsList'),
+        selectedDocDisplay: document.getElementById('selectedDocDisplay'),
+        contactsList: document.getElementById('contactsList'),
+        selectedContactDisplay: document.getElementById('selectedContactDisplay'),
+        printBtn: document.getElementById('printBtn'),
+        distBtn: document.getElementById('distBtn'),
+        hideBtn: document.getElementById('hideBtn'),
+        logList: document.getElementById('logList'),
+        arrestDocsCount: document.getElementById('arrestDocsCount'),
+        arrestNights: document.getElementById('arrestNights'),
+        arrestContacts: document.getElementById('arrestContacts'),
+        arrestDocsSummary: document.getElementById('arrestDocsSummary'),
+        winNights: document.getElementById('winNights'),
+        winContacts: document.getElementById('winContacts'),
+        winSuspicion: document.getElementById('winSuspicion'),
+        winDocsSummary: document.getElementById('winDocsSummary'),
+        infoModal: document.getElementById('infoModal'),
+        infoModalTitle: document.getElementById('infoModalTitle'),
+        infoModalYear: document.getElementById('infoModalYear'),
+        infoModalText: document.getElementById('infoModalText'),
+        infoModalClose: document.getElementById('infoModalClose')
+      };
+
+      /* ── Helpers ── */
+      function esc(str) {
+        var d = document.createElement('div');
+        d.appendChild(document.createTextNode(str));
+        return d.innerHTML;
+      }
+
+      function countDistributed() {
+        return Object.keys(state.distributed).length;
+      }
+
+      function countContactsReached() {
+        return Object.keys(state.contactsReached).length;
+      }
+
+      function getDoc(id) {
+        for (var i = 0; i < data.documents.length; i++) {
+          if (data.documents[i].id === id) return data.documents[i];
+        }
+        return null;
+      }
+
+      function getContact(id) {
+        for (var i = 0; i < data.contacts.length; i++) {
+          if (data.contacts[i].id === id) return data.contacts[i];
+        }
+        return null;
+      }
+
+      function riskClass(risk) {
+        if (risk <= 10)  return 'risk-low';
+        if (risk <= 15)  return 'risk-medium';
+        if (risk <= 25)  return 'risk-high';
+        return 'risk-danger';
+      }
+
+      /* ── Suspicion bar update ── */
+      function updateSuspicionBar() {
+        var pct = Math.min(100, state.suspicion);
+        els.suspicionBar.style.width = pct + '%';
+        els.suspicionBar.setAttribute('aria-valuenow', pct);
+
+        var level;
+        if (pct <= 30)       level = '';
+        else if (pct <= 60)  level = 'level-medium';
+        else if (pct <= 80)  level = 'level-high';
+        else                 level = 'level-danger';
+
+        els.suspicionBar.className = 'suspicion-bar-fill' + (level ? ' ' + level : '');
+        els.suspicionPct.className = 'suspicion-pct' + (level ? ' ' + level : '');
+        els.suspicionPct.textContent = pct + '%';
+      }
+
+      /* ── Update header stats ── */
+      function updateStats() {
+        els.nightDisplay.textContent = state.night;
+        els.actionNight.textContent = state.night;
+        els.distDisplay.textContent = countDistributed() + '/6';
+        updateSuspicionBar();
+      }
+
+      /* ── Add log entry ── */
+      function addLog(text, type) {
+        var entry = document.createElement('div');
+        entry.className = 'log-entry' + (type ? ' log-' + type : '');
+        entry.textContent = text;
+        els.logList.insertBefore(entry, els.logList.firstChild);
+        state.log.push({ night: state.night, text: text, type: type });
+      }
+
+      function addNightSeparator() {
+        var sep = document.createElement('div');
+        sep.className = 'log-night';
+        sep.textContent = '— Ніч ' + state.night + ' —';
+        els.logList.insertBefore(sep, els.logList.firstChild);
+      }
+
+      /* ── Show info modal ── */
+      function showInfo(title, yearStr, detail) {
+        els.infoModalTitle.textContent = title;
+        els.infoModalYear.textContent = yearStr;
+        els.infoModalText.textContent = detail;
+        els.infoModal.classList.remove('hidden');
+        els.infoModalClose.focus();
+      }
+
+      /* ── Render document list ── */
+      function renderDocs() {
+        while (els.docsList.firstChild) els.docsList.removeChild(els.docsList.firstChild);
+
+        for (var i = 0; i < data.documents.length; i++) {
+          (function (doc) {
+            var btn = document.createElement('button');
+            btn.className = 'doc-btn';
+            btn.setAttribute('data-id', doc.id);
+            btn.style.marginBottom = 'var(--space-xs)';
+
+            var isDist = !!state.distributed[doc.id];
+            var isPrinted = !!state.printed[doc.id];
+            var isSelected = state.selectedDocId === doc.id;
+
+            if (isDist) {
+              btn.classList.add('distributed');
+              btn.disabled = true;
+            }
+
+            // Title row
+            var titleEl = document.createElement('div');
+            titleEl.className = 'doc-btn-title';
+            titleEl.textContent = doc.title;
+
+            if (isDist) {
+              var badge = document.createElement('span');
+              badge.className = 'doc-badge';
+              badge.textContent = 'Розповсюджено';
+              titleEl.appendChild(badge);
+            } else if (isPrinted) {
+              var badge2 = document.createElement('span');
+              badge2.className = 'doc-badge';
+              badge2.textContent = 'Надруковано';
+              badge2.style.background = 'rgba(139, 105, 20, 0.25)';
+              badge2.style.borderColor = 'rgba(139, 105, 20, 0.5)';
+              badge2.style.color = 'var(--samv-paper)';
+              titleEl.appendChild(badge2);
+            }
+
+            btn.appendChild(titleEl);
+
+            // Meta row
+            var metaEl = document.createElement('div');
+            metaEl.className = 'doc-btn-meta';
+            metaEl.textContent = doc.author + ', ' + doc.year;
+            btn.appendChild(metaEl);
+
+            // Selection highlight
+            if (isSelected && !isDist) {
+              btn.style.borderColor = 'var(--samv-green)';
+              btn.style.background = 'rgba(74, 124, 89, 0.2)';
+            }
+
+            // Click: select for printing OR show info if distributed
+            btn.addEventListener('click', function () {
+              if (isDist) {
+                showInfo(doc.title, doc.author + ', ' + doc.year + ' р.', doc.detail);
+                return;
+              }
+              // Toggle selection
+              if (state.selectedDocId === doc.id) {
+                state.selectedDocId = null;
+              } else {
+                state.selectedDocId = doc.id;
+              }
+              updateActionPanel();
+              renderDocs();
+            });
+
+            // Long-press / right-click → info
+            btn.addEventListener('contextmenu', function (e) {
+              e.preventDefault();
+              showInfo(doc.title, doc.author + ', ' + doc.year + ' р.', doc.detail);
+            });
+
+            els.docsList.appendChild(btn);
+          })(data.documents[i]);
+        }
+      }
+
+      /* ── Render contacts list ── */
+      function renderContacts() {
+        while (els.contactsList.firstChild) els.contactsList.removeChild(els.contactsList.firstChild);
+
+        for (var i = 0; i < data.contacts.length; i++) {
+          (function (contact) {
+            var btn = document.createElement('button');
+            btn.className = 'contact-btn';
+            btn.setAttribute('data-id', contact.id);
+
+            var isSelected = state.selectedContactId === contact.id;
+            if (isSelected) {
+              btn.style.borderColor = 'var(--samv-brown)';
+              btn.style.background = 'rgba(139, 105, 20, 0.2)';
+            }
+
+            var nameSpan = document.createElement('span');
+            nameSpan.textContent = contact.name;
+            btn.appendChild(nameSpan);
+
+            var riskSpan = document.createElement('span');
+            riskSpan.className = 'contact-risk ' + riskClass(contact.risk);
+            riskSpan.textContent = '+' + contact.risk + ' КДБ';
+            btn.appendChild(riskSpan);
+
+            btn.addEventListener('click', function () {
+              if (state.selectedContactId === contact.id) {
+                state.selectedContactId = null;
+              } else {
+                state.selectedContactId = contact.id;
+              }
+              updateActionPanel();
+              renderContacts();
+            });
+
+            btn.addEventListener('contextmenu', function (e) {
+              e.preventDefault();
+              showInfo(contact.name, 'Ризик: +' + contact.risk + ' до підозрілості', contact.detail);
+            });
+
+            els.contactsList.appendChild(btn);
+          })(data.contacts[i]);
+        }
+      }
+
+      /* ── Update action panel state ── */
+      function updateActionPanel() {
+        // Selected doc display
+        if (state.selectedDocId) {
+          var doc = getDoc(state.selectedDocId);
+          if (doc) {
+            els.selectedDocDisplay.textContent = doc.title;
+          }
+        } else {
+          els.selectedDocDisplay.textContent = 'Жодного документа не обрано';
+        }
+
+        // Selected contact display
+        if (state.selectedContactId) {
+          var contact = getContact(state.selectedContactId);
+          if (contact) {
+            els.selectedContactDisplay.textContent = contact.name + ' (+' + contact.risk + ' КДБ)';
+          }
+        } else {
+          els.selectedContactDisplay.textContent = 'Жодного контакту не обрано';
+        }
+
+        // Print button: enabled if doc selected AND not yet distributed
+        var canPrint = !!(state.selectedDocId && !state.distributed[state.selectedDocId]);
+        els.printBtn.disabled = !canPrint;
+
+        // Distribute button: enabled if doc selected + printed + contact selected
+        var canDist = !!(
+          state.selectedDocId &&
+          state.printed[state.selectedDocId] &&
+          !state.distributed[state.selectedDocId] &&
+          state.selectedContactId
+        );
+        els.distBtn.disabled = !canDist;
+      }
+
+      /* ── Action: Print ── */
+      function doActionPrint() {
+        if (!state.selectedDocId) return;
+        var doc = getDoc(state.selectedDocId);
+        if (!doc) return;
+        if (state.distributed[state.selectedDocId]) return;
+
+        var increase = 5 + Math.floor(Math.random() * 6); // 5–10
+        state.suspicion = Math.min(100, state.suspicion + increase);
+        state.printed[state.selectedDocId] = true;
+
+        addNightSeparator();
+        addLog('Надруковано: ' + doc.title + ' (+' + increase + ' КДБ)', 'print');
+
+        endTurn();
+      }
+
+      /* ── Action: Distribute ── */
+      function doActionDist() {
+        if (!state.selectedDocId || !state.selectedContactId) return;
+        var doc = getDoc(state.selectedDocId);
+        var contact = getContact(state.selectedContactId);
+        if (!doc || !contact) return;
+        if (!state.printed[state.selectedDocId]) return;
+        if (state.distributed[state.selectedDocId]) return;
+
+        state.suspicion = Math.min(100, state.suspicion + contact.risk);
+        state.distributed[state.selectedDocId] = state.selectedContactId;
+        state.contactsReached[state.selectedContactId] = true;
+
+        addNightSeparator();
+        addLog('Розповсюджено «' + doc.title + '» через ' + contact.name + ' (+' + contact.risk + ' КДБ)', 'dist');
+
+        // Clear selection
+        state.selectedDocId = null;
+        state.selectedContactId = null;
+
+        endTurn();
+      }
+
+      /* ── Action: Hide ── */
+      function doActionHide() {
+        var decrease = 15;
+        state.suspicion = Math.max(0, state.suspicion - decrease);
+
+        addNightSeparator();
+        addLog('Вночі залишалися вдома. Підозрілість знизилась (–' + decrease + ' КДБ)', 'hide');
+
+        endTurn();
+      }
+
+      /* ── End turn ── */
+      function endTurn() {
+        updateStats();
+
+        // Check arrest
+        if (state.suspicion >= 100) {
+          triggerArrest();
+          return;
+        }
+
+        // Check win
+        if (countDistributed() >= data.documents.length) {
+          triggerWin();
+          return;
+        }
+
+        state.night++;
+        updateActionPanel();
+        renderDocs();
+        renderContacts();
+      }
+
+      /* ── Trigger arrest ── */
+      function triggerArrest() {
+        state.gameOver = true;
+        if (window.HLGAnalytics) {
+          HLGAnalytics.endSession({ score: countDistributed(), won: false });
+        }
+
+        els.arrestDocsCount.textContent = countDistributed();
+        els.arrestNights.textContent = state.night;
+        els.arrestContacts.textContent = countContactsReached();
+        renderDocsSummary(els.arrestDocsSummary, false);
+
+        els.gameUI.style.display = 'none';
+        els.arrestScreen.classList.remove('hidden');
+      }
+
+      /* ── Trigger win ── */
+      function triggerWin() {
+        state.gameOver = true;
+        if (window.HLGAnalytics) {
+          HLGAnalytics.endSession({ score: countDistributed() + countContactsReached(), won: true });
+        }
+
+        els.winNights.textContent = state.night;
+        els.winContacts.textContent = countContactsReached();
+        els.winSuspicion.textContent = state.suspicion + '%';
+        renderDocsSummary(els.winDocsSummary, true);
+
+        els.gameUI.style.display = 'none';
+        els.winScreen.classList.remove('hidden');
+      }
+
+      /* ── Render educational docs summary ── */
+      function renderDocsSummary(container, showAll) {
+        while (container.firstChild) container.removeChild(container.firstChild);
+
+        var heading = document.createElement('h3');
+        heading.textContent = showAll
+          ? 'Документи самвидаву — що ви розповсюдили:'
+          : 'Документи самвидаву — що залишилося прочитати:';
+        container.appendChild(heading);
+
+        for (var i = 0; i < data.documents.length; i++) {
+          var doc = data.documents[i];
+          var wasDistributed = !!state.distributed[doc.id];
+
+          if (!showAll && wasDistributed) continue; // on lose screen skip already-done ones
+
+          var factDiv = document.createElement('div');
+          factDiv.className = 'doc-fact';
+
+          if (!showAll && !wasDistributed) {
+            factDiv.style.borderColor = 'rgba(179, 58, 58, 0.3)';
+          }
+
+          var titleEl = document.createElement('strong');
+          titleEl.textContent = doc.title;
+          factDiv.appendChild(titleEl);
+
+          var yearEl = document.createElement('div');
+          yearEl.className = 'doc-year';
+          yearEl.textContent = doc.author + ', ' + doc.year + ' р.';
+          factDiv.appendChild(yearEl);
+
+          var detailEl = document.createTextNode(doc.detail);
+          factDiv.appendChild(detailEl);
+
+          container.appendChild(factDiv);
+        }
+
+        // On arrest screen, show what WAS distributed too (briefly)
+        if (!showAll && countDistributed() > 0) {
+          var doneHeading = document.createElement('h3');
+          doneHeading.textContent = 'Вже розповсюджено:';
+          doneHeading.style.marginTop = 'var(--space-lg)';
+          container.appendChild(doneHeading);
+
+          for (var j = 0; j < data.documents.length; j++) {
+            var d = data.documents[j];
+            if (!state.distributed[d.id]) continue;
+
+            var df = document.createElement('div');
+            df.className = 'doc-fact';
+            df.style.borderColor = 'rgba(74, 124, 89, 0.35)';
+
+            var dt = document.createElement('strong');
+            dt.textContent = d.title;
+            df.appendChild(dt);
+
+            var dy = document.createElement('div');
+            dy.className = 'doc-year';
+            dy.textContent = d.author + ', ' + d.year + ' р.';
+            df.appendChild(dy);
+
+            df.appendChild(document.createTextNode(d.detail));
+            container.appendChild(df);
+          }
+        }
+      }
+
+      /* ── Start / restart game ── */
+      function startGame() {
+        state = {
+          night: 1,
+          suspicion: 0,
+          printed: {},
+          distributed: {},
+          contactsReached: {},
+          selectedDocId: null,
+          selectedContactId: null,
+          log: [],
+          gameOver: false
+        };
+
+        // Clear log
+        while (els.logList.firstChild) els.logList.removeChild(els.logList.firstChild);
+
+        els.introScreen.classList.add('hidden');
+        els.arrestScreen.classList.add('hidden');
+        els.winScreen.classList.add('hidden');
+        els.gameUI.style.display = 'flex';
+
+        if (window.HLGAnalytics) HLGAnalytics.startSession('samvydav');
+
+        updateStats();
+        renderDocs();
+        renderContacts();
+        updateActionPanel();
+      }
+
+      /* ── Event listeners ── */
+      els.startBtn.addEventListener('click', startGame);
+      els.arrestRestartBtn.addEventListener('click', startGame);
+      els.winRestartBtn.addEventListener('click', startGame);
+
+      els.printBtn.addEventListener('click', function () {
+        if (!els.printBtn.disabled) doActionPrint();
+      });
+
+      els.distBtn.addEventListener('click', function () {
+        if (!els.distBtn.disabled) doActionDist();
+      });
+
+      els.hideBtn.addEventListener('click', function () {
+        doActionHide();
+      });
+
+      els.infoModalClose.addEventListener('click', function () {
+        els.infoModal.classList.add('hidden');
+      });
+
+      // Close info modal on backdrop click
+      els.infoModal.addEventListener('click', function (e) {
+        if (e.target === els.infoModal) {
+          els.infoModal.classList.add('hidden');
+        }
+      });
+
+      // Close info modal on Escape
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !els.infoModal.classList.contains('hidden')) {
+          els.infoModal.classList.add('hidden');
+        }
+      });
+
+      /* ── Load data (fetch → fallback) ── */
+      function initWithData(d) {
+        data = d;
+        // Data loaded — intro screen is already visible, ready to play
+      }
+
+      (function loadData() {
+        if (typeof fetch === 'undefined') {
+          initWithData(FALLBACK_DATA);
+          return;
+        }
+        fetch('samvydav-data.json')
+          .then(function (r) {
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+          })
+          .then(function (d) {
+            initWithData(d);
+          })
+          .catch(function () {
+            initWithData(FALLBACK_DATA);
+          });
+      })();
+
+    })();
+  </script>
+
+  <script src="../../shared/js/nav.js"></script>
+  <script src="../../shared/js/analytics.js"></script>
+  <script src="../../shared/js/accessibility.js"></script>
+</body>
+</html>
