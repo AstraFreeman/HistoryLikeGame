@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Археологічні розкопки</title>
+  <link rel="stylesheet" href="../../shared/css/reset.css">
+  <link rel="stylesheet" href="../../shared/css/theme.css">
+  <link rel="stylesheet" href="../../shared/css/components.css">
+  <link rel="stylesheet" href="../../shared/css/animations.css">
+  <style>
+    :root {
+      --game-accent: var(--color-accent-orange);
+      --game-bg: linear-gradient(135deg, #1a0f00 0%, #2d1a00 50%, #1a1200 100%);
+    }
+
+    .arch-wrap {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: var(--space-md);
+      box-sizing: border-box;
+    }
+
+    /* ── Header ── */
+    .game-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      padding: var(--space-md) var(--space-lg);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(var(--glass-blur));
+      margin-bottom: var(--space-md);
+    }
+
+    .game-header h1 {
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      background: var(--gradient-warm);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0;
+    }
+
+    .header-stats {
+      display: flex;
+      gap: var(--space-lg);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .header-stat {
+      text-align: center;
+    }
+
+    .header-stat-label {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      display: block;
+    }
+
+    .header-stat-value {
+      font-size: var(--text-xl);
+      font-weight: 700;
+      color: var(--color-accent-orange);
+    }
+
+    /* ── Grid section ── */
+    .grid-section {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-md);
+      backdrop-filter: blur(var(--glass-blur));
+    }
+
+    .section-label {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--space-sm);
+      font-weight: 600;
+    }
+
+    .excavation-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: var(--space-xs);
+    }
+
+    .grid-cell {
+      aspect-ratio: 1;
+      border-radius: var(--radius-sm);
+      border: 2px solid rgba(139, 90, 43, 0.4);
+      background: linear-gradient(135deg, #8B5A2B 0%, #6B4226 50%, #5C3317 100%);
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .grid-cell:hover:not(.dug) {
+      border-color: rgba(249, 115, 22, 0.7);
+      transform: scale(1.05);
+      box-shadow: 0 0 12px rgba(249, 115, 22, 0.3);
+    }
+
+    .grid-cell.dug {
+      background: linear-gradient(135deg, #3d2b1a 0%, #2a1d10 100%);
+      border-color: rgba(139, 90, 43, 0.2);
+    }
+
+    .grid-cell.has-artifact {
+      cursor: pointer;
+    }
+
+    .grid-cell.selected-artifact {
+      border-color: var(--color-accent-orange);
+      box-shadow: 0 0 16px rgba(249, 115, 22, 0.6);
+      animation: pulse 1s ease infinite;
+    }
+
+    .grid-cell.classified {
+      border-color: rgba(34, 197, 94, 0.5);
+      cursor: default;
+      opacity: 0.7;
+    }
+
+    .soil-texture {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle at 30% 40%, rgba(180, 120, 60, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 70% 70%, rgba(100, 60, 20, 0.4) 0%, transparent 40%);
+    }
+
+    .dig-icon {
+      font-size: var(--text-lg);
+      opacity: 0.5;
+      z-index: 1;
+    }
+
+    .artifact-img {
+      width: 80%;
+      height: 80%;
+      object-fit: contain;
+      border-radius: 4px;
+      display: block;
+      pointer-events: none;
+    }
+
+    .artifact-check {
+      position: absolute;
+      top: 2px;
+      right: 4px;
+      font-size: var(--text-sm);
+      font-weight: 700;
+      text-shadow: 0 0 4px rgba(0,0,0,0.8);
+    }
+
+    .artifact-check.ok {
+      color: var(--color-accent-green);
+    }
+
+    .artifact-check.bad {
+      color: var(--color-accent-red);
+    }
+
+    /* ── STL toggle ── */
+    .stl-toggle-btn {
+      padding: var(--space-xs) var(--space-md);
+      background: var(--color-surface);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-full);
+      color: var(--color-text-secondary);
+      font-size: var(--text-xs);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .stl-toggle-btn:hover,
+    .stl-toggle-btn.active {
+      background: rgba(249, 115, 22, 0.2);
+      border-color: var(--color-accent-orange);
+      color: var(--color-accent-orange);
+    }
+
+    /* ── Info panel ── */
+    .info-panel {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-md);
+      backdrop-filter: blur(var(--glass-blur));
+      display: none;
+    }
+
+    .info-panel.visible {
+      display: block;
+    }
+
+    .info-panel-title {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: var(--space-xs);
+      font-weight: 600;
+    }
+
+    .info-artifact-name {
+      font-size: var(--text-lg);
+      font-weight: 700;
+      color: var(--color-accent-orange);
+      margin-bottom: var(--space-xs);
+    }
+
+    .info-instruction {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      font-style: italic;
+    }
+
+    /* ── Culture bins ── */
+    .bins-section {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-md);
+      backdrop-filter: blur(var(--glass-blur));
+    }
+
+    .bins-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-sm);
+    }
+
+    .culture-bin {
+      background: var(--color-surface);
+      border: 2px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-sm);
+      text-align: center;
+      cursor: pointer;
+      transition: all var(--transition-base);
+      min-height: 80px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+    }
+
+    .culture-bin:hover,
+    .culture-bin.drag-over {
+      background: rgba(249, 115, 22, 0.15);
+      border-color: var(--color-accent-orange);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(249, 115, 22, 0.2);
+    }
+
+    .culture-bin.active-target {
+      border-color: var(--color-accent-orange);
+      box-shadow: 0 0 20px rgba(249, 115, 22, 0.5);
+      background: rgba(249, 115, 22, 0.2);
+      animation: pulse 0.8s ease infinite;
+    }
+
+    .bin-emoji {
+      font-size: var(--text-xl);
+    }
+
+    .bin-name {
+      font-size: var(--text-xs);
+      font-weight: 600;
+      color: var(--color-text-primary);
+      line-height: 1.3;
+    }
+
+    .bin-count {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+    }
+
+    /* ── Popup ── */
+    .popup-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: var(--z-modal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-base);
+    }
+
+    .popup-overlay.visible {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .popup-card {
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      max-width: 480px;
+      width: calc(100% - var(--space-2xl));
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      animation: slideIn 0.35s ease both;
+    }
+
+    .popup-icon {
+      font-size: var(--text-4xl);
+      margin-bottom: var(--space-sm);
+    }
+
+    .popup-result-title {
+      font-size: var(--text-xl);
+      font-weight: 700;
+      margin-bottom: var(--space-sm);
+    }
+
+    .popup-result-title.correct {
+      color: var(--color-accent-green);
+    }
+
+    .popup-result-title.wrong {
+      color: var(--color-accent-red);
+    }
+
+    .popup-artifact-name {
+      font-size: var(--text-lg);
+      font-weight: 600;
+      color: var(--color-accent-orange);
+      margin-bottom: var(--space-sm);
+    }
+
+    .popup-detail {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      line-height: 1.7;
+      margin-bottom: var(--space-md);
+    }
+
+    .popup-correct-answer {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-md);
+      padding: var(--space-sm) var(--space-md);
+      background: var(--color-surface);
+      border-radius: var(--radius-md);
+    }
+
+    /* ── Screen overlays ── */
+    .screen-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(10px);
+      z-index: var(--z-modal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .screen-overlay.hidden {
+      display: none;
+    }
+
+    .screen-card {
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl) var(--space-xl);
+      max-width: 580px;
+      width: calc(100% - var(--space-2xl));
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .screen-card h2 {
+      font-size: var(--text-3xl);
+      margin-bottom: var(--space-md);
+      background: var(--gradient-warm);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .screen-card p {
+      color: var(--color-text-secondary);
+      line-height: 1.7;
+      margin-bottom: var(--space-md);
+      font-size: var(--text-sm);
+    }
+
+    .end-stats {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-xl);
+      margin: var(--space-lg) 0;
+      flex-wrap: wrap;
+    }
+
+    .end-stat {
+      text-align: center;
+    }
+
+    .end-stat-value {
+      font-size: var(--text-3xl);
+      font-weight: 700;
+      color: var(--color-accent-orange);
+    }
+
+    .end-stat-label {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+    }
+
+    .facts-section {
+      text-align: left;
+      margin: var(--space-lg) 0;
+    }
+
+    .facts-section h3 {
+      font-size: var(--text-base);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-md);
+      font-weight: 600;
+    }
+
+    .fact-item {
+      background: var(--color-surface);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      margin-bottom: var(--space-sm);
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+
+    .fact-item-name {
+      color: var(--color-accent-orange);
+      display: block;
+      margin-bottom: var(--space-xs);
+      font-weight: 600;
+    }
+
+    /* ── Light theme overrides ── */
+    body.theme-light {
+      --game-bg: linear-gradient(135deg, #f5e8d0 0%, #ede0c8 50%, #f0e4cc 100%);
+    }
+
+    body.theme-light .grid-cell {
+      border-color: rgba(139, 90, 43, 0.6);
+    }
+
+    body.theme-light .grid-cell.dug {
+      background: linear-gradient(135deg, #c4a882 0%, #b09060 100%);
+      border-color: rgba(100, 60, 20, 0.3);
+    }
+
+    /* ── High contrast overrides ── */
+    .high-contrast .grid-cell {
+      border-width: 3px !important;
+    }
+
+    .high-contrast .culture-bin {
+      border-width: 3px !important;
+    }
+
+    .high-contrast .culture-bin:hover,
+    .high-contrast .culture-bin.active-target {
+      border-color: #fff !important;
+    }
+
+    .high-contrast .grid-cell.selected-artifact {
+      border-color: #ff0 !important;
+      box-shadow: 0 0 0 3px #ff0 !important;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 700px) {
+      .excavation-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
+
+      .bins-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .game-header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .header-stats {
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .arch-wrap {
+        padding: var(--space-sm);
+      }
+
+      .excavation-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  </style>
+</head>
+<body data-section="Стародавня історія" data-game-title="Археологічні розкопки" data-home-url="../../index.html" data-nav="overlay">
+
+  <!-- ── Intro screen ── -->
+  <div id="introScreen" class="screen-overlay">
+    <div class="screen-card">
+      <h2>Археологічні розкопки</h2>
+      <p style="font-size: var(--text-3xl); margin-bottom: var(--space-sm);">&#x26CF;&#xFE0F;</p>
+      <p>Ви &#x2014; молодий археолог на розкопках стародавніх поселень України. Дослідіть ділянку 6&#x00D7;4, знайдіть артефакти та визначте, до якої давньої культури вони належать.</p>
+      <p id="introHowTo"></p>
+      <p>Усього 3 життя. Знайдіть і класифікуйте всі 12 артефактів!</p>
+      <button class="btn btn-accent btn-lg" id="startBtn">Почати розкопки</button>
+    </div>
+  </div>
+
+  <!-- ── Results screen ── -->
+  <div id="endScreen" class="screen-overlay hidden">
+    <div class="screen-card">
+      <h2 id="endTitle">Розкопки завершено!</h2>
+      <div class="end-stats">
+        <div class="end-stat">
+          <div class="end-stat-value" id="endScore">0</div>
+          <div class="end-stat-label">Очки</div>
+        </div>
+        <div class="end-stat">
+          <div class="end-stat-value" id="endCorrect">0/12</div>
+          <div class="end-stat-label">Правильно</div>
+        </div>
+        <div class="end-stat">
+          <div class="end-stat-value" id="endLives"></div>
+          <div class="end-stat-label">Залишилось жить</div>
+        </div>
+      </div>
+      <div class="facts-section" id="factsContainer"></div>
+      <button class="btn btn-accent btn-lg" id="restartBtn">Грати знову</button>
+      <br>
+      <a href="../../index.html" class="btn btn-secondary" style="margin-top: var(--space-sm); display: inline-flex;">На головну</a>
+    </div>
+  </div>
+
+  <!-- ── Classification feedback popup ── -->
+  <div id="popupOverlay" class="popup-overlay">
+    <div class="popup-card">
+      <div class="popup-icon" id="popupIcon"></div>
+      <div class="popup-result-title" id="popupResultTitle"></div>
+      <div class="popup-artifact-name" id="popupArtifactName"></div>
+      <div class="popup-detail" id="popupDetail"></div>
+      <div class="popup-correct-answer" id="popupCorrectAnswer" style="display:none;"></div>
+      <button class="btn btn-accent" id="popupCloseBtn">Продовжити</button>
+    </div>
+  </div>
+
+  <!-- ── Game UI ── -->
+  <div class="arch-wrap" id="gameUI" style="display: none;">
+    <div class="game-header">
+      <h1>Археологічні розкопки</h1>
+      <div class="header-stats">
+        <div class="header-stat">
+          <span class="header-stat-label">Очки</span>
+          <span class="header-stat-value" id="scoreDisplay">0</span>
+        </div>
+        <div class="header-stat">
+          <span class="header-stat-label">Артефакти</span>
+          <span class="header-stat-value" id="artifactsDisplay">0/12</span>
+        </div>
+        <div class="header-stat">
+          <span class="header-stat-label">Життя</span>
+          <span class="header-stat-value" id="livesDisplay"></span>
+        </div>
+        <button class="stl-toggle-btn" id="stlToggle">STL режим</button>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: var(--space-md); flex: 1;">
+      <!-- Excavation grid -->
+      <div class="grid-section">
+        <div class="section-label">Ділянка розкопок (натисніть на клітинку)</div>
+        <div class="excavation-grid" id="excavationGrid"></div>
+      </div>
+
+      <!-- Info panel for selected artifact -->
+      <div class="info-panel" id="infoPanel">
+        <div class="info-panel-title">Знайдений артефакт</div>
+        <div class="info-artifact-name" id="infoArtifactName"></div>
+        <div class="info-instruction">Оберіть культуру нижче або перетягніть зображення у потрібний контейнер</div>
+      </div>
+
+      <!-- Culture bins -->
+      <div class="bins-section">
+        <div class="section-label">Класифікація за культурами (перетягніть або клікніть)</div>
+        <div class="bins-row" id="binsRow"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../shared/js/asset-validator.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      /* ── Artifact data ── */
+      var ARTIFACTS = [
+        { id: 'TRPL_pot_1', culture: 'TRPL', name: 'Трипільський горщик', detail: 'Розписний керамічний горщик трипільської культури (бл. 4000 до н.е.). Орнаменти спіралей символізували цикли природи.' },
+        { id: 'TRPL_pot_2', culture: 'TRPL', name: 'Трипільська посудина', detail: 'Кераміка з геометричним розписом \u2014 візитна картка трипільців. Використовували для зберігання зерна.' },
+        { id: 'TRPL_orn_1', culture: 'TRPL', name: 'Трипільські прикраси', detail: 'Колекція артефактів трипільської культури \u2014 одна з найдавніших в Європі (V\u2013III тис. до н.е.).' },
+        { id: 'SKIF_gold_1', culture: 'SKIF', name: 'Скіфський золотий олень', detail: 'Золота прикраса у "звіриному стилі". Скіфи майстерно зображували тварин у русі \u2014 це їхня візитна картка.' },
+        { id: 'SKIF_gold_2', culture: 'SKIF', name: 'Скіфська пектораль', detail: 'Золота нагрудна прикраса IV ст. до н.е. з кургану Товста Могила. Шедевр давньогрецьких ювелірів на замовлення скіфів.' },
+        { id: 'GREK_amph_1', culture: 'GREK', name: 'Грецька амфора', detail: 'Амфора з Клазомен (525\u2013500 до н.е.). Грецькі колоністи привозили такі посудини до Ольвії та Херсонеса.' },
+        { id: 'GREK_amph_2', culture: 'GREK', name: 'Чорнофігурна амфора', detail: 'Атична чорнофігурна кераміка. Грецькі поліси на берегах Чорного моря торгували з місцевими племенами.' },
+        { id: 'KAMN_tool_1', culture: 'KAMN', name: "Кам'яні знаряддя", detail: "Набір неолітичних кам'яних знарядь. Первісні мешканці території України виготовляли знаряддя з кременю." },
+        { id: 'KAMN_tool_2', culture: 'KAMN', name: "Кам'яна сокира", detail: "Шліфована кам'яна сокира доби неоліту. Використовувалася для обробки дерева та будівництва жител." },
+        { id: 'TRPL_pot_1', culture: 'TRPL', name: 'Трипільський горщик (копія)', detail: 'Ще один зразок трипільської кераміки з характерним спіральним орнаментом.' },
+        { id: 'SKIF_gold_1', culture: 'SKIF', name: 'Скіфський олень (копія)', detail: 'Скіфське золото \u2014 одна з найцінніших археологічних колекцій України.' },
+        { id: 'GREK_amph_1', culture: 'GREK', name: 'Грецька амфора (копія)', detail: 'Амфори перевозили вино, оливкову олію та зерно між грецькими колоніями.' }
+      ];
+
+      var CULTURES = [
+        { code: 'TRPL', name: 'Трипілля',       emoji: '\uD83C\uDFFA' },
+        { code: 'SKIF', name: 'Скіфи',           emoji: '\u2694\uFE0F'  },
+        { code: 'GREK', name: 'Грецькі колонії', emoji: '\uD83C\uDFDB\uFE0F' },
+        { code: 'KAMN', name: "Кам'яний вік",    emoji: '\uD83E\uDEA8' }
+      ];
+
+      var IMG_BASE = '../../data/games/archaeology/';
+      var TOTAL_CELLS = 24;
+      var TOTAL_ARTIFACTS = ARTIFACTS.length; // 12
+
+      /* ── State ── */
+      var state = {
+        lives: 3,
+        score: 0,
+        classified: 0,
+        stlMode: false,
+        selectedCellIndex: null,
+        cellData: [],
+        binCounts: {},
+        factsLearned: [],
+        gameRunning: false
+      };
+
+      /* ── DOM refs ── */
+      var introScreen     = document.getElementById('introScreen');
+      var endScreen       = document.getElementById('endScreen');
+      var gameUI          = document.getElementById('gameUI');
+      var startBtn        = document.getElementById('startBtn');
+      var restartBtn      = document.getElementById('restartBtn');
+      var scoreDisplay    = document.getElementById('scoreDisplay');
+      var artifactsDisplay= document.getElementById('artifactsDisplay');
+      var livesDisplay    = document.getElementById('livesDisplay');
+      var stlToggle       = document.getElementById('stlToggle');
+      var excavationGrid  = document.getElementById('excavationGrid');
+      var infoPanel       = document.getElementById('infoPanel');
+      var infoArtifactName= document.getElementById('infoArtifactName');
+      var binsRow         = document.getElementById('binsRow');
+      var popupOverlay    = document.getElementById('popupOverlay');
+      var popupIcon       = document.getElementById('popupIcon');
+      var popupResultTitle= document.getElementById('popupResultTitle');
+      var popupArtifactNameEl = document.getElementById('popupArtifactName');
+      var popupDetail     = document.getElementById('popupDetail');
+      var popupCorrectAnswer  = document.getElementById('popupCorrectAnswer');
+      var popupCloseBtn   = document.getElementById('popupCloseBtn');
+      var endTitle        = document.getElementById('endTitle');
+      var endScore        = document.getElementById('endScore');
+      var endCorrect      = document.getElementById('endCorrect');
+      var endLives        = document.getElementById('endLives');
+      var factsContainer  = document.getElementById('factsContainer');
+
+      /* ── Build intro text safely ── */
+      (function buildIntroHowTo() {
+        var p = document.getElementById('introHowTo');
+        if (!p) return;
+        var lines = [
+          '\u2460 Натисніть на клітинку \u2014 вона розкопується.',
+          '\u2461 Якщо знайдено артефакт \u2014 класифікуйте його:',
+          '\u00A0\u00A0\u2022 Перетягніть артефакт у потрібну культуру, або',
+          '\u00A0\u00A0\u2022 Клікніть на артефакт, щоб виділити, потім клікніть на культуру.',
+          '\u2462 За правильну класифікацію \u2014 очки та факт. За хибну \u2014 мінус 1 життя.',
+          '\u2463 Кнопка STL перемикає між кольоровими та монохромними зображеннями.'
+        ];
+        for (var i = 0; i < lines.length; i++) {
+          p.appendChild(document.createTextNode(lines[i]));
+          if (i < lines.length - 1) p.appendChild(document.createElement('br'));
+        }
+      })();
+
+      /* ── Utilities ── */
+      function shuffleArray(arr) {
+        var a = arr.slice();
+        for (var i = a.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+        }
+        return a;
+      }
+
+      function imgSrc(artifactId) {
+        var suffix = state.stlMode ? '_stl' : '';
+        return IMG_BASE + artifactId + suffix + '.jpg';
+      }
+
+      function getCulture(code) {
+        for (var i = 0; i < CULTURES.length; i++) {
+          if (CULTURES[i].code === code) return CULTURES[i];
+        }
+        return null;
+      }
+
+      function livesStr(n) {
+        var s = '';
+        for (var i = 0; i < n; i++) s += '\u2665';
+        for (var j = n; j < 3; j++) s += '\u2661';
+        return s;
+      }
+
+      /* ── HUD ── */
+      function updateHUD() {
+        scoreDisplay.textContent = state.score;
+        artifactsDisplay.textContent = state.classified + '/' + TOTAL_ARTIFACTS;
+        livesDisplay.textContent = livesStr(state.lives);
+      }
+
+      /* ── Bins ── */
+      function buildBins() {
+        while (binsRow.firstChild) binsRow.removeChild(binsRow.firstChild);
+        state.binCounts = {};
+
+        for (var i = 0; i < CULTURES.length; i++) {
+          state.binCounts[CULTURES[i].code] = 0;
+          (function (culture) {
+            var bin = document.createElement('div');
+            bin.className = 'culture-bin';
+            bin.setAttribute('data-culture', culture.code);
+
+            var emojiDiv = document.createElement('div');
+            emojiDiv.className = 'bin-emoji';
+            emojiDiv.textContent = culture.emoji;
+            bin.appendChild(emojiDiv);
+
+            var nameDiv = document.createElement('div');
+            nameDiv.className = 'bin-name';
+            nameDiv.textContent = culture.name;
+            bin.appendChild(nameDiv);
+
+            var countDiv = document.createElement('div');
+            countDiv.className = 'bin-count';
+            countDiv.id = 'binCount_' + culture.code;
+            countDiv.textContent = '0 артефактів';
+            bin.appendChild(countDiv);
+
+            bin.addEventListener('click', function () {
+              if (state.selectedCellIndex !== null) {
+                classifyArtifact(state.selectedCellIndex, culture.code);
+              }
+            });
+
+            bin.addEventListener('dragover', function (e) {
+              e.preventDefault();
+              bin.classList.add('drag-over');
+            });
+            bin.addEventListener('dragleave', function () {
+              bin.classList.remove('drag-over');
+            });
+            bin.addEventListener('drop', function (e) {
+              e.preventDefault();
+              bin.classList.remove('drag-over');
+              var raw = e.dataTransfer.getData('text/plain');
+              var cellIdx = parseInt(raw, 10);
+              if (!isNaN(cellIdx)) {
+                classifyArtifact(cellIdx, culture.code);
+              }
+            });
+
+            binsRow.appendChild(bin);
+          })(CULTURES[i]);
+        }
+      }
+
+      function updateBinCount(code) {
+        var el = document.getElementById('binCount_' + code);
+        if (el) el.textContent = state.binCounts[code] + ' артефактів';
+      }
+
+      /* ── Grid ── */
+      function buildGrid() {
+        while (excavationGrid.firstChild) excavationGrid.removeChild(excavationGrid.firstChild);
+
+        var positions = shuffleArray(
+          Array.from({ length: TOTAL_CELLS }, function (_, i) { return i; })
+        );
+        var artifactPositions = positions.slice(0, TOTAL_ARTIFACTS);
+
+        state.cellData = [];
+        for (var i = 0; i < TOTAL_CELLS; i++) {
+          state.cellData.push({ artifactIdx: null, dug: false, classified: false });
+        }
+        for (var j = 0; j < TOTAL_ARTIFACTS; j++) {
+          state.cellData[artifactPositions[j]].artifactIdx = j;
+        }
+
+        for (var k = 0; k < TOTAL_CELLS; k++) {
+          (function (idx) {
+            var cell = document.createElement('div');
+            cell.className = 'grid-cell';
+            cell.setAttribute('data-cell', String(idx));
+
+            var texture = document.createElement('div');
+            texture.className = 'soil-texture';
+            cell.appendChild(texture);
+
+            var icon = document.createElement('div');
+            icon.className = 'dig-icon';
+            icon.textContent = '\u26CF';
+            cell.appendChild(icon);
+
+            cell.addEventListener('click', function () { onCellClick(idx); });
+
+            excavationGrid.appendChild(cell);
+          })(k);
+        }
+      }
+
+      function getCell(idx) {
+        return excavationGrid.querySelector('[data-cell="' + idx + '"]');
+      }
+
+      /* ── Cell interaction ── */
+      function onCellClick(idx) {
+        if (!state.gameRunning) return;
+        var cd = state.cellData[idx];
+
+        if (!cd.dug) {
+          digCell(idx);
+          return;
+        }
+
+        if (cd.artifactIdx !== null && !cd.classified) {
+          if (state.selectedCellIndex === idx) {
+            deselectArtifact();
+          } else {
+            selectArtifact(idx);
+          }
+        }
+      }
+
+      function digCell(idx) {
+        state.cellData[idx].dug = true;
+        var cell = getCell(idx);
+        if (!cell) return;
+
+        cell.classList.add('dug');
+
+        // Remove undug decorations
+        var texture = cell.querySelector('.soil-texture');
+        if (texture) cell.removeChild(texture);
+        var icon = cell.querySelector('.dig-icon');
+        if (icon) cell.removeChild(icon);
+
+        if (state.cellData[idx].artifactIdx !== null) {
+          var art = ARTIFACTS[state.cellData[idx].artifactIdx];
+          cell.classList.add('has-artifact');
+
+          var img = AssetValidator.createImg(
+            imgSrc(art.id),
+            art.name,
+            { className: 'artifact-img', width: '80%', height: '80%' }
+          );
+          cell.appendChild(img);
+
+          // Enable drag from this cell
+          cell.setAttribute('draggable', 'true');
+          cell.addEventListener('dragstart', (function (i) {
+            return function (e) {
+              e.dataTransfer.setData('text/plain', String(i));
+              selectArtifact(i);
+            };
+          })(idx));
+
+          selectArtifact(idx);
+        }
+      }
+
+      /* ── Selection ── */
+      function selectArtifact(idx) {
+        if (state.selectedCellIndex !== null && state.selectedCellIndex !== idx) {
+          var prev = getCell(state.selectedCellIndex);
+          if (prev) prev.classList.remove('selected-artifact');
+        }
+
+        state.selectedCellIndex = idx;
+        var cell = getCell(idx);
+        if (cell) cell.classList.add('selected-artifact');
+
+        var art = ARTIFACTS[state.cellData[idx].artifactIdx];
+        infoArtifactName.textContent = art.name;
+        infoPanel.classList.add('visible');
+
+        var bins = binsRow.querySelectorAll('.culture-bin');
+        for (var i = 0; i < bins.length; i++) bins[i].classList.add('active-target');
+      }
+
+      function deselectArtifact() {
+        if (state.selectedCellIndex !== null) {
+          var cell = getCell(state.selectedCellIndex);
+          if (cell) cell.classList.remove('selected-artifact');
+        }
+        state.selectedCellIndex = null;
+        infoPanel.classList.remove('visible');
+
+        var bins = binsRow.querySelectorAll('.culture-bin');
+        for (var i = 0; i < bins.length; i++) bins[i].classList.remove('active-target');
+      }
+
+      /* ── Classify ── */
+      function classifyArtifact(cellIdx, chosenCulture) {
+        var cd = state.cellData[cellIdx];
+        if (cd.classified || cd.artifactIdx === null) return;
+
+        var art = ARTIFACTS[cd.artifactIdx];
+        var correct = (chosenCulture === art.culture);
+
+        cd.classified = true;
+        state.classified++;
+
+        var cell = getCell(cellIdx);
+        if (cell) {
+          cell.classList.remove('selected-artifact', 'has-artifact');
+          cell.classList.add('classified');
+          cell.removeAttribute('draggable');
+
+          var check = document.createElement('div');
+          check.className = 'artifact-check ' + (correct ? 'ok' : 'bad');
+          check.textContent = correct ? '\u2714' : '\u2718';
+          cell.appendChild(check);
+        }
+
+        deselectArtifact();
+
+        if (correct) {
+          state.score += 100;
+          state.binCounts[art.culture]++;
+          updateBinCount(art.culture);
+
+          var factKey = art.culture + ':' + art.id + ':' + art.name;
+          var alreadyLearned = false;
+          for (var i = 0; i < state.factsLearned.length; i++) {
+            if (state.factsLearned[i].key === factKey) { alreadyLearned = true; break; }
+          }
+          if (!alreadyLearned) {
+            state.factsLearned.push({ key: factKey, art: art });
+          }
+          showPopup(true, art, null);
+        } else {
+          state.lives = Math.max(0, state.lives - 1);
+          state.score = Math.max(0, state.score - 25);
+          var correctCulture = getCulture(art.culture);
+          showPopup(false, art, correctCulture);
+        }
+
+        updateHUD();
+      }
+
+      /* ── Popup ── */
+      function showPopup(correct, art, correctCulture) {
+        popupIcon.textContent = correct ? '\uD83C\uDF89' : '\uD83D\uDEA8';
+        popupResultTitle.textContent = correct ? 'Правильно!' : 'Неправильно!';
+        popupResultTitle.className = 'popup-result-title ' + (correct ? 'correct' : 'wrong');
+        popupArtifactNameEl.textContent = art.name;
+        popupDetail.textContent = art.detail;
+
+        if (!correct && correctCulture) {
+          popupCorrectAnswer.style.display = 'block';
+          popupCorrectAnswer.textContent = 'Правильна відповідь: ' + correctCulture.name;
+        } else {
+          popupCorrectAnswer.style.display = 'none';
+        }
+
+        popupOverlay.classList.add('visible');
+
+        // Replace button node to clear old listeners safely
+        var oldBtn = popupCloseBtn;
+        var newBtn = oldBtn.cloneNode(true);
+        oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+        popupCloseBtn = newBtn;
+
+        newBtn.addEventListener('click', function onClose() {
+          popupOverlay.classList.remove('visible');
+          checkEndConditions();
+        });
+      }
+
+      function checkEndConditions() {
+        if (!state.gameRunning) return;
+        if (state.lives <= 0 || state.classified >= TOTAL_ARTIFACTS) {
+          endGame();
+        }
+      }
+
+      /* ── STL mode ── */
+      function applyStlMode() {
+        for (var i = 0; i < TOTAL_CELLS; i++) {
+          var cd = state.cellData[i];
+          if (cd.dug && cd.artifactIdx !== null) {
+            var cell = getCell(i);
+            if (!cell) continue;
+            var img = cell.querySelector('img.artifact-img');
+            if (img) img.src = imgSrc(ARTIFACTS[cd.artifactIdx].id);
+          }
+        }
+      }
+
+      /* ── Game lifecycle ── */
+      function startGame() {
+        if (window.HLGAnalytics) HLGAnalytics.startSession('archaeology');
+
+        state.lives = 3;
+        state.score = 0;
+        state.classified = 0;
+        state.stlMode = false;
+        state.selectedCellIndex = null;
+        state.factsLearned = [];
+        state.gameRunning = true;
+
+        stlToggle.classList.remove('active');
+        introScreen.classList.add('hidden');
+        endScreen.classList.add('hidden');
+        infoPanel.classList.remove('visible');
+        gameUI.style.display = 'flex';
+
+        buildGrid();
+        buildBins();
+        updateHUD();
+      }
+
+      function endGame() {
+        state.gameRunning = false;
+        if (window.HLGAnalytics) HLGAnalytics.endSession({ score: state.score, won: state.lives > 0 });
+
+        var allFound = state.classified >= TOTAL_ARTIFACTS;
+        if (allFound && state.lives > 0) {
+          endTitle.textContent = 'Блискуча робота!';
+        } else if (state.classified >= 9) {
+          endTitle.textContent = 'Добрий результат!';
+        } else if (state.classified >= 6) {
+          endTitle.textContent = 'Непогано!';
+        } else {
+          endTitle.textContent = 'Ще є куди рости!';
+        }
+
+        endScore.textContent = state.score;
+        endCorrect.textContent = state.classified + '/' + TOTAL_ARTIFACTS;
+        endLives.textContent = livesStr(state.lives);
+
+        // Facts
+        while (factsContainer.firstChild) factsContainer.removeChild(factsContainer.firstChild);
+
+        if (state.factsLearned.length > 0) {
+          var h3 = document.createElement('h3');
+          h3.textContent = 'Що ви дізналися:';
+          factsContainer.appendChild(h3);
+
+          for (var i = 0; i < state.factsLearned.length; i++) {
+            var entry = state.factsLearned[i];
+            var div = document.createElement('div');
+            div.className = 'fact-item';
+
+            var nameEl = document.createElement('span');
+            nameEl.className = 'fact-item-name';
+            nameEl.textContent = entry.art.name;
+            div.appendChild(nameEl);
+
+            div.appendChild(document.createTextNode(entry.art.detail));
+            factsContainer.appendChild(div);
+          }
+        } else {
+          var noFacts = document.createElement('p');
+          noFacts.style.color = 'var(--color-text-muted)';
+          noFacts.textContent = 'Жодного факту не розкрито. Спробуйте ще раз!';
+          factsContainer.appendChild(noFacts);
+        }
+
+        endScreen.classList.remove('hidden');
+      }
+
+      /* ── Event listeners ── */
+      startBtn.addEventListener('click', startGame);
+      restartBtn.addEventListener('click', startGame);
+
+      stlToggle.addEventListener('click', function () {
+        state.stlMode = !state.stlMode;
+        stlToggle.classList.toggle('active', state.stlMode);
+        applyStlMode();
+      });
+
+    })();
+  </script>
+  <script src="../../shared/js/nav.js"></script>
+  <script src="../../shared/js/analytics.js"></script>
+  <script src="../../shared/js/accessibility.js"></script>
+</body>
+</html>
