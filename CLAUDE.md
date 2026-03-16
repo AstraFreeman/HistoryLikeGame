@@ -33,6 +33,8 @@ shared/
     canvas-utils.js           # window.CanvasUtils — canvas helpers
     ui-utils.js               # window.UIUtils — modal/notification helpers
     assistant.js              # Octopus mascot (keyboard movement, GIF states)
+    analytics.js              # window.HLGAnalytics — localStorage learning analytics
+    asset-validator.js        # window.AssetValidator — red square fallback for missing images
     accessibility.js          # Floating accessibility settings panel
   templates/
     quiz-question.html        # Template for quiz pages, loads data via ?id= param
