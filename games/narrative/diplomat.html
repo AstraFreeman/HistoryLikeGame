@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Дипломат — при дворі Вітовта</title>
+  <link rel="stylesheet" href="../../shared/css/reset.css">
+  <link rel="stylesheet" href="../../shared/css/theme.css">
+  <link rel="stylesheet" href="../../shared/css/components.css">
+  <link rel="stylesheet" href="../../shared/css/animations.css">
+  <style>
+    :root {
+      --dipl-gold:    #c9a84c;
+      --dipl-gold-lt: #e0c46a;
+      --dipl-red:     #8b2020;
+      --dipl-green:   #2d6a4f;
+      --dipl-green-lt:#52b788;
+      --dipl-blue:    #2d4a8b;
+      --dipl-blue-lt: #6b8fd8;
+    }
+
+    /* ── Base ── */
+    body {
+      background: linear-gradient(145deg, #0d0f1a 0%, #1a1530 50%, #0f1525 100%);
+      min-height: 100vh;
+      font-family: var(--font-body);
+      color: var(--color-text-primary);
+    }
+
+    /* ── Light theme ── */
+    body.theme-light {
+      background: linear-gradient(145deg, #e8e4d0 0%, #f0ecda 50%, #e4dfc8 100%);
+      --color-text-primary: #1e1408;
+      --color-text-secondary: #4a3820;
+      --color-text-muted: #7a6040;
+      --glass-bg: rgba(0,0,0,0.05);
+      --glass-border: rgba(0,0,0,0.15);
+    }
+
+    body.theme-light .dipl-header {
+      background: rgba(255,255,255,0.65);
+      border-color: rgba(201,168,76,0.4);
+    }
+
+    body.theme-light .node-card,
+    body.theme-light .choice-btn,
+    body.theme-light .feedback-panel,
+    body.theme-light .screen-card {
+      background: rgba(255,255,255,0.55);
+      border-color: rgba(0,0,0,0.15);
+    }
+
+    body.theme-light .choice-btn:hover {
+      background: rgba(201,168,76,0.2);
+    }
+
+    body.theme-light .choice-btn.correct-flash {
+      background: rgba(45,106,79,0.18);
+    }
+
+    body.theme-light .choice-btn.wrong-flash {
+      background: rgba(139,32,32,0.12);
+    }
+
+    body.theme-light .summary-table th {
+      background: rgba(0,0,0,0.08);
+    }
+
+    body.theme-light .summary-table td {
+      background: rgba(0,0,0,0.03);
+    }
+
+    /* ── High contrast ── */
+    .high-contrast .node-card,
+    .high-contrast .choice-btn,
+    .high-contrast .feedback-panel,
+    .high-contrast .dipl-header,
+    .high-contrast .screen-card,
+    .high-contrast .rep-bar-wrap {
+      border-width: 2px !important;
+      backdrop-filter: none !important;
+    }
+
+    /* ── Intro / End overlays ── */
+    .screen-overlay {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.88);
+      z-index: var(--z-overlay);
+      padding: var(--space-md);
+    }
+
+    .screen-overlay.hidden {
+      display: none;
+    }
+
+    .screen-card {
+      background: linear-gradient(135deg, #1a1530 0%, #0d0f1a 100%);
+      border: 1px solid rgba(201,168,76,0.35);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl);
+      max-width: 700px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 64px rgba(0,0,0,0.65), 0 0 48px rgba(201,168,76,0.06);
+    }
+
+    body.theme-light .screen-card {
+      background: linear-gradient(135deg, #f4f0e0 0%, #ece8d4 100%);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+    }
+
+    .screen-card h2 {
+      font-size: var(--text-3xl);
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--dipl-gold) 0%, var(--dipl-gold-lt) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: var(--space-lg);
+    }
+
+    .screen-card .subtitle {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      font-style: italic;
+      margin-bottom: var(--space-lg);
+    }
+
+    .screen-card p {
+      font-size: var(--text-base);
+      color: var(--color-text-secondary);
+      line-height: 1.75;
+      margin-bottom: var(--space-md);
+    }
+
+    .screen-card strong {
+      color: var(--dipl-gold-lt);
+    }
+
+    body.theme-light .screen-card strong {
+      color: var(--dipl-gold);
+    }
+
+    .intro-divider {
+      border: none;
+      border-top: 1px solid rgba(201,168,76,0.25);
+      margin: var(--space-lg) 0;
+    }
+
+    /* ── Main wrapper ── */
+    .dipl-wrap {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: var(--space-md);
+      gap: var(--space-md);
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    /* ── Header ── */
+    .dipl-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      padding: var(--space-md) var(--space-lg);
+      background: rgba(10,8,20,0.75);
+      border: 1px solid rgba(201,168,76,0.25);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(var(--glass-blur));
+    }
+
+    .dipl-title {
+      font-size: var(--text-xl);
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--dipl-gold) 0%, var(--dipl-gold-lt) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .header-stats {
+      display: flex;
+      gap: var(--space-xl);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .header-stat { text-align: center; }
+
+    .header-stat-label {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .header-stat-value {
+      font-size: var(--text-xl);
+      font-weight: 700;
+      color: var(--dipl-gold-lt);
+      display: block;
+    }
+
+    /* ── Rep bar ── */
+    .rep-bar-wrap {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-sm) var(--space-lg);
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+
+    .rep-bar-label {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      white-space: nowrap;
+    }
+
+    .rep-bar-track {
+      flex: 1;
+      height: 10px;
+      background: rgba(255,255,255,0.08);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+
+    .rep-bar-fill {
+      height: 100%;
+      border-radius: var(--radius-full);
+      background: linear-gradient(90deg, var(--dipl-green) 0%, var(--dipl-gold) 60%, var(--dipl-gold-lt) 100%);
+      transition: width var(--transition-slow);
+    }
+
+    .rep-value {
+      font-size: var(--text-base);
+      font-weight: 700;
+      color: var(--dipl-gold-lt);
+      min-width: 2.5ch;
+      text-align: right;
+    }
+
+    /* ── Node card ── */
+    .node-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      backdrop-filter: blur(var(--glass-blur));
+    }
+
+    .node-number {
+      font-size: var(--text-xs);
+      color: var(--dipl-gold);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+      margin-bottom: var(--space-sm);
+      display: block;
+    }
+
+    .node-title {
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      color: var(--dipl-gold-lt);
+      margin-bottom: var(--space-md);
+      line-height: 1.3;
+    }
+
+    body.theme-light .node-title { color: var(--dipl-gold); }
+
+    .node-desc {
+      font-size: var(--text-base);
+      color: var(--color-text-secondary);
+      line-height: 1.75;
+      margin-bottom: var(--space-xl);
+    }
+
+    /* ── Choices ── */
+    .choices-list {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .choice-btn {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-md) var(--space-lg);
+      color: var(--color-text-primary);
+      font-size: var(--text-base);
+      font-family: var(--font-body);
+      cursor: pointer;
+      text-align: left;
+      transition: background var(--transition-base), border-color var(--transition-base), transform var(--transition-fast);
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-md);
+    }
+
+    .choice-btn:hover:not(:disabled) {
+      background: rgba(201,168,76,0.12);
+      border-color: rgba(201,168,76,0.4);
+      transform: translateX(4px);
+    }
+
+    .choice-btn:disabled { cursor: default; }
+
+    .choice-letter {
+      font-weight: 700;
+      color: var(--dipl-gold);
+      font-size: var(--text-base);
+      min-width: 1.5ch;
+      flex-shrink: 0;
+    }
+
+    .choice-text {
+      flex: 1;
+      line-height: 1.55;
+    }
+
+    .choice-btn.correct-flash {
+      background: rgba(45,106,79,0.25);
+      border-color: var(--dipl-green-lt);
+    }
+
+    .choice-btn.wrong-flash {
+      background: rgba(139,32,32,0.2);
+      border-color: rgba(200,60,60,0.5);
+    }
+
+    /* ── Feedback panel ── */
+    .feedback-panel {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      backdrop-filter: blur(var(--glass-blur));
+      display: none;
+    }
+
+    .feedback-panel.visible { display: block; }
+
+    .feedback-heading {
+      font-size: var(--text-lg);
+      font-weight: 700;
+      margin-bottom: var(--space-sm);
+    }
+
+    .feedback-heading.correct { color: var(--dipl-green-lt); }
+    .feedback-heading.wrong   { color: #e06060; }
+
+    .feedback-detail {
+      font-size: var(--text-base);
+      color: var(--color-text-secondary);
+      line-height: 1.75;
+      margin-bottom: var(--space-lg);
+    }
+
+    .rep-delta {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-xs);
+      padding: var(--space-xs) var(--space-md);
+      border-radius: var(--radius-full);
+      font-size: var(--text-sm);
+      font-weight: 700;
+      margin-bottom: var(--space-lg);
+    }
+
+    .rep-delta.plus  { background: rgba(45,106,79,0.2);   border: 1px solid var(--dipl-green-lt); color: var(--dipl-green-lt); }
+    .rep-delta.minus { background: rgba(139,32,32,0.2);   border: 1px solid #e06060;              color: #e06060; }
+
+    .btn-next {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-xl);
+      background: linear-gradient(135deg, var(--dipl-gold) 0%, #b8960e 100%);
+      color: #1e1408;
+      border: none;
+      border-radius: var(--radius-full);
+      font-size: var(--text-base);
+      font-weight: 700;
+      font-family: var(--font-body);
+      cursor: pointer;
+      transition: opacity var(--transition-base), transform var(--transition-fast);
+    }
+
+    .btn-next:hover { opacity: 0.88; transform: translateY(-1px); }
+
+    /* ── Summary table ── */
+    .summary-wrap { overflow-x: auto; }
+
+    .summary-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-sm);
+    }
+
+    .summary-table th,
+    .summary-table td {
+      padding: var(--space-sm) var(--space-md);
+      text-align: left;
+      border-bottom: 1px solid var(--glass-border);
+      line-height: 1.4;
+    }
+
+    .summary-table th {
+      background: rgba(201,168,76,0.1);
+      color: var(--dipl-gold-lt);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: var(--text-xs);
+      letter-spacing: 0.05em;
+    }
+
+    .summary-table td {
+      color: var(--color-text-secondary);
+      background: rgba(255,255,255,0.02);
+    }
+
+    .summary-table tr:last-child td { border-bottom: none; }
+
+    .mark-correct { color: var(--dipl-green-lt); font-weight: 600; }
+    .mark-wrong   { color: #e06060;              font-weight: 600; }
+
+    .final-score-line {
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      color: var(--dipl-gold-lt);
+      margin: var(--space-lg) 0 var(--space-md);
+    }
+
+    body.theme-light .final-score-line { color: var(--dipl-gold); }
+
+    .final-rank {
+      font-size: var(--text-lg);
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-xl);
+      font-style: italic;
+    }
+
+    .btn-restart {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-xl);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      color: var(--color-text-primary);
+      border-radius: var(--radius-full);
+      font-size: var(--text-base);
+      font-weight: 600;
+      font-family: var(--font-body);
+      cursor: pointer;
+      transition: background var(--transition-base);
+    }
+
+    .btn-restart:hover { background: var(--color-surface-hover); }
+
+    .btn-home {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-xl);
+      background: linear-gradient(135deg, var(--dipl-gold) 0%, #b8960e 100%);
+      color: #1e1408;
+      border: none;
+      border-radius: var(--radius-full);
+      font-size: var(--text-base);
+      font-weight: 700;
+      font-family: var(--font-body);
+      cursor: pointer;
+      text-decoration: none;
+      transition: opacity var(--transition-base);
+    }
+
+    .btn-home:hover { opacity: 0.88; }
+
+    .end-buttons {
+      display: flex;
+      gap: var(--space-md);
+      flex-wrap: wrap;
+      margin-top: var(--space-lg);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      .dipl-wrap { padding: var(--space-sm); }
+
+      .node-card,
+      .feedback-panel,
+      .screen-card { padding: var(--space-lg); }
+
+      .header-stats { gap: var(--space-md); }
+    }
+  </style>
+</head>
+<body data-section="ВКЛ" data-game-title="Дипломат" data-home-url="../../index.html">
+
+  <!-- ── Intro overlay ── -->
+  <div id="introScreen" class="screen-overlay">
+    <div class="screen-card">
+      <h2>Дипломат при дворі Вітовта</h2>
+      <p class="subtitle">Текстова пригода · 8 вузлів рішень · Доба ВКЛ (XIV–XVI ст.)</p>
+      <p>Ви — посол і радник великого князя. Ваша дипломатична мудрість формуватиме долю
+         <strong>Великого князівства Литовського</strong> та його українських земель.</p>
+      <p>Кожне рішення — відлуння реальних подій. Правильний вибір відповідає тому, що дійсно
+         сталося в історії, і принесе вам <strong>+10 репутації</strong>. Помилковий — покаже
+         наслідки й дасть <strong>−5 репутації</strong>, а потім скерує на правильний шлях.</p>
+      <hr class="intro-divider">
+      <p>Ваша стартова репутація: <strong>50 / 100</strong></p>
+      <button class="btn-next" id="btnStartGame">Розпочати місію ⚜</button>
+    </div>
+  </div>
+
+  <!-- ── End overlay ── -->
+  <div id="endScreen" class="screen-overlay hidden">
+    <div class="screen-card">
+      <h2>Підсумок кар'єри</h2>
+      <div class="final-score-line" id="finalScoreText"></div>
+      <div class="final-rank" id="finalRank"></div>
+      <div class="summary-wrap">
+        <table class="summary-table" id="summaryTable">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Ситуація</th>
+              <th>Ваш вибір</th>
+              <th>Правильна відповідь</th>
+              <th>Результат</th>
+            </tr>
+          </thead>
+          <tbody id="summaryBody"></tbody>
+        </table>
+      </div>
+      <div class="end-buttons">
+        <button class="btn-restart" id="btnRestart">Зіграти знову</button>
+        <a class="btn-home" href="../../index.html">На головну ⚜</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Main game UI ── -->
+  <div class="dipl-wrap">
+
+    <!-- Header -->
+    <header class="dipl-header">
+      <div class="dipl-title">⚜ Дипломат</div>
+      <div class="header-stats">
+        <div class="header-stat">
+          <span class="header-stat-label">Ситуація</span>
+          <span class="header-stat-value" id="nodeCounter">1 / 8</span>
+        </div>
+        <div class="header-stat">
+          <span class="header-stat-label">Репутація</span>
+          <span class="header-stat-value" id="repDisplay">50</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Reputation bar -->
+    <div class="rep-bar-wrap">
+      <span class="rep-bar-label">Дипломатична репутація</span>
+      <div class="rep-bar-track">
+        <div class="rep-bar-fill" id="repBar" style="width:50%"></div>
+      </div>
+      <span class="rep-value" id="repBarVal">50</span>
+    </div>
+
+    <!-- Decision node -->
+    <div class="node-card" id="nodeCard">
+      <span class="node-number" id="nodeLabel">Ситуація 1 з 8</span>
+      <h2 class="node-title" id="nodeTitle"></h2>
+      <p class="node-desc" id="nodeDesc"></p>
+      <div class="choices-list" id="choicesList"></div>
+    </div>
+
+    <!-- Feedback -->
+    <div class="feedback-panel" id="feedbackPanel">
+      <div class="feedback-heading" id="feedbackHeading"></div>
+      <div class="rep-delta" id="repDelta"></div>
+      <p class="feedback-detail" id="feedbackDetail"></p>
+      <button class="btn-next" id="btnNext">Далі →</button>
+    </div>
+
+  </div><!-- /.dipl-wrap -->
+
+  <script src="../../shared/js/nav.js"></script>
+  <script src="../../shared/js/analytics.js"></script>
+  <script src="../../shared/js/accessibility.js"></script>
+  <script>
+  /* ═══════════════════════════════════════════════════════
+     DIPLOMAT — Branching text adventure
+     8 nodes, all data inline, dark glassmorphism theme
+  ═══════════════════════════════════════════════════════ */
+
+  /* ── Scenario data ──────────────────────────────────── */
+  /*
+   * Each node's desc / feedback strings are developer-authored
+   * static content — not user input. They contain <strong> tags
+   * for emphasis and are rendered via appendDescNodes() /
+   * parseFeedback() which use safe DOM construction (no eval,
+   * no user-supplied content).
+   */
+  const NODES = [
+    {
+      id: 1,
+      title: 'Прибуття до двору Вітовта',
+      desc: [
+        'Рік 1392. Ви прибули до Вільна, де ',
+        ['strong', 'Вітовт Великий'],
+        ' щойно став великим князем Литовським після угоди в Острові. Він шукає надійних союзників і радників. Яку дипломатичну стратегію ви оберете?',
+      ],
+      choices: [
+        'Запропонувати тісний союз із Польщею через Кревську унію — спільна оборона проти Тевтонського ордену.',
+        'Запропонувати незалежну політику ВКЛ без союзів — покладатися лише на власну армію.',
+        'Запропонувати союз із Московським князівством проти Польщі та Тевтонського ордену.',
+      ],
+      correct: 0,
+      correctText: 'Союз із Польщею',
+      feedbackCorrect: [
+        'Вірно! Вітовт активно використовував польсько-литовський союз як противагу Тевтонському ордену. Саме ця стратегія призвела до переможної Ґрюнвальдської битви 1410 року, де об\u2019єднані сили розгромили Орден.',
+      ],
+      feedbackWrong: [
+        null,
+        'Ізоляціонізм був неможливий: ВКЛ оточували потужні суперники — Тевтонський орден на заході, Золота Орда на сході. Вітовт потребував союзників. Правильна відповідь — союз із Польщею.',
+        'Союз із Москвою суперечив прагненням Вітовта: він сам прагнув поширити вплив ВКЛ на схід. Правильна відповідь — союз із Польщею.',
+      ],
+    },
+    {
+      id: 2,
+      title: 'Переговори щодо Кревської унії',
+      desc: [
+        'Рік 1385. На переговорах у Крево вирішується питання про унію ВКЛ і Польщі. ',
+        ['strong', 'Ягайло'],
+        ' готовий одружитися з польською королевою Ядвіґою. Яку позицію займете ви як радник ВКЛ?',
+      ],
+      choices: [
+        'Наполягати на повному злитті ВКЛ із Польщею — одна держава, один правитель.',
+        'Відстоювати автономію ВКЛ у персональній унії — спільний монарх, окремі уряди й армії.',
+      ],
+      correct: 1,
+      correctText: 'Автономія ВКЛ',
+      feedbackCorrect: [
+        'Правильно! Після Кревського акту 1385 р. ВКЛ зберегло власні інституції, право й армію. Вітовт наполіг на цьому під час Городельської унії 1413 р., закріпивши автономний статус Литви. Повне злиття відбулося лише в 1569 р. за Люблінської унії.',
+      ],
+      feedbackWrong: [
+        'Повне злиття суперечило інтересам литовської шляхти й самого Вітовта. Реально ВКЛ зберегло автономію — окремий сейм, канцелярію, військо. Правильна відповідь — відстоювати автономію.',
+        null,
+      ],
+    },
+    {
+      id: 3,
+      title: 'Битва на Ворсклі',
+      desc: [
+        'Рік 1399. Вітовт зібрав величезне військо, щоб підтримати хана Тохтамиша проти Тімура (Тамерлана) й встановити контроль над землями Золотої Орди. Чи варто підтримати цей амбітний похід?',
+      ],
+      choices: [
+        'Підтримати Вітовта: похід зміцнить вплив ВКЛ на сході й посилить торгові шляхи.',
+        'Відрадити похід: армія Тімура надто сильна, ризик катастрофічної поразки.',
+      ],
+      correct: 1,
+      correctText: 'Відрадити похід',
+      feedbackCorrect: [
+        'Вірно! Битва на Ворсклі 12 серпня 1399 р. закінчилася нищівною поразкою ВКЛ. Загинули десятки литовських і руських князів. Ця катастрофа зупинила експансію Вітовта на схід і послабила позиції ВКЛ на понад десятиліття.',
+      ],
+      feedbackWrong: [
+        'Похід завершився катастрофою. Об\u2019єднані татарсько-литовські сили зазнали нищівної поразки від військ Едіґея. Краще було відрадити цей ризикований похід. Правильна відповідь — відрадити.',
+        null,
+      ],
+    },
+    {
+      id: 4,
+      title: 'Городельська унія',
+      desc: [
+        'Рік 1413. Підписується нова ',
+        ['strong', 'Городельська унія'],
+        ' між ВКЛ і Польщею. Вона надає католицькій шляхті ВКЛ польські привілеї та герби. Православна шляхта залишається без рівних прав.',
+      ],
+      choices: [
+        'Прийняти унію як є: польські привілеї зміцнять католицьку шляхту й союз із Польщею.',
+        'Вимагати включення православної шляхти: без цього унія розколе суспільство ВКЛ.',
+      ],
+      correct: 1,
+      correctText: 'Захист православних',
+      feedbackCorrect: [
+        'Правильно! Городельська унія 1413 р. справді закріпила дискримінацію православної шляхти — це породило тривалий конфлікт між католицькою й православною знаттю ВКЛ. Більш мудра політика включала б рівні права, що зміцнило б державу.',
+      ],
+      feedbackWrong: [
+        'Дискримінація православної шляхти стала джерелом тривалих конфліктів у ВКЛ. Правильна відповідь — вимагати включення православних, щоб уникнути розколу.',
+        null,
+      ],
+    },
+    {
+      id: 5,
+      title: 'Петиція про магдебурзьке право',
+      desc: [
+        'Рік 1494. Київські міщани звертаються до великого князя ',
+        ['strong', 'Олександра Ягеллончика'],
+        ' з проханням надати Києву ',
+        ['strong', 'Магдебурзьке право'],
+        ' — міське самоврядування за зразком західноєвропейських міст.',
+      ],
+      choices: [
+        'Підтримати надання Магдебурзького права: це зміцнить торгівлю й лояльність містян.',
+        'Відкласти питання: надання права ослабить контроль над стратегічним Києвом.',
+      ],
+      correct: 0,
+      correctText: 'Надати Магдебурзьке право',
+      feedbackCorrect: [
+        'Правильно! У 1494–1497 роках Олександр Ягеллончик надав Києву Магдебурзьке право. Це зміцнило самоврядування, захистило купців від довільних поборів і стимулювало розвиток ремесел і торгівлі на Подолі.',
+      ],
+      feedbackWrong: [
+        null,
+        'Відкладення означало подальшу слабкість міського самоврядування та обмеження розвитку торгівлі. Реально Магдебурзьке право надали Києву в 1494–1497 рр. Правильна відповідь — підтримати.',
+      ],
+    },
+    {
+      id: 6,
+      title: 'Заснування Острозької академії',
+      desc: [
+        'Рік 1576. Князь ',
+        ['strong', 'Костянтин Острозький'],
+        ' звертається до вас по підтримку у заснуванні православного навчального закладу — майбутньої Острозької академії. Державна казна обмежена.',
+      ],
+      choices: [
+        'Підтримати академію: освіта зміцнить православну культуру й виховає кадри для церкви й держави.',
+        'Спрямувати кошти на військо: оборона важливіша за просвіту в часи козацьких воєн.',
+      ],
+      correct: 0,
+      correctText: 'Підтримати академію',
+      feedbackCorrect: [
+        'Вірно! Острозька академія, заснована близько 1576–1580 рр., стала першим вищим навчальним закладом в Україні. Тут видали ',
+        ['strong', 'Острозьку Біблію'],
+        ' (1581) — перший повний переклад Святого Письма церковнослов\u2019янською. Академія виховала покоління православних полемістів і вчених.',
+      ],
+      feedbackWrong: [
+        null,
+        'Ігнорування освіти означало б занепад православної культури перед натиском єзуїтів. Острозька академія стала ключовим осередком культурного опору. Правильна відповідь — підтримати академію.',
+      ],
+    },
+    {
+      id: 7,
+      title: 'Пропозиція Берестейської унії',
+      desc: [
+        'Рік 1596. На соборі в Бересті пропонується ',
+        ['strong', 'церковна унія'],
+        ': православні єпископи визнають верховенство Папи Римського, зберігаючи східний обряд. Це розколює православне суспільство ВКЛ.',
+      ],
+      choices: [
+        'Підтримати унію: об\u2019єднання з Римом зміцнить позиції українського духовенства в католицькій державі.',
+        'Відстоювати православну традицію: унія розколе суспільство й послабить опір полонізації.',
+      ],
+      correct: 1,
+      correctText: 'Відстоювати православ\u2019я',
+      feedbackCorrect: [
+        'Правильно! Берестейська унія 1596 р. справді розколола православне суспільство: більша частина вірян і козацтво відкинули унію, а Петро Могила пізніше відновив православну ієрархію. Унія послабила єдність перед польським тиском і стала джерелом конфліктів на понад два століття.',
+      ],
+      feedbackWrong: [
+        'Берестейська унія призвела до глибокого розколу. Козацтво й більшість мирян рішуче відкинули унію. Вона посилила, а не послабила польський культурний тиск. Правильна відповідь — відстоювати православ\u2019я.',
+        null,
+      ],
+    },
+    {
+      id: 8,
+      title: 'Підсумок спадщини',
+      desc: [
+        'Ваша дипломатична кар\u2019єра добігає кінця. Ви зробили ',
+        ['strong', '8 ключових рішень'],
+        ', що визначили долю Великого князівства Литовського та українських земель. Тепер — час підбити підсумки.',
+      ],
+      choices: [
+        'Завершити кар\u2019єру і переглянути підсумковий звіт.',
+      ],
+      correct: 0,
+      correctText: 'Завершити кар\u2019єру',
+      feedbackCorrect: [
+        'Ваша дипломатична місія завершена. Переходимо до підсумкового звіту…',
+      ],
+      feedbackWrong: [null],
+    },
+  ];
+
+  /* ── State ── */
+  let currentNode = 0;
+  let reputation  = 50;
+  let history     = []; // {nodeIdx, choiceIdx, wasCorrect}
+
+  /* ── DOM refs ── */
+  const introScreen   = document.getElementById('introScreen');
+  const endScreen     = document.getElementById('endScreen');
+  const nodeLabel     = document.getElementById('nodeLabel');
+  const nodeTitle     = document.getElementById('nodeTitle');
+  const nodeDesc      = document.getElementById('nodeDesc');
+  const choicesList   = document.getElementById('choicesList');
+  const feedbackPanel = document.getElementById('feedbackPanel');
+  const feedbackHead  = document.getElementById('feedbackHeading');
+  const feedbackDet   = document.getElementById('feedbackDetail');
+  const repDeltaEl    = document.getElementById('repDelta');
+  const btnNext       = document.getElementById('btnNext');
+  const nodeCounter   = document.getElementById('nodeCounter');
+  const repDisplay    = document.getElementById('repDisplay');
+  const repBar        = document.getElementById('repBar');
+  const repBarVal     = document.getElementById('repBarVal');
+  const summaryBody   = document.getElementById('summaryBody');
+  const finalScoreText= document.getElementById('finalScoreText');
+  const finalRank     = document.getElementById('finalRank');
+
+  /* ── Safe DOM helpers ── */
+
+  /**
+   * Build child nodes from a descriptor array.
+   * Each element is either:
+   *   - a plain string → Text node
+   *   - ['strong', text] → <strong> element
+   * No user-supplied data is used — all content is from NODES above.
+   */
+  function appendDescNodes(parent, parts) {
+    parent.textContent = '';
+    parts.forEach(function(part) {
+      if (typeof part === 'string') {
+        parent.appendChild(document.createTextNode(part));
+      } else if (Array.isArray(part) && part[0] === 'strong') {
+        var el = document.createElement('strong');
+        el.textContent = part[1];
+        parent.appendChild(el);
+      }
+    });
+  }
+
+  /**
+   * Same as appendDescNodes but for feedback strings (flat string array
+   * with optional ['strong', …] tuples).
+   */
+  function renderFeedback(container, parts) {
+    container.textContent = '';
+    parts.forEach(function(part) {
+      if (typeof part === 'string') {
+        container.appendChild(document.createTextNode(part));
+      } else if (Array.isArray(part) && part[0] === 'strong') {
+        var el = document.createElement('strong');
+        el.style.color = 'var(--dipl-gold-lt)';
+        el.textContent = part[1];
+        container.appendChild(el);
+      }
+    });
+  }
+
+  /* ── Helpers ── */
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  function updateRepUI() {
+    var pct = clamp(reputation, 0, 100);
+    repDisplay.textContent  = reputation;
+    repBar.style.width      = pct + '%';
+    repBarVal.textContent   = reputation;
+  }
+
+  function buildChoiceBtn(choiceText, idx, letter, nodeIdx) {
+    var btn = document.createElement('button');
+    btn.className = 'choice-btn';
+
+    var span1 = document.createElement('span');
+    span1.className   = 'choice-letter';
+    span1.textContent = letter + '.';
+
+    var span2 = document.createElement('span');
+    span2.className   = 'choice-text';
+    span2.textContent = choiceText;
+
+    btn.appendChild(span1);
+    btn.appendChild(span2);
+    btn.addEventListener('click', function() { handleChoice(nodeIdx, idx, btn); });
+    return btn;
+  }
+
+  function renderNode(idx) {
+    var n       = NODES[idx];
+    var letters = ['А', 'Б', 'В', 'Г', 'Д'];
+
+    nodeLabel.textContent   = 'Ситуація ' + (idx + 1) + ' з 8';
+    nodeTitle.textContent   = n.title;
+    nodeCounter.textContent = (idx + 1) + ' / 8';
+
+    appendDescNodes(nodeDesc, n.desc);
+
+    choicesList.textContent = '';
+    n.choices.forEach(function(ch, ci) {
+      choicesList.appendChild(buildChoiceBtn(ch, ci, letters[ci], idx));
+    });
+
+    feedbackPanel.classList.remove('visible');
+    document.getElementById('nodeCard').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function handleChoice(nodeIdx, choiceIdx, clickedBtn) {
+    var n         = NODES[nodeIdx];
+    var isCorrect = (choiceIdx === n.correct);
+    var delta     = isCorrect ? 10 : -5;
+
+    /* disable all */
+    var btns = choicesList.querySelectorAll('.choice-btn');
+    btns.forEach(function(b) { b.disabled = true; });
+
+    /* highlight chosen and correct */
+    clickedBtn.classList.add(isCorrect ? 'correct-flash' : 'wrong-flash');
+    if (!isCorrect) {
+      btns[n.correct].classList.add('correct-flash');
+    }
+
+    /* record */
+    history.push({ nodeIdx: nodeIdx, choiceIdx: choiceIdx, wasCorrect: isCorrect });
+
+    /* update rep */
+    reputation = clamp(reputation + delta, 0, 100);
+    updateRepUI();
+
+    /* feedback heading */
+    feedbackHead.textContent = isCorrect ? '\u2713 Правильно!' : '\u2717 Не зовсім\u2026';
+    feedbackHead.className   = 'feedback-heading ' + (isCorrect ? 'correct' : 'wrong');
+
+    /* rep delta pill */
+    repDeltaEl.textContent = (delta >= 0 ? '+' : '') + delta + ' до репутації';
+    repDeltaEl.className   = 'rep-delta ' + (delta >= 0 ? 'plus' : 'minus');
+
+    /* feedback text */
+    var fbParts = isCorrect
+      ? n.feedbackCorrect
+      : (n.feedbackWrong[choiceIdx] != null
+          ? [n.feedbackWrong[choiceIdx]]
+          : n.feedbackCorrect);
+    renderFeedback(feedbackDet, fbParts);
+
+    feedbackPanel.classList.add('visible');
+    btnNext.textContent = (nodeIdx === NODES.length - 1)
+      ? 'Переглянути підсумок →'
+      : 'Далі →';
+  }
+
+  function advance() {
+    currentNode++;
+    if (currentNode >= NODES.length) {
+      showEnd();
+    } else {
+      renderNode(currentNode);
+      feedbackPanel.classList.remove('visible');
+    }
+  }
+
+  function getRank(rep) {
+    if (rep >= 90) return '\u2756 Великий дипломат — ваша мудрість увійшла в хроніки.';
+    if (rep >= 70) return '\u{1F4DC} Досвідчений посол — ви залишили добру спадщину.';
+    if (rep >= 50) return '\u{1F54A} Порядний радник — більше перемог, ніж поразок.';
+    if (rep >= 30) return '\u{1F4C9} Спірний стратег — ваші помилки коштували дорого.';
+    return '\u{1F494} Сумний фінал — Велике князівство потребувало кращих рішень.';
+  }
+
+  function buildSummaryRow(rec, rowNum) {
+    var n   = NODES[rec.nodeIdx];
+    var letters = ['А', 'Б', 'В', 'Г', 'Д'];
+
+    var tr = document.createElement('tr');
+
+    function td(text, cls) {
+      var cell = document.createElement('td');
+      cell.textContent = text;
+      if (cls) { cell.className = cls; }
+      return cell;
+    }
+
+    tr.appendChild(td(String(rowNum)));
+    tr.appendChild(td(n.title));
+    tr.appendChild(td(letters[rec.choiceIdx] + '. ' + n.choices[rec.choiceIdx]));
+    tr.appendChild(td(n.correctText));
+    tr.appendChild(td(rec.wasCorrect ? '+10' : '\u22125', rec.wasCorrect ? 'mark-correct' : 'mark-wrong'));
+    return tr;
+  }
+
+  function showEnd() {
+    summaryBody.textContent = '';
+    history.forEach(function(rec, i) {
+      summaryBody.appendChild(buildSummaryRow(rec, i + 1));
+    });
+
+    finalScoreText.textContent = 'Підсумкова репутація: ' + reputation + ' / 100';
+    finalRank.textContent      = getRank(reputation);
+
+    endScreen.classList.remove('hidden');
+
+    if (window.HLGAnalytics) {
+      window.HLGAnalytics.endSession({ score: reputation, won: reputation >= 50, attempts: 1 });
+    }
+  }
+
+  function startGame() {
+    currentNode = 0;
+    reputation  = 50;
+    history     = [];
+
+    if (window.HLGAnalytics) {
+      window.HLGAnalytics.startSession('diplomat');
+    }
+
+    updateRepUI();
+    introScreen.classList.add('hidden');
+    endScreen.classList.add('hidden');
+    renderNode(0);
+  }
+
+  /* ── Event listeners ── */
+  document.getElementById('btnStartGame').addEventListener('click', startGame);
+  btnNext.addEventListener('click', advance);
+  document.getElementById('btnRestart').addEventListener('click', function() {
+    endScreen.classList.add('hidden');
+    introScreen.classList.remove('hidden');
+  });
+
+  /* ── Initial state ── */
+  updateRepUI();
+  </script>
+</body>
+</html>
