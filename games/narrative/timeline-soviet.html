@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Хронологія: радянський період</title>
+  <link rel="stylesheet" href="../../shared/css/reset.css">
+  <link rel="stylesheet" href="../../shared/css/theme.css">
+  <link rel="stylesheet" href="../../shared/css/layout.css">
+  <link rel="stylesheet" href="../../shared/css/components.css">
+  <link rel="stylesheet" href="../../shared/css/animations.css">
+  <link rel="stylesheet" href="../../shared/css/responsive.css">
+  <style>
+    /* ── Socialist realism overrides ── */
+    :root {
+      --game-accent: #c41e3a;
+      --soviet-gold: #d4a017;
+      --soviet-red: #c41e3a;
+      --soviet-dark: #1a0a0a;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1a0a0a 0%, #2a1010 100%);
+      min-height: 100vh;
+    }
+
+    /* Bold serif headings in the constructivist tradition */
+    h1, h2, h3 {
+      font-family: Georgia, 'Times New Roman', serif;
+      letter-spacing: 0.04em;
+    }
+
+    #gameTitle {
+      color: var(--soviet-gold);
+      text-shadow: 0 0 18px rgba(212, 160, 23, 0.5);
+      font-family: Georgia, 'Times New Roman', serif;
+      font-weight: 700;
+    }
+
+    .round-name {
+      color: var(--soviet-gold);
+      font-family: Georgia, 'Times New Roman', serif;
+      font-style: italic;
+    }
+
+    /* ── Timeline items with red borders and gold star ── */
+    .timeline-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 var(--space-md);
+    }
+
+    .timeline-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-md);
+      margin-bottom: var(--space-sm);
+      background: rgba(42, 16, 16, 0.7);
+      border: 2px solid var(--soviet-red);
+      border-radius: var(--radius-md);
+      cursor: grab;
+      user-select: none;
+      transition: transform 0.15s, border-color 0.3s, background 0.3s;
+      position: relative;
+    }
+
+    /* Gold star decoration on each event card */
+    .timeline-item::before {
+      content: '★';
+      color: var(--soviet-gold);
+      font-size: var(--text-lg);
+      flex-shrink: 0;
+      line-height: 1;
+      opacity: 0.85;
+    }
+
+    .timeline-item:hover {
+      transform: scale(1.01);
+      border-color: var(--soviet-gold);
+      background: rgba(60, 20, 20, 0.85);
+    }
+
+    .timeline-item:active { cursor: grabbing; }
+
+    .timeline-item.dragging {
+      opacity: 0.4;
+      transform: scale(0.98);
+    }
+
+    .timeline-item.drag-over {
+      border-color: var(--soviet-gold);
+      background: rgba(212, 160, 23, 0.12);
+    }
+
+    .timeline-item.selected {
+      border-color: var(--soviet-gold);
+      background: rgba(212, 160, 23, 0.12);
+      box-shadow: 0 0 14px rgba(212, 160, 23, 0.35);
+    }
+
+    .timeline-item.correct {
+      border-color: var(--color-accent-green);
+      background: rgba(34, 197, 94, 0.1);
+    }
+
+    .timeline-item.incorrect {
+      border-color: var(--soviet-red);
+      background: rgba(196, 30, 58, 0.18);
+      animation: shake 0.4s ease;
+    }
+
+    .timeline-item.hint-flash {
+      border-color: var(--soviet-gold);
+      background: rgba(212, 160, 23, 0.18);
+      animation: pulse 0.5s ease 3;
+    }
+
+    .timeline-handle {
+      font-size: var(--text-lg);
+      opacity: 0.4;
+      flex-shrink: 0;
+    }
+
+    .timeline-text {
+      flex: 1;
+      font-size: var(--text-base);
+      color: var(--color-text-primary);
+      font-weight: 500;
+      font-family: Georgia, 'Times New Roman', serif;
+    }
+
+    .timeline-year {
+      font-size: var(--text-sm);
+      font-weight: 700;
+      color: var(--soviet-gold);
+      flex-shrink: 0;
+      min-width: 80px;
+      text-align: right;
+    }
+
+    .timeline-clone {
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      border-color: var(--soviet-gold);
+    }
+
+    /* Stats panel with Soviet styling */
+    .stats-panel {
+      border: 1px solid rgba(196, 30, 58, 0.4);
+    }
+
+    .stat-label {
+      color: rgba(212, 160, 23, 0.8);
+    }
+
+    .stat-value {
+      color: var(--soviet-gold);
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background: linear-gradient(135deg, var(--soviet-red), #8b0000);
+      border-color: var(--soviet-red);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #d42040, #a00000);
+      border-color: var(--soviet-gold);
+    }
+
+    /* Constructivist top border accent */
+    body::before {
+      content: '';
+      display: block;
+      height: 4px;
+      background: linear-gradient(90deg, var(--soviet-red) 0%, var(--soviet-gold) 50%, var(--soviet-red) 100%);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 9999;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .round-name {
+      text-align: center;
+      font-size: var(--text-lg);
+      margin-bottom: var(--space-md);
+    }
+
+    /* ── Light theme overrides ── */
+    body.theme-light {
+      background: linear-gradient(135deg, #f5ede8 0%, #ecdbd5 100%);
+    }
+
+    body.theme-light .timeline-item {
+      background: rgba(255, 245, 240, 0.9);
+      border-color: #c41e3a;
+      color: #1a0a0a;
+    }
+
+    body.theme-light .timeline-item:hover {
+      background: rgba(255, 235, 225, 0.95);
+      border-color: #8b0000;
+    }
+
+    body.theme-light .timeline-text {
+      color: #2a0a0a;
+    }
+
+    body.theme-light .timeline-year {
+      color: #8b0000;
+    }
+
+    body.theme-light #gameTitle {
+      color: #8b0000;
+      text-shadow: none;
+    }
+
+    body.theme-light .round-name {
+      color: #6b2020;
+    }
+
+    body.theme-light .stat-label {
+      color: #8b0000;
+    }
+
+    body.theme-light .stat-value {
+      color: #c41e3a;
+    }
+
+    /* ── High contrast overrides ── */
+    .high-contrast .timeline-item {
+      border-width: 3px;
+      border-color: #c41e3a;
+    }
+
+    .high-contrast .timeline-item:hover,
+    .high-contrast .timeline-item.selected {
+      border-width: 3px;
+      border-color: #d4a017;
+      box-shadow: 0 0 0 2px #d4a017;
+    }
+
+    .high-contrast .timeline-item::before {
+      opacity: 1;
+    }
+
+    .high-contrast body::before {
+      height: 6px;
+    }
+  </style>
+</head>
+<body data-section="Радянський період" data-game-title="Хронологія" data-home-url="../../index.html">
+
+  <h1 id="gameTitle" class="section-title" style="margin-top:var(--space-lg);">Хронологія</h1>
+  <p id="roundName" class="round-name"></p>
+
+  <div class="stats-panel" style="max-width:500px; margin:0 auto var(--space-md);">
+    <div class="stat-item">
+      <span class="stat-label">Раунд</span>
+      <span class="stat-value"><span id="round">1</span> / <span id="totalRounds">1</span></span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Рахунок</span>
+      <span class="stat-value" id="score">0</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Спроби</span>
+      <span class="stat-value" id="attempts">0</span>
+    </div>
+  </div>
+
+  <div class="timeline-container" id="eventList" role="list" aria-label="Перетягніть події у правильному хронологічному порядку"></div>
+
+  <div class="controls-panel" style="max-width:500px; margin:var(--space-md) auto;">
+    <button class="btn btn-primary" id="checkBtn">Перевірити</button>
+    <button class="btn btn-secondary" id="hintBtn">Підказка</button>
+    <button class="btn btn-ghost" id="resetBtn">Скинути</button>
+  </div>
+
+  <script src="../../data/timeline/period-7-radianskyi.js"></script>
+  <script src="../../shared/js/nav.js"></script>
+  <script src="../../shared/js/timeline-engine.js"></script>
+  <script>
+    (function () {
+      function initGame() {
+        var data = window.TIMELINE_DATA;
+        if (!data) {
+          document.getElementById('eventList').textContent =
+            'Не вдалося завантажити дані гри';
+          return;
+        }
+
+        if (data.title) {
+          document.getElementById('gameTitle').textContent = data.title;
+          document.title = data.title;
+          document.body.setAttribute('data-game-title', data.title);
+        }
+        if (data.section) {
+          document.body.setAttribute('data-section', data.section);
+        }
+
+        TimelineGame.init({
+          rounds: data.rounds,
+          title: data.title
+        });
+      }
+
+      initGame();
+    })();
+  </script>
+  <script src="../../shared/js/analytics.js"></script>
+  <script src="../../shared/js/accessibility.js"></script>
+</body>
+</html>
