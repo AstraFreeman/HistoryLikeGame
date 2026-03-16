@@ -1,0 +1,1227 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Будівник міста — ВКЛ</title>
+  <link rel="stylesheet" href="../../shared/css/reset.css">
+  <link rel="stylesheet" href="../../shared/css/theme.css">
+  <link rel="stylesheet" href="../../shared/css/components.css">
+  <link rel="stylesheet" href="../../shared/css/animations.css">
+  <style>
+    :root {
+      --game-accent: var(--color-accent-orange);
+    }
+
+    /* ── Layout ── */
+    .city-wrap {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: var(--space-md);
+      gap: var(--space-md);
+    }
+
+    /* ── Header ── */
+    .game-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      padding: var(--space-md) var(--space-lg);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(var(--glass-blur));
+    }
+
+    .game-header h1 {
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      background: linear-gradient(135deg, #f97316 0%, #f59e0b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0;
+    }
+
+    .header-stats {
+      display: flex;
+      gap: var(--space-lg);
+      align-items: center;
+    }
+
+    .header-stat {
+      text-align: center;
+    }
+
+    .header-stat-label {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      display: block;
+    }
+
+    .header-stat-value {
+      font-size: var(--text-xl);
+      font-weight: 700;
+      color: var(--color-accent-orange);
+    }
+
+    /* ── Main content area ── */
+    .game-content {
+      display: grid;
+      grid-template-columns: 1fr 280px;
+      gap: var(--space-md);
+      flex: 1;
+    }
+
+    /* ── City grid section ── */
+    .city-section {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .city-section-title {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── City grid ── */
+    .city-grid-wrap {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      backdrop-filter: blur(var(--glass-blur));
+      transform: perspective(800px) rotateX(10deg);
+      transform-origin: center bottom;
+    }
+
+    .city-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: var(--space-sm);
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .city-cell {
+      aspect-ratio: 1;
+      border-radius: var(--radius-md);
+      border: 2px dashed var(--glass-border);
+      background: rgba(255, 255, 255, 0.03);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all var(--transition-base);
+      position: relative;
+      overflow: hidden;
+      min-height: 80px;
+    }
+
+    .city-cell:hover:not(.built):not(.road):not(.empty-lot) {
+      border-color: var(--color-accent-orange);
+      background: rgba(249, 115, 22, 0.08);
+      transform: scale(1.05);
+    }
+
+    .city-cell.built {
+      border-style: solid;
+      border-color: var(--color-accent-orange);
+      background: rgba(249, 115, 22, 0.1);
+      cursor: default;
+      animation: buildingAppear 0.6s ease both;
+    }
+
+    @keyframes buildingAppear {
+      from { opacity: 0; transform: scale(0.5) translateY(20px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .city-cell.road {
+      border: 1px solid var(--glass-border);
+      background: rgba(100, 116, 139, 0.1);
+      cursor: default;
+    }
+
+    .city-cell.road::after {
+      content: '';
+      position: absolute;
+      background: rgba(148, 163, 184, 0.15);
+      border-radius: 2px;
+    }
+
+    .city-cell.road.h::after {
+      width: 80%;
+      height: 30%;
+    }
+
+    .city-cell.road.v::after {
+      width: 30%;
+      height: 80%;
+    }
+
+    .city-cell.empty-lot {
+      border-style: dotted;
+      cursor: default;
+    }
+
+    /* Cell contents */
+    .cell-icon {
+      font-size: var(--text-2xl);
+      line-height: 1;
+    }
+
+    .cell-img {
+      width: 70%;
+      height: 70%;
+      object-fit: cover;
+      border-radius: var(--radius-sm);
+    }
+
+    .cell-label {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      margin-top: var(--space-xs);
+      text-align: center;
+      line-height: 1.2;
+      padding: 0 2px;
+    }
+
+    .city-cell.built .cell-label {
+      color: var(--color-accent-orange);
+      font-weight: 600;
+    }
+
+    .cell-plus {
+      font-size: var(--text-xl);
+      color: var(--color-text-muted);
+      opacity: 0.4;
+    }
+
+    /* ── Queue sidebar ── */
+    .queue-sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .sidebar-panel {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-md);
+      backdrop-filter: blur(var(--glass-blur));
+    }
+
+    .panel-title {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: var(--space-sm);
+    }
+
+    /* ── Building queue ── */
+    .building-queue {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xs);
+    }
+
+    .queue-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--glass-border);
+      background: var(--color-surface);
+      font-size: var(--text-sm);
+      transition: all var(--transition-base);
+    }
+
+    .queue-item.active {
+      border-color: var(--color-accent-orange);
+      background: rgba(249, 115, 22, 0.1);
+    }
+
+    .queue-item.done {
+      opacity: 0.4;
+      text-decoration: line-through;
+    }
+
+    .queue-item-icon {
+      font-size: var(--text-lg);
+      flex-shrink: 0;
+    }
+
+    .queue-item-name {
+      color: var(--color-text-primary);
+      flex: 1;
+    }
+
+    .queue-item-status {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+    }
+
+    .queue-item.done .queue-item-status {
+      color: var(--color-accent-green);
+    }
+
+    /* ── Progress bar ── */
+    .progress-wrap {
+      background: rgba(255,255,255,0.05);
+      border-radius: var(--radius-full);
+      height: 8px;
+      overflow: hidden;
+      margin-top: var(--space-xs);
+    }
+
+    .progress-bar {
+      height: 100%;
+      border-radius: var(--radius-full);
+      background: linear-gradient(90deg, var(--color-accent-orange), var(--color-accent-red));
+      transition: width 0.5s ease;
+    }
+
+    /* ── Screen overlays ── */
+    .screen-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: var(--z-modal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .screen-overlay.hidden {
+      display: none;
+    }
+
+    .screen-card {
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl) var(--space-xl);
+      max-width: 560px;
+      width: calc(100% - var(--space-2xl));
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .screen-card h2 {
+      font-size: var(--text-3xl);
+      font-weight: 700;
+      margin-bottom: var(--space-md);
+      background: linear-gradient(135deg, #f97316 0%, #f59e0b 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .screen-card p {
+      color: var(--color-text-secondary);
+      line-height: 1.7;
+      margin-bottom: var(--space-md);
+      font-size: var(--text-base);
+    }
+
+    /* ── Question modal ── */
+    .question-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(10px);
+      z-index: var(--z-modal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.25s ease both;
+    }
+
+    .question-modal.hidden {
+      display: none;
+    }
+
+    .question-card {
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl);
+      max-width: 520px;
+      width: calc(100% - var(--space-2xl));
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .question-building-name {
+      font-size: var(--text-lg);
+      font-weight: 700;
+      color: var(--color-accent-orange);
+      margin-bottom: var(--space-xs);
+    }
+
+    .question-subtitle {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      margin-bottom: var(--space-lg);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .question-text {
+      font-size: var(--text-lg);
+      color: var(--color-text-primary);
+      font-weight: 600;
+      margin-bottom: var(--space-lg);
+      line-height: 1.5;
+    }
+
+    .answer-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-lg);
+    }
+
+    .answer-btn {
+      padding: var(--space-sm) var(--space-md);
+      background: var(--color-surface);
+      border: 2px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      color: var(--color-text-primary);
+      font-size: var(--text-sm);
+      text-align: left;
+      cursor: pointer;
+      transition: all var(--transition-base);
+      min-height: 56px;
+      line-height: 1.4;
+    }
+
+    .answer-btn:hover:not(:disabled) {
+      border-color: var(--color-accent-orange);
+      background: rgba(249, 115, 22, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .answer-btn.correct {
+      border-color: var(--color-accent-green);
+      background: rgba(34, 197, 94, 0.15);
+      color: var(--color-accent-green);
+    }
+
+    .answer-btn.wrong {
+      border-color: var(--color-accent-red);
+      background: rgba(239, 68, 68, 0.12);
+      color: var(--color-accent-red);
+      animation: shake 0.4s ease;
+    }
+
+    .answer-btn:disabled {
+      cursor: not-allowed;
+    }
+
+    .question-feedback {
+      padding: var(--space-md);
+      border-radius: var(--radius-md);
+      font-size: var(--text-sm);
+      line-height: 1.6;
+      margin-bottom: var(--space-md);
+      display: none;
+    }
+
+    .question-feedback.success {
+      display: block;
+      background: rgba(34, 197, 94, 0.1);
+      border: 1px solid rgba(34, 197, 94, 0.3);
+      color: var(--color-text-secondary);
+    }
+
+    .question-feedback.failure {
+      display: block;
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: var(--color-text-secondary);
+    }
+
+    .question-feedback-title {
+      display: block;
+      font-size: var(--text-base);
+      font-weight: 700;
+      margin-bottom: var(--space-xs);
+    }
+
+    .question-feedback.success .question-feedback-title {
+      color: var(--color-accent-green);
+    }
+
+    .question-feedback.failure .question-feedback-title {
+      color: var(--color-accent-red);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: var(--space-sm);
+      justify-content: flex-end;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* ── End screen specifics ── */
+    .end-stats {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-xl);
+      margin: var(--space-lg) 0;
+    }
+
+    .end-stat {
+      text-align: center;
+    }
+
+    .end-stat-value {
+      font-size: var(--text-3xl);
+      font-weight: 700;
+      color: var(--color-accent-orange);
+    }
+
+    .end-stat-label {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+    }
+
+    .facts-recap {
+      text-align: left;
+      margin: var(--space-lg) 0;
+    }
+
+    .facts-recap h3 {
+      font-size: var(--text-lg);
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-md);
+    }
+
+    .fact-item {
+      background: var(--color-surface);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-md);
+      margin-bottom: var(--space-sm);
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+
+    .fact-item-name {
+      color: var(--color-accent-orange);
+      display: block;
+      font-weight: 700;
+      margin-bottom: var(--space-xs);
+    }
+
+    /* ── Light theme overrides ── */
+    body.theme-light .city-grid-wrap {
+      background: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0, 0, 0, 0.1);
+    }
+
+    body.theme-light .city-cell {
+      background: rgba(0, 0, 0, 0.02);
+      border-color: rgba(0, 0, 0, 0.15);
+    }
+
+    body.theme-light .city-cell:hover:not(.built):not(.road):not(.empty-lot) {
+      background: rgba(249, 115, 22, 0.07);
+    }
+
+    body.theme-light .city-cell.built {
+      background: rgba(249, 115, 22, 0.1);
+    }
+
+    body.theme-light .question-card,
+    body.theme-light .screen-card {
+      background: #ffffff;
+    }
+
+    /* ── High contrast overrides ── */
+    .high-contrast .city-cell {
+      border-width: 2px !important;
+    }
+
+    .high-contrast .city-cell.built {
+      border-width: 3px !important;
+    }
+
+    .high-contrast .answer-btn {
+      border-width: 2px !important;
+    }
+
+    .high-contrast .question-card,
+    .high-contrast .screen-card {
+      border-width: 2px !important;
+      backdrop-filter: none !important;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 860px) {
+      .game-content {
+        grid-template-columns: 1fr;
+      }
+
+      .queue-sidebar {
+        order: -1;
+      }
+
+      .city-grid-wrap {
+        transform: none;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .city-grid {
+        gap: var(--space-xs);
+      }
+
+      .city-cell {
+        min-height: 60px;
+      }
+
+      .cell-icon {
+        font-size: var(--text-xl);
+      }
+
+      .cell-label {
+        font-size: 0.6rem;
+      }
+
+      .answer-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .game-header h1 {
+        font-size: var(--text-xl);
+      }
+    }
+  </style>
+</head>
+<body data-section="ВКЛ" data-game-title="Будівник міста" data-home-url="../../index.html">
+
+  <!-- ── Intro screen ── -->
+  <div id="introScreen" class="screen-overlay">
+    <div class="screen-card">
+      <h2>Будівник міста</h2>
+      <p style="font-size: var(--text-3xl); margin-bottom: var(--space-sm);">&#x1F3F0;</p>
+      <p>Вітаємо! Місту щойно надано магдебурзьке право. Ви &#x2014; бурмистр, якому доручено зводити середньовічне українське місто доби Великого Князівства Литовського.</p>
+      <p>Оберіть порожню клітинку на сітці &#x2014; відповідайте на питання про ВКЛ, щоб отримати дозвіл на будівництво. Правильна відповідь зводить будівлю. Побудуйте всі 8 споруд!</p>
+      <p><strong>Як грати:</strong></p>
+      <p>1. Натисніть на вільну клітинку<br>
+         2. Дайте правильну відповідь на питання<br>
+         3. Будівля з&#x2019;явиться на карті міста<br>
+         4. Помилка &#x2014; спробуйте знову в іншій клітинці</p>
+      <button class="btn btn-accent btn-lg" id="startBtn">Заснувати місто</button>
+    </div>
+  </div>
+
+  <!-- ── Win screen ── -->
+  <div id="winScreen" class="screen-overlay hidden">
+    <div class="screen-card">
+      <h2>Місто збудовано!</h2>
+      <p style="font-size: var(--text-3xl); margin-bottom: 0;">&#x1F3C6;</p>
+      <div class="end-stats">
+        <div class="end-stat">
+          <div class="end-stat-value" id="endFirstTry">0</div>
+          <div class="end-stat-label">З першої спроби</div>
+        </div>
+        <div class="end-stat">
+          <div class="end-stat-value">8</div>
+          <div class="end-stat-label">Всього будівель</div>
+        </div>
+      </div>
+      <div class="facts-recap" id="factsRecap"></div>
+      <button class="btn btn-accent btn-lg" id="restartBtn">Нова гра</button>
+      <br>
+      <a href="../../index.html" class="btn btn-secondary" style="margin-top: var(--space-sm); display: inline-flex;">На головну</a>
+    </div>
+  </div>
+
+  <!-- ── Question modal ── -->
+  <div id="questionModal" class="question-modal hidden" role="dialog" aria-modal="true" aria-labelledby="qBuildingName">
+    <div class="question-card">
+      <div class="question-building-name" id="qBuildingName"></div>
+      <div class="question-subtitle">Дозвіл на будівництво &#x2014; відповідайте на питання</div>
+      <div class="question-text" id="qText"></div>
+      <div class="answer-grid" id="qAnswers"></div>
+      <div class="question-feedback" id="qFeedback">
+        <span class="question-feedback-title" id="qFeedbackTitle"></span>
+        <span id="qFeedbackBody"></span>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary btn-sm" id="qCancelBtn">Скасувати</button>
+        <button class="btn btn-accent btn-sm hidden" id="qContinueBtn">Продовжити</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Main game UI ── -->
+  <div class="city-wrap" id="gameUI" style="display: none;">
+    <div class="game-header">
+      <h1>&#x1F3F0; Будівник міста</h1>
+      <div class="header-stats">
+        <div class="header-stat">
+          <span class="header-stat-label">Будівель</span>
+          <span class="header-stat-value" id="builtCount">0/8</span>
+        </div>
+        <div class="header-stat">
+          <span class="header-stat-label">З першої спроби</span>
+          <span class="header-stat-value" id="firstTryCount">0</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="game-content">
+      <!-- Left: city grid -->
+      <div class="city-section">
+        <div class="city-section-title">Карта міста</div>
+        <div class="city-grid-wrap">
+          <div class="city-grid" id="cityGrid"></div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+        </div>
+      </div>
+
+      <!-- Right: sidebar -->
+      <div class="queue-sidebar">
+        <div class="sidebar-panel">
+          <div class="panel-title">&#x1F4CB; Черга будівництва</div>
+          <div class="building-queue" id="buildingQueue"></div>
+        </div>
+        <div class="sidebar-panel">
+          <div class="panel-title">&#x1F4A1; Підказка</div>
+          <p style="font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.6; margin: 0;" id="hintText">
+            Натисніть на вільну клітинку, щоб розпочати будівництво.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../shared/js/asset-validator.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      /* ── Building data ── */
+      var BUILDINGS = [
+        {
+          id: 'ratush',
+          name: 'Ратуша',
+          icon: null,
+          imgSrc: '../../data/games/city-builder/RATH_1.jpg',
+          question: 'Який правовий статус надавав місту магдебурзьке право?',
+          options: ['Самоврядування', 'Церковну владу', 'Військову автономію', 'Кріпацьку залежність'],
+          correct: 0,
+          fact: 'Магдебурзьке право звільняло міщан від влади феодала та надавало місту право обирати власний орган управління — магістрат із бурмистром та радою. В Україні його першим отримало Сянок (1339), а потім Львів (1356).'
+        },
+        {
+          id: 'tserkva',
+          name: 'Церква',
+          icon: null,
+          imgSrc: '../../data/games/city-builder/TSER_1.jpg',
+          question: 'Яку церковну унію було укладено в 1596 році?',
+          options: ['Берестейську', 'Флорентійську', 'Констанцську', 'Люблінську'],
+          correct: 0,
+          fact: 'Берестейська унія 1596 року об\'єднала частину православної церкви України з Римом, утворивши греко-католицьку церкву. Вона стала одним із найважливіших релігійних і політичних актів доби ВКЛ та Речі Посполитої.'
+        },
+        {
+          id: 'shkola',
+          name: 'Школа',
+          icon: null,
+          imgSrc: '../../data/games/city-builder/SHKO_1.jpg',
+          question: 'Хто заснував Острозьку академію?',
+          options: ['Василь-Костянтин Острозький', 'Іван Федоров', 'Петро Могила', 'Вітовт'],
+          correct: 0,
+          fact: 'Острозька академія, заснована близько 1576 року Василем-Костянтином Острозьким, стала першим вищим навчальним закладом на східнослов\'янських землях. Тут вивчали грецьку, латинську та церковнослов\'янську мови, богослов\'я та «сім вільних мистецтв».'
+        },
+        {
+          id: 'fortetsia',
+          name: 'Фортеця',
+          icon: null,
+          imgSrc: '../../data/games/city-builder/FORT_1.jpg',
+          question: 'Яка битва 1362 року передала українські землі під владу ВКЛ?',
+          options: ['Битва на Синіх Водах', 'Битва на Ворсклі', 'Грюнвальдська битва', 'Битва на Куликовому полі'],
+          correct: 0,
+          fact: 'Битва на Синіх Водах (1362) — перемога великого князя Ольгерда над монголо-татарами. Внаслідок цієї перемоги Поділля, Київщина та більша частина Чернігівщини увійшли до складу Великого Князівства Литовського.'
+        },
+        {
+          id: 'rynok',
+          name: 'Ринок',
+          icon: '\uD83D\uDED2',
+          question: 'У якому році Київ отримав магдебурзьке право?',
+          options: ['1494', '1362', '1596', '1410'],
+          correct: 0,
+          fact: 'Магдебурзьке право Київ отримав у 1494 році від великого князя литовського Олександра. Це надало місту самоврядування, звільнило міщан від феодальних повинностей і сприяло розвитку торгівлі та ремесел.'
+        },
+        {
+          id: 'tseh',
+          name: 'Цех ковалів',
+          icon: '\u2694\uFE0F',
+          question: 'Яка унія 1385 року об\'єднала Литву з Польщею?',
+          options: ['Кревська', 'Берестейська', 'Люблінська', 'Флорентійська'],
+          correct: 0,
+          fact: 'Кревська унія 1385 року об\'єднала Велике Князівство Литовське з Польщею під владою Ягайла. Вона була спрямована проти Тевтонського ордену й мала велике значення для подальшої долі українських земель у складі ВКЛ.'
+        },
+        {
+          id: 'shpytal',
+          name: 'Шпиталь',
+          icon: '\uD83C\uDFE5',
+          question: 'Хто очолював ВКЛ у період найбільшої могутності?',
+          options: ['Вітовт', 'Ягайло', 'Гедимін', 'Ольгерд'],
+          correct: 0,
+          fact: 'Вітовт (правив 1392–1430) довів ВКЛ до найбільшого територіального розширення: держава простягалася від Балтики до Чорного моря. За його правління ВКЛ стало однією з наймогутніших держав Європи.'
+        },
+        {
+          id: 'drukarnia',
+          name: 'Друкарня',
+          icon: '\uD83D\uDCDC',
+          question: 'Яку книгу надрукував Іван Федоров в Острозі?',
+          options: ['Острозьку Біблію', 'Літопис руський', 'Апостол київський', 'Псалтир дерманський'],
+          correct: 0,
+          fact: 'Острозька Біблія (1581) — перше повне видання Біблії церковнослов\'янською мовою, надруковане Іваном Федоровим в Острозі за підтримки Василя-Костянтина Острозького. Вона мала величезне культурне і релігійне значення для православних слов\'ян.'
+        }
+      ];
+
+      /* ── Grid layout: 5x5 = 25 cells ── */
+      /* Building slots at corners and mid-edge positions */
+      var BUILDING_POSITIONS = [0, 2, 4, 10, 14, 20, 22, 24];
+      /* Road cells: rows 1 and 3 (indices 5–9, 15–19) */
+      var ROAD_H_CELLS = [5, 6, 7, 8, 9, 15, 16, 17, 18, 19];
+      /* Vertical road separators between building slots */
+      var ROAD_V_CELLS = [1, 3, 11, 13, 21, 23];
+      /* Center park */
+      var PARK_CELLS = [12];
+
+      /* ── State ── */
+      var state = {
+        buildingsBuilt: 0,
+        firstTryCount: 0,
+        nextBuildingIndex: 0,
+        factsLearned: [],
+        activeCell: null,
+        activeBuilding: null,
+        isFirstAttempt: true
+      };
+
+      /* ── DOM refs ── */
+      var els = {
+        introScreen: document.getElementById('introScreen'),
+        winScreen: document.getElementById('winScreen'),
+        gameUI: document.getElementById('gameUI'),
+        questionModal: document.getElementById('questionModal'),
+        qBuildingName: document.getElementById('qBuildingName'),
+        qText: document.getElementById('qText'),
+        qAnswers: document.getElementById('qAnswers'),
+        qFeedback: document.getElementById('qFeedback'),
+        qFeedbackTitle: document.getElementById('qFeedbackTitle'),
+        qFeedbackBody: document.getElementById('qFeedbackBody'),
+        qCancelBtn: document.getElementById('qCancelBtn'),
+        qContinueBtn: document.getElementById('qContinueBtn'),
+        cityGrid: document.getElementById('cityGrid'),
+        builtCount: document.getElementById('builtCount'),
+        firstTryCount: document.getElementById('firstTryCount'),
+        progressBar: document.getElementById('progressBar'),
+        buildingQueue: document.getElementById('buildingQueue'),
+        hintText: document.getElementById('hintText'),
+        startBtn: document.getElementById('startBtn'),
+        restartBtn: document.getElementById('restartBtn'),
+        endFirstTry: document.getElementById('endFirstTry'),
+        factsRecap: document.getElementById('factsRecap')
+      };
+
+      /* ── Helper: determine cell role ── */
+      function cellRole(index) {
+        if (BUILDING_POSITIONS.indexOf(index) !== -1) return 'building';
+        if (ROAD_H_CELLS.indexOf(index) !== -1) return 'road-h';
+        if (ROAD_V_CELLS.indexOf(index) !== -1) return 'road-v';
+        if (PARK_CELLS.indexOf(index) !== -1) return 'park';
+        return 'road-h';
+      }
+
+      /* ── Build city grid ── */
+      function buildGrid() {
+        while (els.cityGrid.firstChild) {
+          els.cityGrid.removeChild(els.cityGrid.firstChild);
+        }
+
+        for (var i = 0; i < 25; i++) {
+          var role = cellRole(i);
+          var cell = document.createElement('div');
+          cell.className = 'city-cell';
+          cell.setAttribute('data-index', String(i));
+
+          if (role === 'road-h') {
+            cell.classList.add('road', 'h');
+            cell.setAttribute('aria-hidden', 'true');
+
+          } else if (role === 'road-v') {
+            cell.classList.add('road', 'v');
+            cell.setAttribute('aria-hidden', 'true');
+
+          } else if (role === 'park') {
+            cell.classList.add('empty-lot');
+            cell.setAttribute('aria-label', 'Парк');
+
+            var treeIcon = document.createElement('span');
+            treeIcon.className = 'cell-icon';
+            treeIcon.setAttribute('aria-hidden', 'true');
+            treeIcon.textContent = '\uD83C\uDF33'; /* tree emoji */
+
+            var treeLabel = document.createElement('span');
+            treeLabel.className = 'cell-label';
+            treeLabel.textContent = 'Парк';
+
+            cell.appendChild(treeIcon);
+            cell.appendChild(treeLabel);
+
+          } else {
+            /* building slot */
+            cell.setAttribute('tabindex', '0');
+            cell.setAttribute('role', 'button');
+            cell.setAttribute('aria-label', 'Порожня ділянка — клацніть для будівництва');
+
+            var plusSpan = document.createElement('span');
+            plusSpan.className = 'cell-plus';
+            plusSpan.setAttribute('aria-hidden', 'true');
+            plusSpan.textContent = '+';
+            cell.appendChild(plusSpan);
+
+            cell.addEventListener('click', onCellClick);
+            cell.addEventListener('keydown', function (e) {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onCellClick.call(this, e);
+              }
+            });
+          }
+
+          els.cityGrid.appendChild(cell);
+        }
+      }
+
+      /* ── Cell click handler ── */
+      function onCellClick() {
+        var cell = this;
+        if (cell.classList.contains('built')) return;
+        if (cell.classList.contains('road')) return;
+        if (cell.classList.contains('empty-lot')) return;
+        if (state.nextBuildingIndex >= BUILDINGS.length) return;
+
+        state.activeCell = cell;
+        state.activeBuilding = BUILDINGS[state.nextBuildingIndex];
+        state.isFirstAttempt = true;
+
+        openQuestion(state.activeBuilding);
+      }
+
+      /* ── Question modal ── */
+      function openQuestion(building) {
+        els.qBuildingName.textContent = building.name;
+        els.qText.textContent = building.question;
+        els.qFeedback.className = 'question-feedback';
+        els.qFeedback.style.display = 'none';
+        els.qFeedbackTitle.textContent = '';
+        els.qFeedbackBody.textContent = '';
+        els.qContinueBtn.classList.add('hidden');
+        els.qCancelBtn.textContent = 'Скасувати';
+        els.qCancelBtn.classList.remove('hidden');
+
+        /* Clear previous answers */
+        while (els.qAnswers.firstChild) {
+          els.qAnswers.removeChild(els.qAnswers.firstChild);
+        }
+
+        /* Shuffle option order */
+        var shuffled = [0, 1, 2, 3];
+        for (var i = shuffled.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var tmp = shuffled[i];
+          shuffled[i] = shuffled[j];
+          shuffled[j] = tmp;
+        }
+
+        for (var k = 0; k < shuffled.length; k++) {
+          var optIdx = shuffled[k];
+          var btn = document.createElement('button');
+          btn.className = 'answer-btn';
+          btn.textContent = building.options[optIdx];
+          btn.setAttribute('data-opt-index', String(optIdx));
+
+          btn.addEventListener('click', (function (idx) {
+            return function () { onAnswer(idx); };
+          })(optIdx));
+
+          els.qAnswers.appendChild(btn);
+        }
+
+        els.questionModal.classList.remove('hidden');
+        els.qCancelBtn.focus();
+
+        updateHint('Відповідайте на питання, щоб отримати дозвіл на будівництво «' + building.name + '».');
+      }
+
+      function closeQuestion() {
+        els.questionModal.classList.add('hidden');
+        state.activeCell = null;
+        state.activeBuilding = null;
+        updateHint('Натисніть на вільну клітинку, щоб розпочати будівництво.');
+      }
+
+      function onAnswer(optIndex) {
+        var building = state.activeBuilding;
+        if (!building) return;
+
+        var isCorrect = (optIndex === building.correct);
+
+        /* Disable all answer buttons and mark correct/wrong */
+        var answerBtns = els.qAnswers.querySelectorAll('.answer-btn');
+        for (var i = 0; i < answerBtns.length; i++) {
+          answerBtns[i].disabled = true;
+          var btnOpt = parseInt(answerBtns[i].getAttribute('data-opt-index'), 10);
+          if (btnOpt === building.correct) {
+            answerBtns[i].classList.add('correct');
+          } else if (btnOpt === optIndex && !isCorrect) {
+            answerBtns[i].classList.add('wrong');
+          }
+        }
+
+        if (isCorrect) {
+          els.qFeedback.className = 'question-feedback success';
+          els.qFeedbackTitle.textContent = 'Правильно! Будівництво дозволено.';
+          els.qFeedbackBody.textContent = building.fact;
+          els.qFeedback.style.display = 'block';
+
+          els.qCancelBtn.classList.add('hidden');
+          els.qContinueBtn.classList.remove('hidden');
+          els.qContinueBtn.setAttribute('data-action', 'build');
+          els.qContinueBtn.focus();
+        } else {
+          state.isFirstAttempt = false;
+
+          els.qFeedback.className = 'question-feedback failure';
+          els.qFeedbackTitle.textContent = 'Будівництво затримано.';
+          els.qFeedbackBody.textContent = 'Правильна відповідь: «' + building.options[building.correct] + '». ' + building.fact;
+          els.qFeedback.style.display = 'block';
+
+          els.qCancelBtn.textContent = 'Спробую пізніше';
+          els.qContinueBtn.classList.remove('hidden');
+          els.qContinueBtn.setAttribute('data-action', 'dismiss');
+          els.qContinueBtn.focus();
+        }
+      }
+
+      els.qContinueBtn.addEventListener('click', function () {
+        var action = els.qContinueBtn.getAttribute('data-action');
+        if (action === 'build') {
+          placeBuilding(state.activeBuilding, state.activeCell, state.isFirstAttempt);
+        }
+        closeQuestion();
+      });
+
+      els.qCancelBtn.addEventListener('click', closeQuestion);
+
+      /* ── Place building ── */
+      function placeBuilding(building, cell, firstTry) {
+        /* Remove placeholder content */
+        while (cell.firstChild) {
+          cell.removeChild(cell.firstChild);
+        }
+        cell.classList.add('built');
+        cell.removeAttribute('tabindex');
+        cell.removeAttribute('role');
+        cell.setAttribute('aria-label', building.name + ' (збудовано)');
+
+        if (building.imgSrc) {
+          var img = window.AssetValidator.createImg(
+            building.imgSrc,
+            building.name,
+            { className: 'cell-img', width: '100%', height: '100%' }
+          );
+          cell.appendChild(img);
+        } else {
+          var iconSpan = document.createElement('span');
+          iconSpan.className = 'cell-icon';
+          iconSpan.setAttribute('aria-hidden', 'true');
+          iconSpan.textContent = building.icon;
+          cell.appendChild(iconSpan);
+        }
+
+        var labelSpan = document.createElement('span');
+        labelSpan.className = 'cell-label';
+        labelSpan.textContent = building.name;
+        cell.appendChild(labelSpan);
+
+        /* Update state */
+        state.buildingsBuilt++;
+        if (firstTry) state.firstTryCount++;
+        state.factsLearned.push(building);
+        state.nextBuildingIndex++;
+
+        updateUI();
+
+        if (state.buildingsBuilt >= 8) {
+          setTimeout(endGame, 700);
+        }
+      }
+
+      /* ── Update header and queue ── */
+      function updateUI() {
+        els.builtCount.textContent = state.buildingsBuilt + '/8';
+        els.firstTryCount.textContent = String(state.firstTryCount);
+        els.progressBar.style.width = ((state.buildingsBuilt / 8) * 100) + '%';
+        renderBuildingQueue();
+      }
+
+      function renderBuildingQueue() {
+        while (els.buildingQueue.firstChild) {
+          els.buildingQueue.removeChild(els.buildingQueue.firstChild);
+        }
+
+        for (var i = 0; i < BUILDINGS.length; i++) {
+          var b = BUILDINGS[i];
+          var isBuilt = (i < state.nextBuildingIndex);
+          var isNext = (i === state.nextBuildingIndex);
+
+          var item = document.createElement('div');
+          item.className = 'queue-item' +
+            (isNext ? ' active' : '') +
+            (isBuilt ? ' done' : '');
+
+          var iconEl = document.createElement('span');
+          iconEl.className = 'queue-item-icon';
+          iconEl.setAttribute('aria-hidden', 'true');
+          iconEl.textContent = b.icon ? b.icon : '\uD83C\uDFD7\uFE0F'; /* building construction */
+          item.appendChild(iconEl);
+
+          var nameEl = document.createElement('span');
+          nameEl.className = 'queue-item-name';
+          nameEl.textContent = b.name;
+          item.appendChild(nameEl);
+
+          var statusEl = document.createElement('span');
+          statusEl.className = 'queue-item-status';
+          if (isBuilt) {
+            statusEl.textContent = '\u2713'; /* checkmark */
+          } else if (isNext) {
+            statusEl.textContent = 'Наступна';
+          }
+          item.appendChild(statusEl);
+
+          els.buildingQueue.appendChild(item);
+        }
+      }
+
+      function updateHint(text) {
+        els.hintText.textContent = text;
+      }
+
+      /* ── Game lifecycle ── */
+      function startGame() {
+        if (window.HLGAnalytics) HLGAnalytics.startSession('city-builder');
+
+        state.buildingsBuilt = 0;
+        state.firstTryCount = 0;
+        state.nextBuildingIndex = 0;
+        state.factsLearned = [];
+        state.activeCell = null;
+        state.activeBuilding = null;
+        state.isFirstAttempt = true;
+
+        els.introScreen.classList.add('hidden');
+        els.winScreen.classList.add('hidden');
+        els.gameUI.style.display = 'flex';
+
+        buildGrid();
+        updateUI();
+        updateHint('Натисніть на вільну клітинку, щоб розпочати будівництво.');
+      }
+
+      function endGame() {
+        if (window.HLGAnalytics) {
+          HLGAnalytics.endSession({
+            score: state.firstTryCount,
+            won: true,
+            attempts: state.buildingsBuilt
+          });
+        }
+
+        els.endFirstTry.textContent = String(state.firstTryCount);
+
+        /* Build facts recap */
+        while (els.factsRecap.firstChild) {
+          els.factsRecap.removeChild(els.factsRecap.firstChild);
+        }
+
+        if (state.factsLearned.length > 0) {
+          var heading = document.createElement('h3');
+          heading.textContent = 'Що ви дізналися про ВКЛ:';
+          els.factsRecap.appendChild(heading);
+
+          for (var i = 0; i < state.factsLearned.length; i++) {
+            var b = state.factsLearned[i];
+            var factDiv = document.createElement('div');
+            factDiv.className = 'fact-item';
+
+            var nameSpan = document.createElement('span');
+            nameSpan.className = 'fact-item-name';
+            nameSpan.textContent = b.name;
+            factDiv.appendChild(nameSpan);
+
+            factDiv.appendChild(document.createTextNode(b.fact));
+            els.factsRecap.appendChild(factDiv);
+          }
+        }
+
+        els.winScreen.classList.remove('hidden');
+      }
+
+      /* ── Event listeners ── */
+      els.startBtn.addEventListener('click', startGame);
+      els.restartBtn.addEventListener('click', startGame);
+
+      /* Close modal on backdrop click */
+      els.questionModal.addEventListener('click', function (e) {
+        if (e.target === els.questionModal) closeQuestion();
+      });
+
+      /* Escape key closes modal */
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !els.questionModal.classList.contains('hidden')) {
+          closeQuestion();
+        }
+      });
+
+    })();
+  </script>
+
+  <script src="../../shared/js/nav.js"></script>
+  <script src="../../shared/js/analytics.js"></script>
+  <script src="../../shared/js/accessibility.js"></script>
+</body>
+</html>
