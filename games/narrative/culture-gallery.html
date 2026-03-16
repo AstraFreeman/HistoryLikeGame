@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Культурна галерея</title>
+  <link rel="stylesheet" href="../../shared/css/reset.css">
+  <link rel="stylesheet" href="../../shared/css/theme.css">
+  <link rel="stylesheet" href="../../shared/css/components.css">
+  <link rel="stylesheet" href="../../shared/css/animations.css">
+  <style>
+    :root {
+      --game-accent: var(--color-accent-purple);
+    }
+
+    /* ── Layout ── */
+    .gallery-wrap {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: var(--space-md);
+      box-sizing: border-box;
+    }
+
+    /* ── Header ── */
+    .gallery-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      padding: var(--space-md) var(--space-lg);
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      backdrop-filter: blur(var(--glass-blur));
+      margin-bottom: var(--space-md);
+    }
+
+    .gallery-header h1 {
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 0;
+    }
+
+    .header-stats {
+      display: flex;
+      gap: var(--space-lg);
+      align-items: center;
+    }
+
+    .header-stat {
+      text-align: center;
+    }
+
+    .header-stat-label {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      display: block;
+    }
+
+    .header-stat-value {
+      font-size: var(--text-xl);
+      font-weight: 700;
+      color: var(--color-accent-purple);
+    }
+
+    /* ── Main carousel area ── */
+    .carousel-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-md);
+    }
+
+    /* ── Progress bar ── */
+    .progress-bar-wrap {
+      width: 100%;
+      max-width: 720px;
+      height: 6px;
+      background: var(--color-surface);
+      border-radius: var(--radius-full);
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--gradient-primary);
+      border-radius: var(--radius-full);
+      transition: width var(--transition-slow);
+    }
+
+    /* ── Artwork card ── */
+    .artwork-card {
+      width: 100%;
+      max-width: 720px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      backdrop-filter: blur(var(--glass-blur));
+      box-shadow: var(--glass-shadow);
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Carousel transition */
+    .artwork-card.slide-out-left {
+      animation: slideOutLeft 0.3s ease both;
+    }
+
+    .artwork-card.slide-in-right {
+      animation: slideInFromRight 0.35s ease both;
+    }
+
+    @keyframes slideOutLeft {
+      from { opacity: 1; transform: translateX(0); }
+      to   { opacity: 0; transform: translateX(-60px); }
+    }
+
+    @keyframes slideInFromRight {
+      from { opacity: 0; transform: translateX(60px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ── Image area ── */
+    .artwork-img-wrap {
+      width: 100%;
+      height: 320px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--color-bg-tertiary);
+      position: relative;
+    }
+
+    .artwork-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .artwork-counter {
+      position: absolute;
+      top: var(--space-sm);
+      right: var(--space-sm);
+      background: rgba(0, 0, 0, 0.6);
+      color: #fff;
+      font-size: var(--text-xs);
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--radius-full);
+      backdrop-filter: blur(4px);
+    }
+
+    /* Zoom success animation */
+    .artwork-card.zoom-success {
+      animation: zoomSuccess 0.5s ease;
+    }
+
+    @keyframes zoomSuccess {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.03); box-shadow: 0 0 40px rgba(168, 85, 247, 0.5); }
+      100% { transform: scale(1); }
+    }
+
+    /* ── Info & matching area ── */
+    .artwork-body {
+      padding: var(--space-lg);
+    }
+
+    .artwork-title {
+      font-size: var(--text-xl);
+      font-weight: 700;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-sm);
+    }
+
+    .artwork-description {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      margin-bottom: var(--space-lg);
+      min-height: 2.4em;
+    }
+
+    /* ── Matching rows ── */
+    .match-rows {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .match-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      flex-wrap: wrap;
+    }
+
+    .match-label {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      min-width: 80px;
+      flex-shrink: 0;
+    }
+
+    /* ── Drop zone ── */
+    .drop-zone {
+      flex: 1;
+      min-height: 48px;
+      min-width: 160px;
+      padding: var(--space-sm) var(--space-md);
+      border: 2px dashed var(--glass-border);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--color-text-muted);
+      font-size: var(--text-sm);
+      transition: border-color var(--transition-fast), background var(--transition-fast);
+      position: relative;
+    }
+
+    .drop-zone.drag-over {
+      border-color: var(--color-accent-purple);
+      background: rgba(168, 85, 247, 0.1);
+    }
+
+    .drop-zone.correct {
+      border-color: var(--color-accent-green);
+      background: rgba(34, 197, 94, 0.1);
+      color: var(--color-accent-green);
+      font-weight: 600;
+    }
+
+    .drop-zone.wrong {
+      border-color: var(--color-accent-red);
+      background: rgba(239, 68, 68, 0.08);
+      animation: shake 0.5s ease;
+    }
+
+    /* ── Label chips pool ── */
+    .labels-pool {
+      margin-top: var(--space-lg);
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-sm);
+    }
+
+    .label-chip {
+      padding: var(--space-xs) var(--space-md);
+      background: var(--color-surface);
+      border: 1.5px solid var(--glass-border);
+      border-radius: var(--radius-full);
+      color: var(--color-text-primary);
+      font-size: var(--text-sm);
+      cursor: grab;
+      transition: transform var(--transition-fast), background var(--transition-fast), opacity var(--transition-fast);
+      user-select: none;
+      min-height: 36px;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .label-chip:hover {
+      background: var(--color-surface-hover);
+      transform: translateY(-2px);
+    }
+
+    .label-chip.dragging {
+      opacity: 0.4;
+      cursor: grabbing;
+    }
+
+    .label-chip.used {
+      opacity: 0.25;
+      pointer-events: none;
+    }
+
+    /* ── Educational info panel ── */
+    .edu-panel {
+      width: 100%;
+      max-width: 720px;
+      background: var(--glass-bg);
+      border: 1.5px solid var(--color-accent-purple);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      backdrop-filter: blur(var(--glass-blur));
+      animation: fadeIn 0.4s ease both;
+      display: none;
+    }
+
+    .edu-panel.visible {
+      display: block;
+    }
+
+    .edu-panel-title {
+      font-size: var(--text-base);
+      font-weight: 700;
+      color: var(--color-accent-purple);
+      margin-bottom: var(--space-sm);
+    }
+
+    .edu-panel-text {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      line-height: 1.7;
+    }
+
+    /* ── Next button ── */
+    .next-btn-wrap {
+      width: 100%;
+      max-width: 720px;
+      display: flex;
+      justify-content: flex-end;
+      gap: var(--space-md);
+    }
+
+    /* ── Intro & End screens ── */
+    .screen-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: var(--z-modal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .screen-overlay.hidden {
+      display: none;
+    }
+
+    .screen-card {
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl) var(--space-xl);
+      max-width: 560px;
+      width: calc(100% - var(--space-2xl));
+      text-align: center;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .screen-card h2 {
+      font-size: var(--text-3xl);
+      margin-bottom: var(--space-md);
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .screen-card p {
+      color: var(--color-text-secondary);
+      line-height: 1.7;
+      margin-bottom: var(--space-md);
+      font-size: var(--text-sm);
+    }
+
+    .end-stats {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-xl);
+      margin: var(--space-lg) 0;
+    }
+
+    .end-stat {
+      text-align: center;
+    }
+
+    .end-stat-value {
+      font-size: var(--text-3xl);
+      font-weight: 700;
+      color: var(--color-accent-purple);
+    }
+
+    .end-stat-label {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+    }
+
+    /* ── Light theme overrides ── */
+    body.theme-light {
+      --color-bg-primary: #f5f5f0;
+      --color-bg-secondary: #ffffff;
+      --color-bg-tertiary: #e8e8e3;
+    }
+
+    body.theme-light .artwork-card {
+      background: rgba(0, 0, 0, 0.04);
+    }
+
+    body.theme-light .artwork-img-wrap {
+      background: #e0ddd8;
+    }
+
+    body.theme-light .screen-card {
+      background: #ffffff;
+    }
+
+    /* ── High contrast overrides ── */
+    html.high-contrast .drop-zone {
+      border-width: 3px !important;
+    }
+
+    html.high-contrast .label-chip {
+      border-width: 2px !important;
+      border-color: var(--color-text-primary) !important;
+    }
+
+    html.high-contrast .edu-panel {
+      border-width: 3px !important;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 720px) {
+      .artwork-img-wrap {
+        height: 220px;
+      }
+
+      .gallery-header h1 {
+        font-size: var(--text-xl);
+      }
+
+      .match-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .drop-zone {
+        width: 100%;
+      }
+
+      .end-stats {
+        flex-direction: column;
+        gap: var(--space-md);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .gallery-wrap {
+        padding: var(--space-sm);
+      }
+
+      .gallery-header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .labels-pool {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body data-section="Українська культура" data-game-title="Культурна галерея" data-home-url="../../index.html">
+
+  <!-- ── Intro screen ── -->
+  <div id="introScreen" class="screen-overlay">
+    <div class="screen-card">
+      <h2>Культурна галерея</h2>
+      <p style="font-size: var(--text-3xl); margin-bottom: var(--space-sm);">&#x1F3DB;&#xFE0F;</p>
+      <p>Ласкаво просимо до інтерактивної галереї української культури! Ви побачите 12 визначних творів мистецтва та архітектури різних епох.</p>
+      <p>Ваше завдання — перетягнути правильні мітки <strong>епохи</strong> та <strong>автора/стилю</strong> на відповідні поля під кожним твором.</p>
+      <p>За кожне правильне визначення з першої спроби ви отримуєте очки. Після правильного підбору з'явиться освітній текст про твір.</p>
+      <button class="btn btn-primary btn-lg" id="startBtn">Почати огляд</button>
+    </div>
+  </div>
+
+  <!-- ── End screen ── -->
+  <div id="endScreen" class="screen-overlay hidden">
+    <div class="screen-card">
+      <h2 id="endTitle">Галерею пройдено!</h2>
+      <div class="end-stats">
+        <div class="end-stat">
+          <div class="end-stat-value" id="endScore">0</div>
+          <div class="end-stat-label">Очки</div>
+        </div>
+        <div class="end-stat">
+          <div class="end-stat-value" id="endFirstTry">0</div>
+          <div class="end-stat-label">З першої спроби</div>
+        </div>
+        <div class="end-stat">
+          <div class="end-stat-value" id="endTotal">12</div>
+          <div class="end-stat-label">Усього творів</div>
+        </div>
+      </div>
+      <p id="endMessage" style="margin-bottom: var(--space-lg);"></p>
+      <button class="btn btn-primary btn-lg" id="restartBtn">Грати знову</button>
+      <br>
+      <a href="../../index.html" class="btn btn-secondary" style="margin-top: var(--space-sm); display: inline-flex;">На головну</a>
+    </div>
+  </div>
+
+  <!-- ── Game UI ── -->
+  <div class="gallery-wrap" id="gameUI" style="display: none;">
+
+    <div class="gallery-header">
+      <h1>Культурна галерея</h1>
+      <div class="header-stats">
+        <div class="header-stat">
+          <span class="header-stat-label">Очки</span>
+          <span class="header-stat-value" id="scoreDisplay">0</span>
+        </div>
+        <div class="header-stat">
+          <span class="header-stat-label">Твір</span>
+          <span class="header-stat-value" id="itemDisplay">1/12</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="carousel-area">
+
+      <!-- Progress bar -->
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progressBar" style="width: 0%;"></div>
+      </div>
+
+      <!-- Artwork card -->
+      <div class="artwork-card" id="artworkCard">
+        <div class="artwork-img-wrap" id="artworkImgWrap">
+          <span class="artwork-counter" id="artworkCounter">1 / 12</span>
+        </div>
+        <div class="artwork-body">
+          <div class="artwork-title" id="artworkTitle"></div>
+          <div class="artwork-description" id="artworkDesc"></div>
+
+          <div class="match-rows" id="matchRows">
+            <!-- Era row -->
+            <div class="match-row">
+              <span class="match-label">Епоха</span>
+              <div class="drop-zone" id="dropEra" data-field="era">Перетягніть епоху сюди</div>
+            </div>
+            <!-- Author/Style row -->
+            <div class="match-row">
+              <span class="match-label" id="authorLabel">Автор</span>
+              <div class="drop-zone" id="dropAuthor" data-field="author">Перетягніть автора/стиль сюди</div>
+            </div>
+          </div>
+
+          <!-- Label chips pool -->
+          <div class="labels-pool" id="labelsPool"></div>
+        </div>
+      </div>
+
+      <!-- Educational info panel -->
+      <div class="edu-panel" id="eduPanel">
+        <div class="edu-panel-title" id="eduTitle"></div>
+        <div class="edu-panel-text" id="eduText"></div>
+      </div>
+
+      <!-- Next button -->
+      <div class="next-btn-wrap">
+        <button class="btn btn-primary" id="nextBtn" style="display: none;">Наступний твір &rarr;</button>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="../../shared/js/asset-validator.js"></script>
+  <script>
+    (function () {
+      'use strict';
+
+      /* ────────── Gallery data ────────── */
+      var GALLERY = [
+        {
+          id: 'trpl1',
+          title: 'Трипільська кераміка',
+          imgFile: 'GAL_TRPL_1.jpg',
+          era: 'Трипілля',
+          authorField: 'Стиль',
+          author: 'Неолітичне мистецтво',
+          shortDesc: 'Розписна кераміка трипільської культури (IV–III тис. до н.е.).',
+          eduText: 'Трипільська культура (бл. 5400–2750 до н. е.) — одна з найдавніших розвинених цивілізацій Європи. Яскраво розписна кераміка з геометричними орнаментами є її символом. Трипільці жили на теренах сучасної України та вважаються предками протоукраїнських племен.'
+        },
+        {
+          id: 'kyiv1',
+          title: 'Мозаїка Богоматері Оранти',
+          imgFile: 'GAL_KYIV_1.jpg',
+          era: 'Київська Русь',
+          authorField: 'Стиль',
+          author: 'Візантійські майстри',
+          shortDesc: 'Монументальна мозаїка в апсиді Софійського собору в Києві (XI ст.).',
+          eduText: 'Богоматір Оранта ("Нерушима стіна") — велична мозаїка XI ст. у Софійському соборі Києва. Висота фігури — понад 5 м. Майстри приїхали з Константинополя й принесли на Русь традиції візантійського монументального мистецтва. Оранта стала символом небесної охорони Києва.'
+        },
+        {
+          id: 'baro1',
+          title: 'Андріївська церква',
+          imgFile: 'GAL_BARO_1.jpg',
+          era: 'Бароко',
+          authorField: 'Автор',
+          author: 'Растреллі',
+          shortDesc: 'Православна церква в стилі бароко, збудована у Києві (1754 р.).',
+          eduText: 'Андріївська церква (1754) — шедевр українського бароко. Спроєктована придворним архітектором Бартоломео Франческо Растреллі за наказом Єлизавети Петрівни. Розташована на крутому пагорбі над Подолом. Характерні риси: пишний декор, блакитно-білий колір, п\'ять куполів.'
+        },
+        {
+          id: 'roma1',
+          title: 'Автопортрет Шевченка',
+          imgFile: 'GAL_ROMA_1.jpg',
+          era: 'Романтизм',
+          authorField: 'Автор',
+          author: 'Тарас Шевченко',
+          shortDesc: 'Автопортрет великого українського поета і художника (1840-і рр.).',
+          eduText: 'Тарас Шевченко (1814–1861) — видатний поет, прозаїк, художник і громадський діяч. Закінчив Академію мистецтв у Петербурзі. Написав понад 130 живописних і сотні графічних творів. Його "Кобзар" (1840) став основою нової української літератури. Шевченко — символ українського романтизму і визвольної ідеї.'
+        },
+        {
+          id: 'mod1',
+          title: 'Кіно "Земля"',
+          imgFile: null,
+          era: 'Модерн',
+          authorField: 'Автор',
+          author: 'Довженко',
+          shortDesc: 'Мовчазний фільм Олександра Довженка (1930) — поетичне кіно про сільське життя.',
+          eduText: 'Олександр Довженко (1894–1956) — класик світового кінематографа. "Земля" (1930) включена до списку кращих фільмів усіх часів за версією Британського інституту кіно. Довженко поєднав реалізм і ліричність, створивши власний стиль "поетичного кіно". Фільм став символом українського авангарду.'
+        },
+        {
+          id: 'baro2',
+          title: 'Острозька Біблія',
+          imgFile: null,
+          era: 'Бароко',
+          authorField: 'Стиль',
+          author: 'Друкарство',
+          shortDesc: 'Перше повне видання Біблії церковнослов\'янською мовою, надруковане Іваном Федоровим (1581).',
+          eduText: 'Острозька Біблія (1581) — перша повна слов\'янська Біблія, видана Іваном Федоровим на замовлення князя Костянтина Острозького. Надрукована в м. Острог (сучасна Рівненська область). Подія стала важливим кроком у розвитку книгодрукування та слов\'янської культури.'
+        },
+        {
+          id: 'baro3',
+          title: 'Козацький собор',
+          imgFile: null,
+          era: 'Бароко',
+          authorField: 'Стиль',
+          author: 'Козацьке бароко',
+          shortDesc: 'Архітектурний стиль XVII–XVIII ст., що поєднує бароко з народними традиціями.',
+          eduText: 'Козацьке бароко — оригінальний архітектурний стиль, що виникнув в Україні в XVII–XVIII ст. Характерні риси: масивні стіни, грушоподібні бані, пишний декор, поєднання сакрального і народного. Яскраві приклади: Успенський собор у Лаврі, Троїцький собор у Чернігові, церкви Гетьманщини.'
+        },
+        {
+          id: 'roma2',
+          title: 'Портрет Івана Франка',
+          imgFile: null,
+          era: 'Романтизм',
+          authorField: 'Автор',
+          author: 'Іван Труш',
+          shortDesc: 'Портрет видатного письменника, намальований львівським художником (поч. XX ст.).',
+          eduText: 'Іван Труш (1869–1941) — засновник Товариства для розвою руської штуки у Львові. Автор численних портретів, пейзажів, іконостасів. Намалював знамениті портрети Лесі Українки та Михайла Грушевського. Портрет Івана Франка — один з найвідоміших творів Труша, що передає духовну силу Каменяра.'
+        },
+        {
+          id: 'mod2',
+          title: 'Фільм Параджанова',
+          imgFile: null,
+          era: 'Модерн',
+          authorField: 'Автор',
+          author: 'Параджанов',
+          shortDesc: '"Тіні забутих предків" (1964) — поетична кінодрама за повістю Коцюбинського.',
+          eduText: 'Сергій Параджанов (1924–1990) — видатний кінорежисер. Фільм "Тіні забутих предків" (1964) переміг на 40 міжнародних фестивалях і дав поштовх Новій хвилі українського кіно. Параджанов поєднав гуцульський фольклор з авангардною кінопоетикою. Прем\'єра фільму стала культурним та суспільним подієм в Україні.'
+        },
+        {
+          id: 'trpl2',
+          title: 'Скіфська пектораль',
+          imgFile: null,
+          era: 'Трипілля (античність)',
+          authorField: 'Стиль',
+          author: 'Ювелірне мистецтво',
+          shortDesc: 'Золота нагрудна прикраса скіфського царя (IV ст. до н. е.), знайдена на Дніпропетровщині.',
+          eduText: 'Скіфська пектораль (IV ст. до н. е.) — шедевр золотарського мистецтва, знайдений у кургані Товста Могила у 1971 р. Вага — 1148 г, діаметр — 30 см. На трьох ярусах зображені сцени зі скіфського побуту і звіриного стилю. Зберігається в Музеї історичних коштовностей України.'
+        },
+        {
+          id: 'kyiv2',
+          title: 'Собор Святої Софії',
+          imgFile: null,
+          era: 'Київська Русь',
+          authorField: 'Стиль',
+          author: 'Візантійська архітектура',
+          shortDesc: 'Кафедральний собор Ярослава Мудрого (XI ст.) — пам\'ятка ЮНЕСКО.',
+          eduText: 'Собор Святої Софії в Києві (1037) — головний храм Русі, зведений Ярославом Мудрим. Тринадцять куполів, мозаїки та фрески X–XVIII ст. Є у списку ЮНЕСКО з 1990 р. Назва перегукується з Константинопольською Агія Софія, підкреслюючи рівновеликість Русі Візантії. Тут зберігаються унікальні оригінальні фрески київської школи.'
+        },
+        {
+          id: 'mod3',
+          title: 'Мурали Києва',
+          imgFile: null,
+          era: 'Модерн',
+          authorField: 'Стиль',
+          author: 'Стріт-арт',
+          shortDesc: 'Монументальні розписи на фасадах будинків Києва (поч. XXI ст.).',
+          eduText: 'Київ — одне з найкращих міст Європи для вуличного мистецтва. Муральний рух стартував у 2010-х роках. Роботи охоплюють будинки заввишки 9–16 поверхів. Теми муралів: козацька слава, Шевченко, народна символіка, протест і надія. Мистецтво стало важливою частиною ідентичності сучасного Києва.'
+        }
+      ];
+
+      /* ── Era options ── */
+      var ERA_OPTIONS = ['Трипілля', 'Київська Русь', 'Бароко', 'Романтизм', 'Модерн', 'Трипілля (античність)'];
+
+      /* ── State ── */
+      var state = {
+        currentIndex: 0,
+        score: 0,
+        firstTryCount: 0,
+        eraState: 'empty',    // 'empty' | 'filled-correct' | 'filled-wrong'
+        authorState: 'empty',
+        eraFirstTry: true,
+        authorFirstTry: true,
+        dragLabel: null,
+        itemComplete: false
+      };
+
+      /* ── DOM refs ── */
+      var els = {
+        introScreen:   document.getElementById('introScreen'),
+        endScreen:     document.getElementById('endScreen'),
+        gameUI:        document.getElementById('gameUI'),
+        startBtn:      document.getElementById('startBtn'),
+        restartBtn:    document.getElementById('restartBtn'),
+        nextBtn:       document.getElementById('nextBtn'),
+        scoreDisplay:  document.getElementById('scoreDisplay'),
+        itemDisplay:   document.getElementById('itemDisplay'),
+        progressBar:   document.getElementById('progressBar'),
+        artworkCard:   document.getElementById('artworkCard'),
+        artworkImgWrap:document.getElementById('artworkImgWrap'),
+        artworkCounter:document.getElementById('artworkCounter'),
+        artworkTitle:  document.getElementById('artworkTitle'),
+        artworkDesc:   document.getElementById('artworkDesc'),
+        dropEra:       document.getElementById('dropEra'),
+        dropAuthor:    document.getElementById('dropAuthor'),
+        authorLabel:   document.getElementById('authorLabel'),
+        labelsPool:    document.getElementById('labelsPool'),
+        eduPanel:      document.getElementById('eduPanel'),
+        eduTitle:      document.getElementById('eduTitle'),
+        eduText:       document.getElementById('eduText'),
+        endTitle:      document.getElementById('endTitle'),
+        endScore:      document.getElementById('endScore'),
+        endFirstTry:   document.getElementById('endFirstTry'),
+        endTotal:      document.getElementById('endTotal'),
+        endMessage:    document.getElementById('endMessage')
+      };
+
+      /* ────────── Helpers ────────── */
+      function shuffle(arr) {
+        var a = arr.slice();
+        for (var i = a.length - 1; i > 0; i--) {
+          var j = Math.floor(Math.random() * (i + 1));
+          var t = a[i]; a[i] = a[j]; a[j] = t;
+        }
+        return a;
+      }
+
+      function updateStats() {
+        els.scoreDisplay.textContent = state.score;
+        var idx = state.currentIndex + 1;
+        els.itemDisplay.textContent = idx + '/12';
+        els.artworkCounter.textContent = idx + ' / 12';
+        els.progressBar.style.width = ((idx - 1) / 12 * 100) + '%';
+      }
+
+      /* ────────── Render current item ────────── */
+      function renderItem(animate) {
+        var item = GALLERY[state.currentIndex];
+
+        /* reset per-item state */
+        state.eraState = 'empty';
+        state.authorState = 'empty';
+        state.eraFirstTry = true;
+        state.authorFirstTry = true;
+        state.itemComplete = false;
+
+        /* card animation */
+        if (animate) {
+          els.artworkCard.classList.remove('slide-in-right', 'slide-out-left');
+          els.artworkCard.classList.add('slide-in-right');
+          els.artworkCard.addEventListener('animationend', function onEnd() {
+            els.artworkCard.removeEventListener('animationend', onEnd);
+            els.artworkCard.classList.remove('slide-in-right');
+          });
+        }
+
+        /* image */
+        while (els.artworkImgWrap.firstChild) {
+          els.artworkImgWrap.removeChild(els.artworkImgWrap.firstChild);
+        }
+        els.artworkImgWrap.appendChild(els.artworkCounter);
+
+        if (item.imgFile) {
+          var img = window.AssetValidator.createImg(
+            '../../data/games/culture-gallery/' + item.imgFile,
+            item.title,
+            { style: 'width:100%;height:100%;object-fit:cover;', width: '100%', height: '320px' }
+          );
+          els.artworkImgWrap.appendChild(img);
+        } else {
+          /* placeholder for items without images */
+          var ph = document.createElement('div');
+          ph.style.cssText = 'width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:var(--text-4xl);color:var(--color-text-muted);';
+          ph.textContent = getEraEmoji(item.era);
+          els.artworkImgWrap.appendChild(ph);
+        }
+
+        /* text */
+        els.artworkTitle.textContent = item.title;
+        els.artworkDesc.textContent = item.shortDesc;
+        els.authorLabel.textContent = item.authorField;
+
+        /* reset drop zones */
+        resetDropZone(els.dropEra, 'Перетягніть епоху сюди');
+        resetDropZone(els.dropAuthor, 'Перетягніть ' + item.authorField.toLowerCase() + '/стиль сюди');
+
+        /* hide edu panel & next button */
+        els.eduPanel.classList.remove('visible');
+        els.nextBtn.style.display = 'none';
+
+        /* build labels pool */
+        buildLabelsPool(item);
+
+        updateStats();
+      }
+
+      function getEraEmoji(era) {
+        var map = {
+          'Трипілля': '&#x1F3FA;',
+          'Трипілля (античність)': '&#x1F48E;',
+          'Київська Русь': '&#x26EA;',
+          'Бароко': '&#x1F3DB;&#xFE0F;',
+          'Романтизм': '&#x1F58C;&#xFE0F;',
+          'Модерн': '&#x1F3AC;'
+        };
+        return map[era] || '&#x1F5BC;&#xFE0F;';
+      }
+
+      function resetDropZone(zone, placeholder) {
+        zone.textContent = placeholder;
+        zone.classList.remove('correct', 'wrong', 'drag-over');
+      }
+
+      /* ────────── Label chips ────────── */
+      function buildLabelsPool(item) {
+        while (els.labelsPool.firstChild) {
+          els.labelsPool.removeChild(els.labelsPool.firstChild);
+        }
+
+        /* collect era options + author options, shuffle together */
+        var authorOptions = getAuthorOptions(item);
+        var allLabels = shuffle(ERA_OPTIONS.concat(authorOptions));
+
+        allLabels.forEach(function (label) {
+          var chip = document.createElement('div');
+          chip.className = 'label-chip';
+          chip.textContent = label;
+          chip.setAttribute('data-label', label);
+          chip.setAttribute('draggable', 'true');
+
+          /* drag events */
+          chip.addEventListener('dragstart', onDragStart);
+          chip.addEventListener('dragend', onDragEnd);
+
+          /* touch/click fallback: click to pick, then click zone to drop */
+          chip.addEventListener('click', onChipClick);
+
+          els.labelsPool.appendChild(chip);
+        });
+      }
+
+      function getAuthorOptions(item) {
+        /* include the correct author + 2 distractors from other items */
+        var correct = item.author;
+        var others = [];
+        for (var i = 0; i < GALLERY.length; i++) {
+          if (GALLERY[i].id !== item.id && others.indexOf(GALLERY[i].author) === -1 && GALLERY[i].author !== correct) {
+            others.push(GALLERY[i].author);
+          }
+        }
+        others = shuffle(others).slice(0, 3);
+        return shuffle([correct].concat(others));
+      }
+
+      /* ────────── Drag & Drop ────────── */
+      function onDragStart(e) {
+        state.dragLabel = e.currentTarget.getAttribute('data-label');
+        e.currentTarget.classList.add('dragging');
+        if (e.dataTransfer) {
+          e.dataTransfer.effectAllowed = 'copy';
+          e.dataTransfer.setData('text/plain', state.dragLabel);
+        }
+      }
+
+      function onDragEnd(e) {
+        e.currentTarget.classList.remove('dragging');
+      }
+
+      function setupDropZone(zone) {
+        zone.addEventListener('dragover', function (e) {
+          e.preventDefault();
+          if (e.dataTransfer) e.dataTransfer.dropEffect = 'copy';
+          zone.classList.add('drag-over');
+        });
+
+        zone.addEventListener('dragleave', function () {
+          zone.classList.remove('drag-over');
+        });
+
+        zone.addEventListener('drop', function (e) {
+          e.preventDefault();
+          zone.classList.remove('drag-over');
+          var label = state.dragLabel || (e.dataTransfer && e.dataTransfer.getData('text/plain'));
+          if (label) {
+            handleDrop(zone, label);
+          }
+        });
+
+        /* click-based drop */
+        zone.addEventListener('click', function () {
+          if (state.selectedChip) {
+            handleDrop(zone, state.selectedChip);
+            clearSelectedChip();
+          }
+        });
+      }
+
+      /* ── Click-to-pick/drop fallback ── */
+      state.selectedChip = null;
+
+      function onChipClick(e) {
+        var chip = e.currentTarget;
+        var label = chip.getAttribute('data-label');
+
+        if (chip.classList.contains('used')) return;
+
+        /* if already selected, deselect */
+        if (state.selectedChip === label) {
+          chip.style.outline = '';
+          state.selectedChip = null;
+          return;
+        }
+
+        /* deselect previous */
+        clearSelectedChip();
+
+        state.selectedChip = label;
+        chip.style.outline = '2px solid var(--color-accent-purple)';
+      }
+
+      function clearSelectedChip() {
+        if (state.selectedChip) {
+          var chips = els.labelsPool.querySelectorAll('.label-chip');
+          for (var i = 0; i < chips.length; i++) {
+            chips[i].style.outline = '';
+          }
+          state.selectedChip = null;
+        }
+      }
+
+      /* ────────── Drop handling ────────── */
+      function handleDrop(zone, label) {
+        var item = GALLERY[state.currentIndex];
+        var field = zone.getAttribute('data-field'); /* 'era' or 'author' */
+
+        /* ignore if already correct */
+        if (field === 'era' && state.eraState === 'filled-correct') return;
+        if (field === 'author' && state.authorState === 'filled-correct') return;
+
+        var correct = (field === 'era') ? item.era : item.author;
+        var isCorrect = (label === correct);
+
+        if (isCorrect) {
+          zone.textContent = label;
+          zone.classList.remove('wrong');
+          zone.classList.add('correct');
+
+          if (field === 'era') {
+            state.eraState = 'filled-correct';
+            if (state.eraFirstTry) state.score += 50;
+          } else {
+            state.authorState = 'filled-correct';
+            if (state.authorFirstTry) state.score += 50;
+          }
+
+          /* mark chip as used */
+          markChipUsed(label);
+          clearSelectedChip();
+          updateStats();
+          checkBothCorrect();
+
+        } else {
+          /* wrong — shake and reset */
+          if (field === 'era') {
+            state.eraFirstTry = false;
+          } else {
+            state.authorFirstTry = false;
+          }
+
+          zone.classList.remove('wrong');
+          zone.textContent = label + ' — невірно!';
+          /* force reflow for animation restart */
+          void zone.offsetWidth;
+          zone.classList.add('wrong');
+
+          /* reset after shake */
+          var placeholder = (field === 'era')
+            ? 'Перетягніть епоху сюди'
+            : 'Перетягніть ' + item.authorField.toLowerCase() + '/стиль сюди';
+
+          setTimeout(function () {
+            zone.classList.remove('wrong');
+            zone.textContent = placeholder;
+          }, 700);
+          clearSelectedChip();
+        }
+      }
+
+      function markChipUsed(label) {
+        var chips = els.labelsPool.querySelectorAll('.label-chip');
+        for (var i = 0; i < chips.length; i++) {
+          if (chips[i].getAttribute('data-label') === label) {
+            chips[i].classList.add('used');
+            break;
+          }
+        }
+      }
+
+      function checkBothCorrect() {
+        if (state.eraState === 'filled-correct' && state.authorState === 'filled-correct') {
+          state.itemComplete = true;
+
+          /* count first-try bonus */
+          if (state.eraFirstTry && state.authorFirstTry) {
+            state.firstTryCount++;
+          }
+
+          /* zoom animation */
+          els.artworkCard.classList.remove('zoom-success');
+          void els.artworkCard.offsetWidth;
+          els.artworkCard.classList.add('zoom-success');
+          els.artworkCard.addEventListener('animationend', function onZoom() {
+            els.artworkCard.removeEventListener('animationend', onZoom);
+            els.artworkCard.classList.remove('zoom-success');
+          });
+
+          /* show educational panel */
+          var item = GALLERY[state.currentIndex];
+          els.eduTitle.textContent = item.title;
+          els.eduText.textContent = item.eduText;
+          els.eduPanel.classList.add('visible');
+
+          /* show next button */
+          els.nextBtn.style.display = (state.currentIndex < GALLERY.length - 1) ? 'flex' : 'none';
+
+          /* last item: auto-end after 1.5s if next button hidden */
+          if (state.currentIndex >= GALLERY.length - 1) {
+            setTimeout(endGame, 1800);
+          }
+        }
+      }
+
+      /* ────────── Navigation ────────── */
+      function nextItem() {
+        if (state.currentIndex >= GALLERY.length - 1) {
+          endGame();
+          return;
+        }
+
+        /* slide out current */
+        els.artworkCard.classList.add('slide-out-left');
+        els.artworkCard.addEventListener('animationend', function onOut() {
+          els.artworkCard.removeEventListener('animationend', onOut);
+          els.artworkCard.classList.remove('slide-out-left');
+          state.currentIndex++;
+          renderItem(true);
+        });
+      }
+
+      /* ────────── Game lifecycle ────────── */
+      function startGame() {
+        if (window.HLGAnalytics) HLGAnalytics.startSession('culture-gallery');
+
+        els.introScreen.classList.add('hidden');
+        els.endScreen.classList.add('hidden');
+        els.gameUI.style.display = 'flex';
+
+        state.currentIndex = 0;
+        state.score = 0;
+        state.firstTryCount = 0;
+
+        renderItem(false);
+      }
+
+      function endGame() {
+        if (window.HLGAnalytics) HLGAnalytics.endSession({ score: state.score, won: true });
+
+        els.endScore.textContent = state.score;
+        els.endFirstTry.textContent = state.firstTryCount;
+        els.endTotal.textContent = GALLERY.length;
+
+        var pct = state.firstTryCount / GALLERY.length;
+        var msg;
+        if (pct >= 0.9) {
+          els.endTitle.textContent = 'Чудово! Ви справжній знавець культури!';
+          msg = 'Ви правильно визначили майже всі твори з першої спроби. Вітаємо!';
+        } else if (pct >= 0.6) {
+          els.endTitle.textContent = 'Добре! Ви знаєте українську культуру!';
+          msg = 'Непоганий результат. Ще трохи практики — і будете знавцем!';
+        } else if (pct >= 0.3) {
+          els.endTitle.textContent = 'Непогано, але є куди рости!';
+          msg = 'Ви познайомилися з багатьма творами. Спробуйте ще раз для кращого результату.';
+        } else {
+          els.endTitle.textContent = 'Гарний початок!';
+          msg = 'Не хвилюйтесь — тепер ви знаєте більше! Грайте ще раз.';
+        }
+        els.endMessage.textContent = msg;
+
+        els.endScreen.classList.remove('hidden');
+      }
+
+      /* ────────── Event listeners ────────── */
+      els.startBtn.addEventListener('click', startGame);
+      els.restartBtn.addEventListener('click', startGame);
+      els.nextBtn.addEventListener('click', nextItem);
+
+      setupDropZone(els.dropEra);
+      setupDropZone(els.dropAuthor);
+
+    })();
+  </script>
+  <script src="../../shared/js/nav.js"></script>
+  <script src="../../shared/js/analytics.js"></script>
+  <script src="../../shared/js/accessibility.js"></script>
+</body>
+</html>
