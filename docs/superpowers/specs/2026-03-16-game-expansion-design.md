@@ -44,13 +44,14 @@ All games that use images must validate asset presence at runtime:
 #### 1.1 Археологічні розкопки (unique canvas game) — Priority 1
 - **File:** `games/narrative/archaeology.html`
 - **Data folder:** `data/games/archaeology/` — contains asset manifest and game data
-- **Concept:** Player excavates soil layers click-by-click, revealing artifacts. Each artifact must be classified by culture (Trypillia, Scythian, Greek colony, Stone Age) via **fixed buttons** (not drag-and-drop).
+- **Concept:** Player excavates soil layers click-by-click, revealing artifacts. Each artifact must be classified by culture (Trypillia, Scythian, Greek colony, Stone Age) via **two control methods**: drag-and-drop into bins AND fixed buttons (both always available).
 - **Mechanics:**
   - Canvas grid representing excavation site (6×4 cells)
   - Click a cell to "dig" — reveals an artifact image or empty soil
   - Artifacts: pottery, jewelry, tools, ornaments, coins (~12 types, minimal weapon emphasis)
-  - 4 classification buttons at bottom (one per culture): Трипілля, Скіфи, Грецькі колонії, Кам'яний вік
-  - After revealing artifact → click correct culture button → +points, educational detail popup
+  - 4 classification bins at bottom (one per culture): Трипілля, Скіфи, Грецькі колонії, Кам'яний вік
+  - **Dual controls:** drag artifact to correct bin OR click artifact then click culture button — both methods work
+  - Correct classification → +points, educational detail popup
   - Wrong button → -1 life, shows correct answer
   - Score: artifacts correctly classified out of total found
   - 3 difficulty tiers: surface (easy), middle (medium), deep (hard)
