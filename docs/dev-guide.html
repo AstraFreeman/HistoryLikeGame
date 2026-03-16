@@ -512,6 +512,20 @@ if (window.HLGAnalytics) HLGAnalytics.endSession({
             </div>
         </section>
 
+        <!-- Валідація зображень -->
+        <section class="doc-section" id="asset-validator">
+            <h2>Валідація зображень (<code class="inline-code">shared/js/asset-validator.js</code>)</h2>
+            <p>Утиліта для ігор, що використовують зображення від користувача. Якщо файл відсутній, відображає червоний квадрат із назвою очікуваного файлу.</p>
+<pre><code>// Створити &lt;img&gt; з fallback:
+var img = AssetValidator.createImg(
+  '../../data/games/archaeology/TRPL_pot_1.jpg',
+  'Трипільський горщик',
+  { width: '200px', height: '200px' }
+);
+container.appendChild(img);</code></pre>
+            <p>Ігри з валідацією: <code class="inline-code">archaeology</code>, <code class="inline-code">city-builder</code>, <code class="inline-code">culture-gallery</code></p>
+        </section>
+
         <!-- Конвенції -->
         <section class="doc-section" id="conventions">
             <h2>Конвенції</h2>

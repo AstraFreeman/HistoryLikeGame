@@ -30,13 +30,18 @@ shared/
     falling-answer.html       # Шаблон гри з падаючими відповідями
 data/
   quiz/                       # 23 файли даних вікторин
-  falling/                    # 3 файли даних падаючих ігор
+  falling/                    # 9 файлів даних падаючих ігор
+  timeline/                   # 8 файлів хронологічного сортування
   assistant/facts.js          # 50+ фактів для помічника
-  games/                      # Дані нових ігор
+  games/                      # Дані ігор та зображення
     solitaire-v2-cossack.js
     bobble-imperial.js
     puzzle-soviet.js
     kafe-independence.js
+    archaeology/              # Зображення артефактів (TRPL_*, SKIF_*, GREK_*, KAMN_*)
+    city-builder/             # Фото будівель (RATH_1, TSER_1, SHKO_1, FORT_1)
+    culture-gallery/          # Зображення мистецтва (GAL_*)
+    culture-timeline/         # Зображення подій культури (TL9_*)
   pheniks_2/                  # Зображення пазлів (MZP/PTL/SGD)
 games/
   narrative/                  # Наративні та унікальні ігри

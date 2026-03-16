@@ -30,6 +30,7 @@ shared/
     nav.js                    # Sticky nav bar, reads data-* attrs from <body>
     quiz-engine.js            # window.QuizGame — shared quiz logic
     game-engine.js            # window.FallingGame — falling-answer game logic
+    timeline-engine.js        # window.TimelineGame — chronological sorting engine
     canvas-utils.js           # window.CanvasUtils — canvas helpers
     ui-utils.js               # window.UIUtils — modal/notification helpers
     assistant.js              # Octopus mascot (keyboard movement, GIF states)
