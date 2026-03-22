@@ -10,132 +10,150 @@
     <a href="../index.html" style="position:fixed;top:15px;left:15px;z-index:9999;background:rgba(0,0,0,0.6);color:#fff;text-decoration:none;padding:10px 16px;border-radius:8px;font-family:sans-serif;font-size:14px;backdrop-filter:blur(8px);transition:background 0.2s;">На головну</a>
     <a-scene>
         <a-assets>
-            <img id="akac-img" src="ontario-akac/img_1.jpg">
-            <img id="bere-img" src="ontario-bere/img_1.jpg">
+            <img id="akac-img1" src="ontario-akac/img_1.png">
+            <img id="akac-img2" src="ontario-akac/img_2.png">
+            <img id="akac-img3" src="ontario-akac/img_3.png">
+            <img id="bere-img1" src="ontario-bere/img_1.jpg">
+            <img id="bere-img2" src="ontario-bere/img_2.jpg">
         </a-assets>
 
-        <!-- Камера з WASD-керуванням -->
-        <a-entity camera look-controls wasd-controls="acceleration: 25" position="0 1.3 1">
+        <!-- Камера в центрі -->
+        <a-entity camera look-controls wasd-controls="acceleration: 25" position="0 1.3 0">
             <a-entity id="mouseCursor" cursor="rayOrigin: mouse"></a-entity>
         </a-entity>
 
-        <!-- Площина-основа (пергаментний колір) -->
-        <a-plane
-            position="0 0 -4"
+        <!-- Площина-основа -->
+        <a-circle
+            position="0 0 0"
             rotation="-90 0 0"
-            width="10"
-            height="10"
+            radius="6"
             color="#D4A574">
-        </a-plane>
+        </a-circle>
 
-        <!-- Заголовок -->
+        <!-- Заголовок (над головою) -->
         <a-text
             value="Simejni stosunky v Ukraini XVIII st."
             align="center"
-            position="0 4 -3"
+            position="0 3.5 -3.5"
             font="../assets/fonts/ADVENTURE.TTF-msdf.json"
             color="#5C3A1F"
             negate="false"
             scale="0.7 0.7 0.7">
         </a-text>
 
-        <!-- Сторінка 1: Акація -->
+        <!-- ===== 1. Акація — зображення 1 (θ=0°, перед користувачем) ===== -->
         <a-plane
-            id="akac-image"
-            position="-1.5 1 -3"
+            id="akac1-image"
+            position="0 1 -3.5"
             rotation="0 0 0"
             width="1.5"
             height="2"
             color="white"
-            src="#akac-img"
+            src="#akac-img1"
             data-image="true"
             animation__cursor-enter="property: scale; from: 1 1 1; to: 1.1 1.1 1.1; dur: 200; startEvents: mouseenter"
             animation__cursor-leave="property: scale; from: 1.1 1.1 1.1; to: 1 1 1; dur: 200; startEvents: mouseleave"
-            animation__click-up="property: position; from: -1.5 1 -3; to: -1.5 2.5 -3; dur: 500; easing: easeOutQuad; startEvents: click-up"
-            animation__click-down="property: position; from: -1.5 2.5 -3; to: -1.5 1 -3; dur: 500; easing: easeOutQuad; startEvents: click-down">
+            animation__click-up="property: position; from: 0 1 -3.5; to: 0 2.5 -3.5; dur: 500; easing: easeOutQuad; startEvents: click-up"
+            animation__click-down="property: position; from: 0 2.5 -3.5; to: 0 1 -3.5; dur: 500; easing: easeOutQuad; startEvents: click-down">
         </a-plane>
-
-        <!-- Підпис: Акація -->
-        <a-text
-            value="Akatsiya"
-            align="center"
-            position="-1.5 -0.3 -3"
-            color="#5C3A1F"
-            scale="0.6 0.6 0.6">
-        </a-text>
-
-        <!-- Кнопка-посилання для Акації -->
-        <a-entity
-            id="akac-hidden-button"
-            position="-1.5 3.2 -3"
-            visible="false">
-            <a-box
-                color="#8B5E3C"
-                depth="0.2"
-                height="0.5"
-                width="1.2"
-                id="akac-go-button">
-            </a-box>
-            <a-text
-                value="Vidkryty"
-                align="center"
-                position="0 0 0.15"
-                color="#FFFFFF"
-                scale="0.8 0.8 0.8">
-            </a-text>
+        <a-text value="Akatsiya 1" align="center" position="0 -0.3 -3.5" rotation="0 0 0" color="#5C3A1F" scale="0.6 0.6 0.6"></a-text>
+        <a-entity id="akac1-hidden-button" position="0 3.2 -3.5" rotation="0 0 0" visible="false">
+            <a-box color="#8B5E3C" depth="0.2" height="0.5" width="1.2" id="akac1-go-button"></a-box>
+            <a-text value="Vidkryty" align="center" position="0 0 0.15" color="#FFFFFF" scale="0.8 0.8 0.8"></a-text>
         </a-entity>
 
-        <!-- Сторінка 2: Береза -->
+        <!-- ===== 2. Акація — зображення 2 (θ=72°, праворуч-спереду) ===== -->
         <a-plane
-            id="bere-image"
-            position="1.5 1 -3"
-            rotation="0 0 0"
+            id="akac2-image"
+            position="3.33 1 -1.08"
+            rotation="0 -72 0"
             width="1.5"
             height="2"
             color="white"
-            src="#bere-img"
+            src="#akac-img2"
             data-image="true"
             animation__cursor-enter="property: scale; from: 1 1 1; to: 1.1 1.1 1.1; dur: 200; startEvents: mouseenter"
             animation__cursor-leave="property: scale; from: 1.1 1.1 1.1; to: 1 1 1; dur: 200; startEvents: mouseleave"
-            animation__click-up="property: position; from: 1.5 1 -3; to: 1.5 2.5 -3; dur: 500; easing: easeOutQuad; startEvents: click-up"
-            animation__click-down="property: position; from: 1.5 2.5 -3; to: 1.5 1 -3; dur: 500; easing: easeOutQuad; startEvents: click-down">
+            animation__click-up="property: position; from: 3.33 1 -1.08; to: 3.33 2.5 -1.08; dur: 500; easing: easeOutQuad; startEvents: click-up"
+            animation__click-down="property: position; from: 3.33 2.5 -1.08; to: 3.33 1 -1.08; dur: 500; easing: easeOutQuad; startEvents: click-down">
         </a-plane>
+        <a-text value="Akatsiya 2" align="center" position="3.33 -0.3 -1.08" rotation="0 -72 0" color="#5C3A1F" scale="0.6 0.6 0.6"></a-text>
+        <a-entity id="akac2-hidden-button" position="3.33 3.2 -1.08" rotation="0 -72 0" visible="false">
+            <a-box color="#8B5E3C" depth="0.2" height="0.5" width="1.2" id="akac2-go-button"></a-box>
+            <a-text value="Vidkryty" align="center" position="0 0 0.15" color="#FFFFFF" scale="0.8 0.8 0.8"></a-text>
+        </a-entity>
 
-        <!-- Підпис: Береза -->
-        <a-text
-            value="Bereza"
-            align="center"
-            position="1.5 -0.3 -3"
-            color="#5C3A1F"
-            scale="0.6 0.6 0.6">
-        </a-text>
+        <!-- ===== 3. Акація — зображення 3 (θ=144°, праворуч-ззаду) ===== -->
+        <a-plane
+            id="akac3-image"
+            position="2.06 1 2.83"
+            rotation="0 -144 0"
+            width="1.5"
+            height="2"
+            color="white"
+            src="#akac-img3"
+            data-image="true"
+            animation__cursor-enter="property: scale; from: 1 1 1; to: 1.1 1.1 1.1; dur: 200; startEvents: mouseenter"
+            animation__cursor-leave="property: scale; from: 1.1 1.1 1.1; to: 1 1 1; dur: 200; startEvents: mouseleave"
+            animation__click-up="property: position; from: 2.06 1 2.83; to: 2.06 2.5 2.83; dur: 500; easing: easeOutQuad; startEvents: click-up"
+            animation__click-down="property: position; from: 2.06 2.5 2.83; to: 2.06 1 2.83; dur: 500; easing: easeOutQuad; startEvents: click-down">
+        </a-plane>
+        <a-text value="Akatsiya 3" align="center" position="2.06 -0.3 2.83" rotation="0 -144 0" color="#5C3A1F" scale="0.6 0.6 0.6"></a-text>
+        <a-entity id="akac3-hidden-button" position="2.06 3.2 2.83" rotation="0 -144 0" visible="false">
+            <a-box color="#8B5E3C" depth="0.2" height="0.5" width="1.2" id="akac3-go-button"></a-box>
+            <a-text value="Vidkryty" align="center" position="0 0 0.15" color="#FFFFFF" scale="0.8 0.8 0.8"></a-text>
+        </a-entity>
 
-        <!-- Кнопка-посилання для Берези -->
-        <a-entity
-            id="bere-hidden-button"
-            position="1.5 3.2 -3"
-            visible="false">
-            <a-box
-                color="#8B5E3C"
-                depth="0.2"
-                height="0.5"
-                width="1.2"
-                id="bere-go-button">
-            </a-box>
-            <a-text
-                value="Vidkryty"
-                align="center"
-                position="0 0 0.15"
-                color="#FFFFFF"
-                scale="0.8 0.8 0.8">
-            </a-text>
+        <!-- ===== 4. Береза — зображення 1 (θ=216°, ліворуч-ззаду) ===== -->
+        <a-plane
+            id="bere1-image"
+            position="-2.06 1 2.83"
+            rotation="0 144 0"
+            width="1.5"
+            height="2"
+            color="white"
+            src="#bere-img1"
+            data-image="true"
+            animation__cursor-enter="property: scale; from: 1 1 1; to: 1.1 1.1 1.1; dur: 200; startEvents: mouseenter"
+            animation__cursor-leave="property: scale; from: 1.1 1.1 1.1; to: 1 1 1; dur: 200; startEvents: mouseleave"
+            animation__click-up="property: position; from: -2.06 1 2.83; to: -2.06 2.5 2.83; dur: 500; easing: easeOutQuad; startEvents: click-up"
+            animation__click-down="property: position; from: -2.06 2.5 2.83; to: -2.06 1 2.83; dur: 500; easing: easeOutQuad; startEvents: click-down">
+        </a-plane>
+        <a-text value="Bereza 1" align="center" position="-2.06 -0.3 2.83" rotation="0 144 0" color="#5C3A1F" scale="0.6 0.6 0.6"></a-text>
+        <a-entity id="bere1-hidden-button" position="-2.06 3.2 2.83" rotation="0 144 0" visible="false">
+            <a-box color="#8B5E3C" depth="0.2" height="0.5" width="1.2" id="bere1-go-button"></a-box>
+            <a-text value="Vidkryty" align="center" position="0 0 0.15" color="#FFFFFF" scale="0.8 0.8 0.8"></a-text>
+        </a-entity>
+
+        <!-- ===== 5. Береза — зображення 2 (θ=288°, ліворуч-спереду) ===== -->
+        <a-plane
+            id="bere2-image"
+            position="-3.33 1 -1.08"
+            rotation="0 72 0"
+            width="1.5"
+            height="2"
+            color="white"
+            src="#bere-img2"
+            data-image="true"
+            animation__cursor-enter="property: scale; from: 1 1 1; to: 1.1 1.1 1.1; dur: 200; startEvents: mouseenter"
+            animation__cursor-leave="property: scale; from: 1.1 1.1 1.1; to: 1 1 1; dur: 200; startEvents: mouseleave"
+            animation__click-up="property: position; from: -3.33 1 -1.08; to: -3.33 2.5 -1.08; dur: 500; easing: easeOutQuad; startEvents: click-up"
+            animation__click-down="property: position; from: -3.33 2.5 -1.08; to: -3.33 1 -1.08; dur: 500; easing: easeOutQuad; startEvents: click-down">
+        </a-plane>
+        <a-text value="Bereza 2" align="center" position="-3.33 -0.3 -1.08" rotation="0 72 0" color="#5C3A1F" scale="0.6 0.6 0.6"></a-text>
+        <a-entity id="bere2-hidden-button" position="-3.33 3.2 -1.08" rotation="0 72 0" visible="false">
+            <a-box color="#8B5E3C" depth="0.2" height="0.5" width="1.2" id="bere2-go-button"></a-box>
+            <a-text value="Vidkryty" align="center" position="0 0 0.15" color="#FFFFFF" scale="0.8 0.8 0.8"></a-text>
         </a-entity>
 
         <script>
-            var akacImage = document.querySelector('#akac-image');
-            var bereImage = document.querySelector('#bere-image');
-            var akacGoButton = document.querySelector('#akac-go-button');
-            var bereGoButton = document.querySelector('#bere-go-button');
+            var items = [
+                { id: 'akac1', url: 'ontario-akac/ontario-akac-1-img1.html' },
+                { id: 'akac2', url: 'ontario-akac/ontario-akac-1-img2.html' },
+                { id: 'akac3', url: 'ontario-akac/ontario-akac-1-img3.html' },
+                { id: 'bere1', url: 'ontario-bere/ontario-bere-1.html' },
+                { id: 'bere2', url: 'ontario-bere/ontario-bere-1.html' }
+            ];
 
             function handleImageClick(image, buttonId) {
                 var currentPosition = image.getAttribute('position');
@@ -150,18 +168,17 @@
                 }
             }
 
-            akacImage.addEventListener('click', function() {
-                handleImageClick(akacImage, '#akac-hidden-button');
-            });
-            bereImage.addEventListener('click', function() {
-                handleImageClick(bereImage, '#bere-hidden-button');
-            });
+            items.forEach(function(item) {
+                var image = document.querySelector('#' + item.id + '-image');
+                var goButton = document.querySelector('#' + item.id + '-go-button');
 
-            akacGoButton.addEventListener('click', function() {
-                window.location.href = 'ontario-akac/ontario-akac-1.html';
-            });
-            bereGoButton.addEventListener('click', function() {
-                window.location.href = 'ontario-bere/ontario-bere-1.html';
+                image.addEventListener('click', function() {
+                    handleImageClick(image, '#' + item.id + '-hidden-button');
+                });
+
+                goButton.addEventListener('click', function() {
+                    window.location.href = item.url;
+                });
             });
         </script>
     </a-scene>
