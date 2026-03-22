@@ -318,6 +318,11 @@ D:\Корн_новий\Робоча19\HistoryLikeGame\ar\ontario-akac\ontario-ak
     <div style="text-align:center;">
         <a id="nextBtn" class="btn-next" href="ontario-akac-1-img1.html">Далі</a>
     </div>
+    <div id="rewardBlock" style="display:none;text-align:center;margin-top:30px;animation:fadeIn 0.5s;">
+        <img src="../../assets/images/win_4.jpg" alt="Винагорода" style="max-width:100%;border-radius:12px;box-shadow:0 8px 25px rgba(0,0,0,0.3);margin-bottom:20px;">
+        <br>
+        <a class="btn-next" href="../../index.html" style="display:inline-block;">На головну</a>
+    </div>
 </div>
 
 <script>
@@ -359,7 +364,13 @@ D:\Корн_новий\Робоча19\HistoryLikeGame\ar\ontario-akac\ontario-ak
 
         resDiv.className = score >= 7 ? 'correct-res' : 'wrong-res';
 
+        // Кнопка "Далі" — завжди
         document.getElementById('nextBtn').style.display = 'inline-block';
+
+        // Винагорода при 80%+
+        if (score >= 8) {
+            document.getElementById('rewardBlock').style.display = 'block';
+        }
 
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
     }

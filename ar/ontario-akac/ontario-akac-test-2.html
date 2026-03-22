@@ -233,8 +233,12 @@
     </form>
 
     <div id="result"></div>
+    <div id="rewardBlock" style="display:none;text-align:center;margin-top:30px;animation:fadeIn 0.5s;">
+        <img id="rewardImg" src="../../assets/images/win_4.jpg" alt="Винагорода" style="max-width:100%;border-radius:12px;box-shadow:0 8px 25px rgba(0,0,0,0.3);margin-bottom:20px;">
+        <br>
+        <a class="btn-next" href="../../index.html" style="display:inline-block;">На головну</a>
+    </div>
     <div style="text-align:center;">
-        <a id="nextBtn" class="btn-next" href="../../index.html">Далі</a>
         <p id="retryMsg" style="display:none;color:#721c24;margin-top:15px;font-size:16px;">Потрібно набрати щонайменше 80%. Спробуйте ще раз!</p>
     </div>
 </div>
@@ -285,14 +289,14 @@
 
         resDiv.className = percentage >= 70 ? 'correct-res' : 'wrong-res';
 
-        // Кнопка "Далі" при 80%+
-        var nextBtn = document.getElementById('nextBtn');
+        // Винагорода при 80%+
+        var rewardBlock = document.getElementById('rewardBlock');
         var retryMsg = document.getElementById('retryMsg');
         if (percentage >= 80) {
-            nextBtn.style.display = 'inline-block';
+            rewardBlock.style.display = 'block';
             retryMsg.style.display = 'none';
         } else {
-            nextBtn.style.display = 'none';
+            rewardBlock.style.display = 'none';
             retryMsg.style.display = 'block';
         }
 
