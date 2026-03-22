@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-"Історія як гра" (History as a Game) — a Ukrainian-language educational web project that teaches Ukrainian history through interactive browser-based games. Pure static HTML/CSS/JS with no build system, package manager, or test framework.
+"Історія як гра" (History as a Game) — a Ukrainian-language educational web project that teaches Ukrainian history through interactive browser-based games covering 9 historical periods. Pure static HTML/CSS/JS with no build system, package manager, or test framework. No tests exist — verify changes by opening the relevant HTML file in a browser.
 
 ## Running the Project
 
@@ -43,15 +43,31 @@ shared/
     timeline-sort.html        # Template for timeline sorting games, loads data via ?id=
 data/
   quiz/                       # 23 quiz data files (crstm-s-{row}-{col}.js)
-  falling/                    # 8 falling-game data files (period-{n}-{name}.js)
-  timeline/                   # 4 timeline-sort data files (period-{n}-{name}.js)
+  falling/                    # 9 falling-game data files (period-{n}-{name}.js)
+  timeline/                   # 8 timeline-sort data files (period-{n}-{name}.js)
   assistant/                  # Assistant facts database
-  games/                      # Game-specific data files (solitaire, bobble, puzzle, kafe)
+  pheniks_2/                  # Puzzle piece images (MZP/PTL/SGD sets)
+  games/                      # Game-specific data files and assets
+    solitaire-v2-cossack.js   # Solitaire card data
+    bobble-imperial.js        # Bobble shooter categories
+    puzzle-soviet.js           # Puzzle game data
+    kafe-independence.js       # Kafe simulator data
+    archaeology/              # Artifact images (TRPL_*, SKIF_*, GREK_*, KAMN_*)
+    city-builder/             # Building photos (RATH_1, TSER_1, SHKO_1, FORT_1)
+    culture-gallery/          # Artwork images (GAL_*)
+    culture-timeline/         # Cultural event images (TL9_*)
 games/
-  narrative/                  # Story-driven, interactive, and unique game pages
+  narrative/                  # 26 game pages: story-driven, interactive, and unique games
     masachuchi/               # Apple-catching canvas game (own image/ subdir)
     new-makako-1/             # Falling game variant (own styles.css, script.js)
     tower-defense.html        # Three.js tower defense game (Period 5)
+    archaeology.html          # Excavation game — dig artifacts, classify by culture (Period 1)
+    city-builder.html         # Grid-based city builder with quiz (Period 3)
+    diplomat.html             # 8-node branching text adventure (Period 3)
+    culture-tower.html        # 15-level stacking quiz (Period 9)
+    culture-gallery.html      # Artwork identification carousel (Period 9)
+    samvydav.html             # Turn-based stealth/strategy with JSON data (Period 7)
+    radio-svoboda.html        # Radio quiz-show format (Period 7)
   start-pages/                # Educational intro pages before games
   quiz-hub/                   # crstm-s-main.html — quiz grid hub
   map/                        # Interactive zoomable historical map
@@ -67,6 +83,10 @@ assets/
   music/                      # Audio files (.mp3)
   map/                        # Map image assets
   fonts/                      # ADVENTURE MSDF font for A-Frame text
+docs/
+  GUIDE.md                    # Player guide (Ukrainian)
+  DEV-GUIDE.md                # Developer guide (Ukrainian) — detailed API reference
+  superpowers/                # Claude Code plans and design specs
 ```
 
 ## Architecture
@@ -83,17 +103,35 @@ assets/
 
 **Navigation** via `nav.js`: reads `data-section`, `data-game-title`, `data-home-url` from `<body>`. Use `data-nav="overlay"` for fullscreen games (floating button), `data-nav="false"` to skip. AR pages use an inline floating `<a>` tag instead.
 
+**Asset validation:** `window.AssetValidator.createImg()` replaces missing images with a red (#e00) square showing the expected filename, preventing broken layouts during development.
+
 **Quiz template system:** `shared/templates/quiz-question.html?id=1-1` dynamically loads `data/quiz/crstm-s-1-1.js` which sets `window.QUIZ_DATA`. Same pattern for falling games (`window.FALLING_DATA`) and timeline games (`window.TIMELINE_DATA`).
 
 **CSS theming:** `theme.css` defines CSS custom properties. Pages can override with `--game-accent`, `--game-bg` etc. Dark glassmorphism base with vibrant accents.
 
+## Adding a New Game
+
+1. Create a data file if needed: `data/games/my-game-data.js` → `window.MY_GAME_DATA = { ... };`
+2. Create HTML in `games/narrative/my-game.html`:
+   - Load shared CSS: `reset.css`, `theme.css`, `animations.css` (minimum)
+   - Set `<body>` data attrs: `data-nav="overlay"` for fullscreen, `data-home-url="../../index.html"`
+   - Load game data script, then game logic
+   - Load `nav.js`, `analytics.js`, `accessibility.js` before `</body>` (in that order)
+3. Integrate analytics (2 lines): `HLGAnalytics.startSession('id')` at start, `HLGAnalytics.endSession({...})` at end
+4. Add link card in `index.html`
+
+For template-based games (quiz/falling/timeline), create only a data file and link to the shared template with `?id=` param.
+
 ## Key Conventions
 
 - **Language:** All UI text in Ukrainian. Only first word in a sentence capitalized (Ukrainian rule)
-- **No build step:** Files served as-is. No transpilation, bundling, or minification
+- **No build step:** Files served as-is. No transpilation, bundling, or minification. No npm/yarn/pnpm
 - **Naming:** kebab-case for files and directories
 - **AR pages** depend on CDN-hosted A-Frame and AR.js libraries
 - **Paths from game pages:** Games in `games/*/` use `../../shared/`, `../../assets/` etc.
+- **No innerHTML:** Use `document.createElement` and DOM methods for all dynamic content (security + accessibility.js convention)
+- **Script load order before `</body>`:** `nav.js` → `analytics.js` → `accessibility.js` (accessibility panel depends on analytics being available)
+- **`file://` compatibility:** No ES modules, no `fetch()` for local JSON — use `<script>` tags that set `window.*` globals instead
 
 ## Accessibility
 

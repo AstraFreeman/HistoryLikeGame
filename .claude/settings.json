@@ -1,8 +1,12 @@
 {
   "mcpServers": {
     "playwright": {
-      "command": "npx",
-      "args": ["@playwright/mcp", "--headless"]
+      "command": "D:\\Program Files\\nodejs\\npx.cmd",
+      "args": ["-y", "@playwright/mcp", "--headless"]
+    },
+    "context7": {
+      "command": "D:\\Program Files\\nodejs\\npx.cmd",
+      "args": ["-y", "@upstash/context7-mcp"]
     }
   }
 }
