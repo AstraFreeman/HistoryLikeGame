@@ -1,319 +1,304 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
-    <meta charset="utf-8">
-    <!-- ЗАМІНІТЬ: Впишіть назву вашого тесту -->
-    <title>Тест — Сімейні стосунки (Акація)</title>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест — Сімейні стосунки (Акація)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --egypt-gold: #d4af37;
+            --egypt-blue: #2c3e50;
+            --papyrus: #f2e8c9;
+            --dark-sand: #c2b280;
+            --white: #ffffff;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #5C3A1F 0%, #D4A574 100%);
-            min-height: 100vh;
+            font-family: 'Roboto', sans-serif;
+            background-color: #e5d3b3;
+            background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png');
+            margin: 0;
             padding: 20px;
-            color: #fff;
+            color: #2c3e50;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            background: var(--white);
+            padding: 40px;
+            border-radius: 2px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-left: 15px solid var(--egypt-gold);
+            position: relative;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            border-bottom: 3px double var(--egypt-gold);
+            padding-bottom: 20px;
         }
 
         h1 {
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 28px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5em;
+            color: var(--egypt-blue);
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
 
         .question-block {
-            background: rgba(255, 255, 255, 0.15);
+            margin-bottom: 35px;
             padding: 25px;
-            margin-bottom: 25px;
-            border-radius: 15px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .question-title {
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #fff;
-        }
-
-        .option {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 12px 15px;
-            margin: 10px 0;
+            border: 1px solid #eee;
             border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
+            transition: transform 0.2s, box-shadow 0.2s;
+            background: #fafafa;
         }
 
-        .option:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateX(5px);
+        .question-block:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-color: var(--egypt-gold);
         }
 
-        .option input[type="radio"],
-        .option input[type="checkbox"] {
-            margin-right: 10px;
+        h3 {
+            font-family: 'Playfair Display', serif;
+            color: #8b4513;
+            margin-top: 0;
+            font-size: 1.3em;
+        }
+
+        .options label {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin: 8px 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 6px;
             cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .options label:hover {
+            background-color: #fff9e6;
+            border-color: var(--egypt-gold);
+        }
+
+        input[type="radio"], input[type="checkbox"] {
             width: 18px;
             height: 18px;
-        }
-
-        .option label {
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        .option.correct {
-            background: rgba(76, 175, 80, 0.4);
-            border-color: #4CAF50;
-        }
-
-        .option.incorrect {
-            background: rgba(244, 67, 54, 0.4);
-            border-color: #f44336;
+            margin-right: 15px;
+            accent-color: var(--egypt-gold);
         }
 
         textarea {
             width: 100%;
             min-height: 100px;
             padding: 15px;
-            border-radius: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
+            border: 2px solid var(--dark-sand);
+            border-radius: 5px;
+            background: white;
+            color: #2c3e50;
             font-size: 16px;
             font-family: inherit;
             resize: vertical;
-        }
-
-        textarea::placeholder {
-            color: rgba(255, 255, 255, 0.7);
+            box-sizing: border-box;
         }
 
         textarea:focus {
             outline: none;
-            border-color: #D4A574;
-            background: rgba(255, 255, 255, 0.25);
-        }
-
-        .button-container {
-            text-align: center;
-            margin-top: 30px;
-        }
-
-        button {
-            background: #8B5E3C;
-            color: white;
-            border: none;
-            padding: 15px 40px;
-            font-size: 18px;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(139, 94, 60, 0.4);
-        }
-
-        button:hover {
-            background: #6D4A2E;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(139, 94, 60, 0.6);
-        }
-
-        button:disabled {
-            background: #666;
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-
-        .result {
-            background: rgba(255, 255, 255, 0.2);
-            padding: 20px;
-            border-radius: 15px;
-            margin-top: 20px;
-            text-align: center;
-            font-size: 18px;
-            display: none;
-        }
-
-        .result.show {
-            display: block;
+            border-color: var(--egypt-gold);
         }
 
         .hint {
             font-size: 14px;
-            color: rgba(255, 255, 255, 0.8);
-            margin-top: 10px;
+            color: #8b4513;
+            margin-bottom: 10px;
             font-style: italic;
+        }
+
+        .btn-submit {
+            background: var(--egypt-blue);
+            color: var(--egypt-gold);
+            padding: 20px 40px;
+            border: 2px solid var(--egypt-gold);
+            font-size: 1.2em;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            letter-spacing: 2px;
+            margin-top: 20px;
+        }
+
+        .btn-submit:hover {
+            background: var(--egypt-gold);
+            color: var(--egypt-blue);
+        }
+
+        .btn-next {
+            display: none;
+            background: var(--egypt-gold);
+            color: var(--egypt-blue);
+            padding: 15px 40px;
+            border: none;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-decoration: none;
+            border-radius: 6px;
+            margin-top: 20px;
+            letter-spacing: 1px;
+            transition: all 0.3s;
+        }
+
+        .btn-next:hover {
+            background: var(--egypt-blue);
+            color: var(--egypt-gold);
+        }
+
+        #result {
+            margin-top: 30px;
+            padding: 30px;
+            display: none;
+            text-align: center;
+            font-size: 1.5em;
+            border-radius: 8px;
+            animation: fadeIn 0.5s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .correct-res { background: #d4edda; color: #155724; border: 2px solid #c3e6cb; }
+        .wrong-res { background: #f8d7da; color: #721c24; border: 2px solid #f5c6cb; }
+
+        @media (max-width: 600px) {
+            .container { padding: 20px; }
+            h1 { font-size: 1.6em; }
         }
     </style>
 </head>
 <body>
-    <a href="../../index.html" style="position:fixed;top:15px;left:15px;z-index:9999;background:rgba(0,0,0,0.6);color:#fff;text-decoration:none;padding:10px 16px;border-radius:8px;font-family:sans-serif;font-size:14px;backdrop-filter:blur(8px);transition:background 0.2s;">На головну</a>
-    <div class="container">
-        <!-- ЗАМІНІТЬ: Впишіть назву вашого тесту -->
-        <h1>Тест: сімейні стосунки в Україні XVIII ст.</h1>
+<a href="../../index.html" style="position:fixed;top:15px;left:15px;z-index:9999;background:rgba(0,0,0,0.6);color:#fff;text-decoration:none;padding:10px 16px;border-radius:8px;font-family:sans-serif;font-size:14px;backdrop-filter:blur(8px);transition:background 0.2s;">На головну</a>
 
-        <form id="testForm">
-            <!-- ЗАМІНІТЬ: Питання 1 (radio — одна правильна відповідь) -->
-            <div class="question-block">
-                <div class="question-title">1. Яку роль відігравав посаг у шлюбних відносинах XVIII ст.?</div>
-                <div class="option">
-                    <input type="radio" id="q1a" name="q1" value="A">
-                    <label for="q1a">А) Це був символічний подарунок без юридичного значення</label>
-                </div>
-                <div class="option">
-                    <input type="radio" id="q1b" name="q1" value="B">
-                    <label for="q1b">Б) Посаг був обов'язковою умовою шлюбного договору</label>
-                </div>
-                <div class="option">
-                    <input type="radio" id="q1c" name="q1" value="C">
-                    <label for="q1c">В) Посаг існував лише в аристократичних родинах</label>
-                </div>
-                <div class="option">
-                    <input type="radio" id="q1d" name="q1" value="D">
-                    <label for="q1d">Г) Посаг давав лише наречений</label>
-                </div>
-            </div>
-
-            <!-- ЗАМІНІТЬ: Питання 2 (checkbox — кілька правильних відповідей) -->
-            <div class="question-block">
-                <div class="question-title">2. Які з цих тверджень про сімейне життя в Україні XVIII ст. є правильними?</div>
-                <div class="hint">(Оберіть усі правильні варіанти)</div>
-                <div class="option">
-                    <input type="checkbox" id="q2a" name="q2" value="church">
-                    <label for="q2a">Церква мала значний вплив на сімейні відносини</label>
-                </div>
-                <div class="option">
-                    <input type="checkbox" id="q2b" name="q2" value="women">
-                    <label for="q2b">Жінки в козацьких родинах мали певні майнові права</label>
-                </div>
-                <div class="option">
-                    <input type="checkbox" id="q2c" name="q2" value="divorce">
-                    <label for="q2c">Розлучення було простою та поширеною процедурою</label>
-                </div>
-                <div class="option">
-                    <input type="checkbox" id="q2d" name="q2" value="community">
-                    <label for="q2d">Громада відігравала роль у вирішенні сімейних конфліктів</label>
-                </div>
-            </div>
-
-            <!-- ЗАМІНІТЬ: Питання 3 (відкрите — текстова відповідь) -->
-            <div class="question-block">
-                <div class="question-title">3. Опишіть, як змінювалася роль жінки в українській родині протягом XVIII ст.</div>
-                <textarea id="q3" name="q3" placeholder="Напишіть свою відповідь тут..." required></textarea>
-            </div>
-
-            <!-- ЗАМІНІТЬ: Питання 4 (відкрите — текстова відповідь) -->
-            <div class="question-block">
-                <div class="question-title">4. Порівняйте сімейні традиції козацької старшини та простих козаків.</div>
-                <textarea id="q4" name="q4" placeholder="Напишіть свою відповідь тут..." required></textarea>
-            </div>
-
-            <div class="button-container">
-                <button type="submit">Перевірити відповіді</button>
-            </div>
-        </form>
-
-        <div id="result" class="result"></div>
-        <div class="button-container">
-            <a id="nextBtn" href="../../index.html" style="display:none;background:#8B5E3C;color:white;text-decoration:none;padding:15px 40px;font-size:18px;border-radius:10px;box-shadow:0 4px 15px rgba(139,94,60,0.4);transition:all 0.3s;">Далі</a>
-            <p id="retryMsg" style="display:none;color:#ffcccc;margin-top:15px;font-size:16px;">Потрібно набрати щонайменше 80%. Спробуйте ще раз!</p>
-        </div>
+<div class="container">
+    <div class="header">
+        <h1>Сімейні стосунки</h1>
+        <p>Україна XVIII століття</p>
     </div>
 
-    <script>
-        document.getElementById('testForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+    <form id="quizForm">
+        <div class="question-block">
+            <h3>1. Яку роль відігравав посаг у шлюбних відносинах XVIII ст.?</h3>
+            <div class="options">
+                <label><input type="radio" name="q1" value="A"> Це був символічний подарунок без юридичного значення</label>
+                <label><input type="radio" name="q1" value="B"> Посаг був обов'язковою умовою шлюбного договору</label>
+                <label><input type="radio" name="q1" value="C"> Посаг існував лише в аристократичних родинах</label>
+                <label><input type="radio" name="q1" value="D"> Посаг давав лише наречений</label>
+            </div>
+        </div>
 
-            var score = 0;
-            var totalQuestions = 4;
+        <div class="question-block">
+            <h3>2. Які з цих тверджень про сімейне життя в Україні XVIII ст. є правильними?</h3>
+            <div class="hint">(Оберіть усі правильні варіанти)</div>
+            <div class="options">
+                <label><input type="checkbox" name="q2" value="church"> Церква мала значний вплив на сімейні відносини</label>
+                <label><input type="checkbox" name="q2" value="women"> Жінки в козацьких родинах мали певні майнові права</label>
+                <label><input type="checkbox" name="q2" value="divorce"> Розлучення було простою та поширеною процедурою</label>
+                <label><input type="checkbox" name="q2" value="community"> Громада відігравала роль у вирішенні сімейних конфліктів</label>
+            </div>
+        </div>
 
-            // ЗАМІНІТЬ: правильна відповідь для питання 1 (value radio-кнопки)
-            var correctQ1 = 'B';
-            var q1 = document.querySelector('input[name="q1"]:checked');
-            var q1Options = document.querySelectorAll('input[name="q1"]');
-            q1Options.forEach(function(option) {
-                var parent = option.parentElement;
-                parent.classList.remove('correct', 'incorrect');
-                if (option.value === correctQ1) {
-                    parent.classList.add('correct');
-                } else if (option.checked) {
-                    parent.classList.add('incorrect');
-                }
-            });
-            if (q1 && q1.value === correctQ1) {
-                score++;
-            }
+        <div class="question-block">
+            <h3>3. Опишіть, як змінювалася роль жінки в українській родині протягом XVIII ст.</h3>
+            <textarea id="q3" name="q3" placeholder="Напишіть свою відповідь тут..."></textarea>
+        </div>
 
-            // ЗАМІНІТЬ: правильні відповіді для питання 2 (масив value чекбоксів)
-            var q2Correct = ['church', 'women', 'community'];
-            var q2Checked = document.querySelectorAll('input[name="q2"]:checked');
-            var q2Values = Array.from(q2Checked).map(function(cb) { return cb.value; });
+        <div class="question-block">
+            <h3>4. Порівняйте сімейні традиції козацької старшини та простих козаків.</h3>
+            <textarea id="q4" name="q4" placeholder="Напишіть свою відповідь тут..."></textarea>
+        </div>
 
-            var q2Options = document.querySelectorAll('input[name="q2"]');
-            q2Options.forEach(function(option) {
-                var parent = option.parentElement;
-                parent.classList.remove('correct', 'incorrect');
-                if (q2Correct.indexOf(option.value) !== -1) {
-                    parent.classList.add('correct');
-                } else if (option.checked) {
-                    parent.classList.add('incorrect');
-                }
-            });
+        <button type="button" class="btn-submit" onclick="checkQuiz()">Перевірити відповіді</button>
+    </form>
 
-            var q2CorrectCount = q2Values.filter(function(v) { return q2Correct.indexOf(v) !== -1; }).length;
-            var q2IncorrectCount = q2Values.filter(function(v) { return q2Correct.indexOf(v) === -1; }).length;
-            if (q2CorrectCount === q2Correct.length && q2IncorrectCount === 0) {
-                score++;
-            }
+    <div id="result"></div>
+    <div style="text-align:center;">
+        <a id="nextBtn" class="btn-next" href="../../index.html">Далі</a>
+        <p id="retryMsg" style="display:none;color:#721c24;margin-top:15px;font-size:16px;">Потрібно набрати щонайменше 80%. Спробуйте ще раз!</p>
+    </div>
+</div>
 
-            // Перевірка текстових відповідей (не змінюйте)
-            var q3 = document.getElementById('q3').value.trim();
-            var q4 = document.getElementById('q4').value.trim();
+<script>
+    function checkQuiz() {
+        var score = 0;
+        var totalQuestions = 4;
 
-            if (q3.length >= 20) score++;
-            if (q4.length >= 20) score++;
+        // Питання 1 — radio
+        if (document.querySelector('input[name="q1"]:checked')?.value === 'B') score++;
 
-            // Показати результат (не змінюйте)
-            var resultDiv = document.getElementById('result');
-            var percentage = (score / totalQuestions) * 100;
+        // Питання 2 — checkbox
+        var q2Correct = ['church', 'women', 'community'];
+        var q2Checked = Array.from(document.querySelectorAll('input[name="q2"]:checked')).map(function(cb) { return cb.value; });
+        var q2CorrectCount = q2Checked.filter(function(v) { return q2Correct.indexOf(v) !== -1; }).length;
+        var q2IncorrectCount = q2Checked.filter(function(v) { return q2Correct.indexOf(v) === -1; }).length;
+        if (q2CorrectCount === q2Correct.length && q2IncorrectCount === 0) score++;
 
-            resultDiv.innerHTML =
-                '<h2>Результат: ' + score + ' з ' + totalQuestions + '</h2>' +
-                '<p style="font-size:24px;margin:15px 0;">' + percentage + '%</p>' +
-                '<p>' + (percentage >= 75 ? 'Чудовий результат!' : percentage >= 50 ? 'Непоганий результат!' : 'Продовжуй вчитися!') + '</p>';
-            resultDiv.classList.add('show');
+        // Питання 3, 4 — текстові
+        var q3 = document.getElementById('q3').value.trim();
+        var q4 = document.getElementById('q4').value.trim();
+        if (q3.length >= 20) score++;
+        if (q4.length >= 20) score++;
 
-            // Показати кнопку "Далі" лише при 80%+ (не змінюйте)
-            var nextBtn = document.getElementById('nextBtn');
-            var retryMsg = document.getElementById('retryMsg');
-            if (percentage >= 80) {
-                nextBtn.style.display = 'inline-block';
-                retryMsg.style.display = 'none';
-            } else {
-                nextBtn.style.display = 'none';
-                retryMsg.style.display = 'block';
-            }
+        // Результат
+        var resDiv = document.getElementById('result');
+        var percentage = (score / totalQuestions) * 100;
+        resDiv.style.display = 'block';
+        resDiv.textContent = '';
 
-            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        });
-    </script>
+        var scoreText = document.createElement('span');
+        scoreText.textContent = 'Ваш результат: ' + score + ' з ' + totalQuestions;
+        resDiv.appendChild(scoreText);
+        resDiv.appendChild(document.createElement('br'));
+
+        var pctText = document.createElement('span');
+        pctText.style.fontSize = '1.2em';
+        pctText.style.margin = '10px 0';
+        pctText.style.display = 'block';
+        pctText.textContent = percentage + '%';
+        resDiv.appendChild(pctText);
+        resDiv.appendChild(document.createElement('br'));
+
+        var comment = document.createElement('small');
+        comment.textContent = percentage >= 75 ? 'Чудовий результат!' : percentage >= 50 ? 'Непоганий результат!' : 'Продовжуй вчитися!';
+        resDiv.appendChild(comment);
+
+        resDiv.className = percentage >= 70 ? 'correct-res' : 'wrong-res';
+
+        // Кнопка "Далі" при 80%+
+        var nextBtn = document.getElementById('nextBtn');
+        var retryMsg = document.getElementById('retryMsg');
+        if (percentage >= 80) {
+            nextBtn.style.display = 'inline-block';
+            retryMsg.style.display = 'none';
+        } else {
+            nextBtn.style.display = 'none';
+            retryMsg.style.display = 'block';
+        }
+
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+</script>
+
 </body>
 </html>
