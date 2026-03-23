@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+D:\Корн_новий\Робоча19\HistoryLikeGame\ar\ontario-akac\ontario-akac-test.html<!DOCTYPE html>
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Тест — Сімейні стосунки (Акація)</title>
+    <title>Мистецтво Стародавнього Сходу: Тест</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -96,30 +96,29 @@
             accent-color: var(--egypt-gold);
         }
 
-        textarea {
-            width: 100%;
-            min-height: 100px;
+        .match-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            background: #fff;
             padding: 15px;
-            border: 2px solid var(--dark-sand);
+            border-radius: 8px;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--dark-sand);
             border-radius: 5px;
             background: white;
-            color: #2c3e50;
+        }
+
+        input[type="text"] {
+            padding: 10px;
+            border: 2px solid var(--dark-sand);
+            border-radius: 5px;
+            width: 200px;
             font-size: 16px;
-            font-family: inherit;
-            resize: vertical;
-            box-sizing: border-box;
-        }
-
-        textarea:focus {
-            outline: none;
-            border-color: var(--egypt-gold);
-        }
-
-        .hint {
-            font-size: 14px;
-            color: #8b4513;
-            margin-bottom: 10px;
-            font-style: italic;
         }
 
         .btn-submit {
@@ -183,8 +182,8 @@
         .wrong-res { background: #f8d7da; color: #721c24; border: 2px solid #f5c6cb; }
 
         @media (max-width: 600px) {
+            .match-grid { grid-template-columns: 1fr; }
             .container { padding: 20px; }
-            h1 { font-size: 1.6em; }
         }
     </style>
 </head>
@@ -193,111 +192,178 @@
 
 <div class="container">
     <div class="header">
-        <h1>Сімейні стосунки</h1>
-        <p>Україна XVIII століття</p>
+        <h1>Вічне Кохання</h1>
+        <p>Мистецтво Стародавнього Сходу в деталях</p>
     </div>
 
     <form id="quizForm">
         <div class="question-block">
-            <h3>1. Яку роль відігравав посаг у шлюбних відносинах XVIII ст.?</h3>
+            <h3>1. Що було центром офіційного мистецтва Єгипту?</h3>
             <div class="options">
-                <label><input type="radio" name="q1" value="A"> Це був символічний подарунок без юридичного значення</label>
-                <label><input type="radio" name="q1" value="B"> Посаг був обов'язковою умовою шлюбного договору</label>
-                <label><input type="radio" name="q1" value="C"> Посаг існував лише в аристократичних родинах</label>
-                <label><input type="radio" name="q1" value="D"> Посаг давав лише наречений</label>
+                <label><input type="radio" name="q1" value="Б"> Релігійний культ, безсмертя та влада фараона</label>
+                <label><input type="radio" name="q1" value="А"> Відображення особистої пристрасті</label>
+                <label><input type="radio" name="q1" value="В"> Повсякденний побут селян</label>
             </div>
         </div>
 
         <div class="question-block">
-            <h3>2. Які з цих тверджень про сімейне життя в Україні XVIII ст. є правильними?</h3>
-            <div class="hint">(Оберіть усі правильні варіанти)</div>
+            <h3>2. Ознака індивідуальності Рахотепа і Нофрет:</h3>
             <div class="options">
-                <label><input type="checkbox" name="q2" value="church"> Церква мала значний вплив на сімейні відносини</label>
-                <label><input type="checkbox" name="q2" value="women"> Жінки в козацьких родинах мали певні майнові права</label>
-                <label><input type="checkbox" name="q2" value="divorce"> Розлучення було простою та поширеною процедурою</label>
-                <label><input type="checkbox" name="q2" value="community"> Громада відігравала роль у вирішенні сімейних конфліктів</label>
+                <label><input type="radio" name="q2" value="В"> Портретна схожість (повні щоки, ніжний овал)</label>
+                <label><input type="radio" name="q2" value="А"> Золоті прикраси</label>
+                <label><input type="radio" name="q2" value="Б"> Відсутність канонічних поз</label>
             </div>
         </div>
 
         <div class="question-block">
-            <h3>3. Опишіть, як змінювалася роль жінки в українській родині протягом XVIII ст.</h3>
-            <textarea id="q3" name="q3" placeholder="Напишіть свою відповідь тут..."></textarea>
+            <h3>3. "Вибух" реалізму та емоційності — це:</h3>
+            <div class="options">
+                <label><input type="radio" name="q3" value="Б"> Амарнський період (Ехнатон)</label>
+                <label><input type="radio" name="q3" value="А"> Раннє царство</label>
+                <label><input type="radio" name="q3" value="В"> Пізнє царство</label>
+            </div>
         </div>
 
         <div class="question-block">
-            <h3>4. Порівняйте сімейні традиції козацької старшини та простих козаків.</h3>
-            <textarea id="q4" name="q4" placeholder="Напишіть свою відповідь тут..."></textarea>
+            <h3>4. Простір для вираження пристрасного кохання:</h3>
+            <div class="options">
+                <label><input type="radio" name="q4" value="В"> Лірична поезія та пісні</label>
+                <label><input type="radio" name="q4" value="А"> Храмова архітектура</label>
+                <label><input type="radio" name="q4" value="Б"> Статуї богів</label>
+            </div>
         </div>
 
-        <button type="button" class="btn-submit" onclick="checkQuiz()">Перевірити відповіді</button>
+        <div class="question-block">
+            <h3>5. Встановіть відповідність проявів почуттів:</h3>
+            <div class="match-grid">
+                <div>1. Канонічна Скульптура</div>
+                <select name="q5_1">
+                    <option value="">Оберіть...</option>
+                    <option value="Б">Подружній союз для вічності</option>
+                    <option value="В">Спільні бенкети та гармонія</option>
+                    <option value="А">Краса природи Нілу</option>
+                    <option value="Г">Туга за померлим (плачі)</option>
+                </select>
+                <div>2. Живопис і рельєфи</div>
+                <select name="q5_2">
+                    <option value="">Оберіть...</option>
+                    <option value="Б">Подружній союз для вічності</option>
+                    <option value="В">Спільні бенкети та гармонія</option>
+                    <option value="А">Краса природи Нілу</option>
+                    <option value="Г">Туга за померлим (плачі)</option>
+                </select>
+                <div>3. Пейзажне мистецтво</div>
+                <select name="q5_3">
+                    <option value="">Оберіть...</option>
+                    <option value="Б">Подружній союз для вічності</option>
+                    <option value="В">Спільні бенкети та гармонія</option>
+                    <option value="А">Краса природи Нілу</option>
+                    <option value="Г">Туга за померлим (плачі)</option>
+                </select>
+                <div>4. Обрядові пісні</div>
+                <select name="q5_4">
+                    <option value="">Оберіть...</option>
+                    <option value="Б">Подружній союз для вічності</option>
+                    <option value="В">Спільні бенкети та гармонія</option>
+                    <option value="А">Краса природи Нілу</option>
+                    <option value="Г">Туга за померлим (плачі)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <h3>6. Риси Амарнського мистецтва (Оберіть 3):</h3>
+            <div class="options">
+                <label><input type="checkbox" name="q6" value="2"> Реалізм фараона та родини</label>
+                <label><input type="checkbox" name="q6" value="4"> Емоційна ніжність</label>
+                <label><input type="checkbox" name="q6" value="5"> Діти у родинному колі</label>
+                <label><input type="checkbox" name="q6" value="1"> Сувора симетрія</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <h3>7. Як виявлялася "любов до життя"? (Оберіть 2):</h3>
+            <div class="options">
+                <label><input type="checkbox" name="q7" value="1"> Зображення птахів, риб, квітів</label>
+                <label><input type="checkbox" name="q7" value="3"> Краса природи для потойбіччя</label>
+                <label><input type="checkbox" name="q7" value="2"> Абстрактні фігури</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <h3>8. Назва космічного порядку:</h3>
+            <input type="text" id="q8" placeholder="Введіть слово...">
+        </div>
+
+        <div class="question-block">
+            <h3>9. Чоловіки — темніші, жінки — світліші?</h3>
+            <div class="options">
+                <label><input type="radio" name="q9" value="Так"> Так, це канон</label>
+                <label><input type="radio" name="q9" value="Ні"> Ні, це міф</label>
+            </div>
+        </div>
+
+        <div class="question-block">
+            <h3>10. Чому статуетки слуг були реалістичніші?</h3>
+            <div class="options">
+                <label><input type="radio" name="q10" value="Б"> Канон був менш суворим для них</label>
+                <label><input type="radio" name="q10" value="А"> Слуги були важливіші за царів</label>
+            </div>
+        </div>
+
+        <button type="button" class="btn-submit" onclick="checkQuiz()">Завершити тест</button>
     </form>
 
     <div id="result"></div>
     <div id="rewardBlock" style="display:none;text-align:center;margin-top:30px;animation:fadeIn 0.5s;">
-        <img id="rewardImg" src="../../assets/images/win_4.jpg" alt="Винагорода" style="max-width:100%;border-radius:12px;box-shadow:0 8px 25px rgba(0,0,0,0.3);margin-bottom:20px;">
+        <img src="../../assets/images/win_4.jpg" alt="Винагорода" style="max-width:100%;border-radius:12px;box-shadow:0 8px 25px rgba(0,0,0,0.3);margin-bottom:20px;">
         <br>
         <a class="btn-next" href="../../index.html" style="display:inline-block;">На головну</a>
-    </div>
-    <div style="text-align:center;">
-        <p id="retryMsg" style="display:none;color:#721c24;margin-top:15px;font-size:16px;">Потрібно набрати щонайменше 80%. Спробуйте ще раз!</p>
     </div>
 </div>
 
 <script>
     function checkQuiz() {
-        var score = 0;
-        var totalQuestions = 4;
+        let score = 0;
 
-        // Питання 1 — radio
-        if (document.querySelector('input[name="q1"]:checked')?.value === 'B') score++;
+        if (document.querySelector('input[name="q1"]:checked')?.value === 'Б') score++;
+        if (document.querySelector('input[name="q2"]:checked')?.value === 'В') score++;
+        if (document.querySelector('input[name="q3"]:checked')?.value === 'Б') score++;
+        if (document.querySelector('input[name="q4"]:checked')?.value === 'В') score++;
 
-        // Питання 2 — checkbox
-        var q2Correct = ['church', 'women', 'community'];
-        var q2Checked = Array.from(document.querySelectorAll('input[name="q2"]:checked')).map(function(cb) { return cb.value; });
-        var q2CorrectCount = q2Checked.filter(function(v) { return q2Correct.indexOf(v) !== -1; }).length;
-        var q2IncorrectCount = q2Checked.filter(function(v) { return q2Correct.indexOf(v) === -1; }).length;
-        if (q2CorrectCount === q2Correct.length && q2IncorrectCount === 0) score++;
+        if (document.getElementsByName('q5_1')[0].value === 'Б' &&
+            document.getElementsByName('q5_2')[0].value === 'В' &&
+            document.getElementsByName('q5_3')[0].value === 'А' &&
+            document.getElementsByName('q5_4')[0].value === 'Г') score++;
 
-        // Питання 3, 4 — текстові
-        var q3 = document.getElementById('q3').value.trim();
-        var q4 = document.getElementById('q4').value.trim();
-        if (q3.length >= 20) score++;
-        if (q4.length >= 20) score++;
+        const q6 = Array.from(document.querySelectorAll('input[name="q6"]:checked')).map(e => e.value);
+        if (q6.length === 3 && q6.includes('2') && q6.includes('4') && q6.includes('5')) score++;
 
-        // Результат
-        var resDiv = document.getElementById('result');
-        var percentage = (score / totalQuestions) * 100;
+        const q7 = Array.from(document.querySelectorAll('input[name="q7"]:checked')).map(e => e.value);
+        if (q7.length === 2 && q7.includes('1') && q7.includes('3')) score++;
+
+        if (document.getElementById('q8').value.trim().toLowerCase() === 'маат') score++;
+        if (document.querySelector('input[name="q9"]:checked')?.value === 'Так') score++;
+        if (document.querySelector('input[name="q10"]:checked')?.value === 'Б') score++;
+
+        const resDiv = document.getElementById('result');
         resDiv.style.display = 'block';
         resDiv.textContent = '';
 
         var scoreText = document.createElement('span');
-        scoreText.textContent = 'Ваш результат: ' + score + ' з ' + totalQuestions;
+        scoreText.textContent = 'Ваш результат: ' + score + ' з 10';
         resDiv.appendChild(scoreText);
         resDiv.appendChild(document.createElement('br'));
 
-        var pctText = document.createElement('span');
-        pctText.style.fontSize = '1.2em';
-        pctText.style.margin = '10px 0';
-        pctText.style.display = 'block';
-        pctText.textContent = percentage + '%';
-        resDiv.appendChild(pctText);
-        resDiv.appendChild(document.createElement('br'));
-
         var comment = document.createElement('small');
-        comment.textContent = percentage >= 75 ? 'Чудовий результат!' : percentage >= 50 ? 'Непоганий результат!' : 'Продовжуй вчитися!';
+        comment.textContent = score >= 8 ? 'Чудово! Ви справжній знавець!' : 'Непогано, але можна ще почитати про Амарну.';
         resDiv.appendChild(comment);
 
-        resDiv.className = percentage >= 70 ? 'correct-res' : 'wrong-res';
+        resDiv.className = score >= 7 ? 'correct-res' : 'wrong-res';
 
         // Винагорода при 80%+
-        var rewardBlock = document.getElementById('rewardBlock');
-        var retryMsg = document.getElementById('retryMsg');
-        if (percentage >= 80) {
-            rewardBlock.style.display = 'block';
-            retryMsg.style.display = 'none';
-        } else {
-            rewardBlock.style.display = 'none';
-            retryMsg.style.display = 'block';
+        if (score >= 8) {
+            document.getElementById('rewardBlock').style.display = 'block';
         }
 
         window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
