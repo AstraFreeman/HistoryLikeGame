@@ -28,7 +28,11 @@
       "Bash(mv ar/ontario-akac/ontario-test.html ar/ontario-akac/ontario-akac-test.html)",
       "Bash(mv ar/ontario-bere/ontario-test.html ar/ontario-bere/ontario-bere-test.html)",
       "Bash(cp ar/ontario-akac/ontario-akac-test.html ar/ontario-akac/ontario-akac-test-2.html)",
-      "Bash(cp ar/ontario-bere/ontario-bere-test.html ar/ontario-bere/ontario-bere-test-2.html)"
+      "Bash(cp ar/ontario-bere/ontario-bere-test.html ar/ontario-bere/ontario-bere-test-2.html)",
+      "Bash(for dir:*)",
+      "Bash(do echo:*)",
+      "Read(//d/Корн_новий/Робоча19/HistoryLikeGame/ar/**)",
+      "Bash(done)"
     ]
   }
 }
