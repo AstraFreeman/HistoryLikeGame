@@ -1,0 +1,486 @@
+<!D<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Тест: Любов і шлюб у Стародавньому Єгипті</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Open+Sans:wght@400;600;700&display=swap');
+
+        body {
+            font-family: 'Open Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+                        url('https://images.unsplash.com/photo-1596796332152-4464c06f3b0e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') no-repeat center center fixed;
+            background-size: cover;
+            overflow-x: hidden;
+        }
+
+        #quiz-container {
+            width: 100%;
+            max-width: 650px;
+            background: url('https://www.transparenttextures.com/patterns/cartographer.png') #fdf5e6;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            border-top: 8px solid #0f4c81; /* Темно-синій колір замість золотого для контрасту */
+            border-bottom: 8px solid #0f4c81;
+            position: relative;
+            z-index: 10;
+        }
+
+        #quiz-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-family: 'Cinzel', serif;
+            color: #0f4c81; /* Єгипетський синій для кращого читання */
+            font-size: 28px;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .ankh-symbol {
+            font-size: 50px;
+            color: #0f4c81;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .question-container {
+            animation: fadeIn 0.8s ease;
+        }
+
+        .question-text {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #000000; /* Чорний текст для максимального контрасту */
+            text-align: center;
+        }
+
+        .options {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .options li {
+            margin: 12px 0;
+        }
+
+        label {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: #ffffff;
+            color: #000000;
+            font-weight: 600;
+            border: 2px solid #bfae8f;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        label:hover {
+            background: #eef3f8;
+            border-color: #0f4c81;
+            transform: scale(1.02);
+        }
+
+        input[type="radio"] {
+            margin-right: 15px;
+            transform: scale(1.3);
+            cursor: pointer;
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #0f4c81;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            font-family: 'Cinzel', serif;
+            cursor: pointer;
+            margin-top: 25px;
+            transition: background 0.3s, transform 0.1s;
+        }
+
+        .btn:hover {
+            background-color: #0a365c;
+        }
+
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn:disabled {
+            background-color: #555;
+            cursor: not-allowed;
+        }
+
+        #feedback {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 8px;
+            display: none;
+            font-size: 16px;
+            font-weight: 600;
+            line-height: 1.6;
+            animation: slideInDown 0.5s ease;
+        }
+
+        .correct {
+            background-color: #d4edda;
+            color: #0b4a1b;
+            border: 1px solid #c3e6cb;
+        }
+
+        .incorrect {
+            background-color: #f8d7da;
+            color: #61131a;
+            border: 1px solid #f5c6cb;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        #results {
+            text-align: center;
+            display: none;
+        }
+
+        #results h2 {
+            font-family: 'Cinzel', serif;
+            color: #0f4c81;
+            font-weight: bold;
+        }
+
+        .progress {
+            font-size: 16px;
+            font-weight: bold;
+            color: #222222; /* Темніший колір для прогресу */
+            margin-bottom: 15px;
+            text-align: right;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
+        .option-correct {
+            background-color: #d4edda !important;
+            border-color: #4caf50 !important;
+        }
+
+        .option-incorrect {
+            background-color: #f8d7da !important;
+            border-color: #f44336 !important;
+        }
+    </style>
+</head>
+<body>
+
+<div id="quiz-container">
+    <div id="quiz-header">
+        <span class="ankh-symbol">☥</span>
+        <h1>Таємниці кохання фараонів</h1>
+    </div>
+    
+    <div id="quiz-body">
+        <div class="progress" id="progress">Питання 1 з 10</div>
+        <div class="question-container">
+            <div class="question-text" id="question"></div>
+            <ul class="options" id="options"></ul>
+        </div>
+        
+        <div id="feedback"></div>
+        
+        <button class="btn" id="submit-btn" onclick="checkAnswer()">Відповісти</button>
+        <button class="btn" id="next-btn" onclick="nextQuestion()" style="display: none;">Наступне питання</button>
+    </div>
+
+    <div id="results">
+        <h2>Твої таємниці розкриті!</h2>
+        <p id="score-text" style="font-size: 20px; font-weight: bold; color: #000;"></p>
+        <button class="btn" onclick="location.reload()">Пройти ще раз</button>
+    </div>
+</div>
+
+<script>
+    // Вбудований генератор звуків
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx;
+
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new AudioContext();
+        }
+    }
+
+    function playSound(type) {
+        initAudio();
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+
+        const oscillator = audioCtx.createOscillator();
+        const gainNode = audioCtx.createGain();
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+
+        if (type === 'correct') {
+            oscillator.type = 'sine';
+            oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); 
+            oscillator.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.1); 
+            gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.4);
+        } else {
+            oscillator.type = 'sawtooth';
+            oscillator.frequency.setValueAtTime(200, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.3);
+            gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            oscillator.start();
+            oscillator.stop(audioCtx.currentTime + 0.3);
+        }
+    }
+
+    const quizData = [
+        {
+            question: "Якою була головна мета укладення шлюбу в Стародавньому Єгипті?",
+            a: "Створення політичних союзів між містами",
+            b: "Створення сім'ї та народження дітей",
+            c: "Виключно романтичне кохання",
+            d: "Накопичення спільного багатства",
+            correct: "b",
+            explanation: "Хоча любовна лірика існувала, головною метою шлюбу вважалося продовження роду і створення міцної родини для підтримки одне одного."
+        },
+        {
+            question: "У якому віці єгиптянки зазвичай виходили заміж?",
+            a: "12-14 років",
+            b: "18-20 років",
+            c: "25-30 років",
+            d: "Після 30 років",
+            correct: "a",
+            explanation: "Тривалість життя в ті часи була порівняно короткою, тому сім'ї створювалися дуже рано (одразу після досягнення дівчатами статевої зрілості)."
+        },
+        {
+            question: "Яким був соціальний статус жінки у давньоєгипетському шлюбі?",
+            a: "Вона була повністю безправною",
+            b: "Мала права майже рівні з чоловіком",
+            c: "Жінка вважалася власністю чоловіка",
+            d: "Не мала права виходити з дому без дозволу",
+            correct: "b",
+            explanation: "Єгиптянки могли самостійно володіти майном, вести бізнес, звертатися до суду і навіть ініціювати розлучення."
+        },
+        {
+            question: "Як найчастіше проходила шлюбна церемонія у простих єгиптян?",
+            a: "Пишна релігійна церемонія в храмі Амона",
+            b: "Обов'язкове благословення від місцевого жерця",
+            c: "Жінка просто переїжджала до будинку чоловіка",
+            d: "Обмін золотими каблучками перед натовпом",
+            correct: "c",
+            explanation: "Шлюб був здебільшого світською угодою. Часто не було жодних спеціальних релігійних ритуалів, достатньо було згоди сторін та переїзду жінки."
+        },
+        {
+            question: "Що таке давньоєгипетський «шлюбний контракт»?",
+            a: "Клятва вірності богам",
+            b: "Документ, що фіксував майнові права дружини та дітей",
+            c: "Дозвіл на шлюб від місцевого чиновника",
+            d: "Угода про купівлю нареченої у її батька",
+            correct: "b",
+            explanation: "Цей важливий документ складався для захисту економічних інтересів жінки та її дітей, особливо на випадок розлучення або смерті чоловіка."
+        },
+        {
+            question: "Чи існувала полігамія, багатоженство, у Стародавньому Єгипті?",
+            a: "Ні, вона була суворо заборонена законом",
+            b: "Так, але переважно серед фараонів та вищої знаті",
+            c: "Так, кожен чоловік обов'язково мав кілька дружин",
+            d: "Так, але лише якщо перша дружина була іноземкою",
+            correct: "b",
+            explanation: "Прості єгиптяни зазвичай були моногамними через економічні причини, тоді як правителі та заможні чиновники часто мали гареми."
+        },
+        {
+            question: "Як суспільство ставилося до розлучення?",
+            a: "Воно було абсолютно неможливим",
+            b: "Дозволялося, і його могли ініціювати як чоловік, так і жінка",
+            c: "Дозволялося лише чоловікам",
+            d: "Дозволялося лише у випадку безпліддя дружини",
+            correct: "b",
+            explanation: "Розлучення було цілком законним і прийнятним явищем у суспільстві. Після нього майно ділилося згідно з умовами шлюбного контракту."
+        },
+        {
+            question: "Якою була типова форма ласкавого звернення подружжя одне до одного в любовній ліриці?",
+            a: "«Пан» та «Слугиня»",
+            b: "«Брат» і «Сестра»",
+            c: "«Мій цар» та «Моя цариця»",
+            d: "За офіційними титулами",
+            correct: "b",
+            explanation: "Слова «брат» і «сестра» в поезії були популярними пестливими термінами для закоханих і в цьому контексті не означали кровну спорідненість."
+        },
+        {
+            question: "Для кого шлюби між кровними родичами були звичайним явищем?",
+            a: "Для ремісників та землеробів",
+            b: "Для військових",
+            c: "Для царської родини",
+            d: "Для рабів",
+            correct: "c",
+            explanation: "Фараони часто одружувалися з рідними сестрами або доньками, щоб зберегти «божественну» кров і не ділитися владою з іншими родинами."
+        },
+        {
+            question: "Як у суспільстві ставилися до подружньої зради?",
+            a: "Вона не вважалася злочином взагалі",
+            b: "Зрадника просто виганяли з міста",
+            c: "Це суворо засуджувалося і могло призвести до жорстоких покарань",
+            d: "Зрадника змушували працювати на будівництві пірамід",
+            correct: "c",
+            explanation: "Зрада вважалася серйозним проступком. Чоловік міг вимагати суворого покарання для невірної дружини, іноді аж до страти, хоча на практиці частіше все закінчувалося розлученням і фінансовими втратами."
+        }
+    ];
+
+    let currentQuiz = 0;
+    let score = 0;
+
+    const questionEl = document.getElementById('question');
+    const optionsEl = document.getElementById('options');
+    const progressEl = document.getElementById('progress');
+    const feedbackEl = document.getElementById('feedback');
+    const submitBtn = document.getElementById('submit-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const quizBody = document.getElementById('quiz-body');
+    const resultsEl = document.getElementById('results');
+    const scoreText = document.getElementById('score-text');
+
+    function loadQuiz() {
+        feedbackEl.style.display = 'none';
+        feedbackEl.className = ''; 
+        submitBtn.style.display = 'block';
+        nextBtn.style.display = 'none';
+        
+        const currentQuizData = quizData[currentQuiz];
+        progressEl.innerText = `Питання ${currentQuiz + 1} з ${quizData.length}`;
+        questionEl.innerText = currentQuizData.question;
+        
+        optionsEl.innerHTML = `
+            <li>
+                <label>
+                    <input type="radio" name="answer" value="a">
+                    ${currentQuizData.a}
+                </label>
+            </li>
+            <li>
+                <label>
+                    <input type="radio" name="answer" value="b">
+                    ${currentQuizData.b}
+                </label>
+            </li>
+            <li>
+                <label>
+                    <input type="radio" name="answer" value="c">
+                    ${currentQuizData.c}
+                </label>
+            </li>
+            <li>
+                <label>
+                    <input type="radio" name="answer" value="d">
+                    ${currentQuizData.d}
+                </label>
+            </li>
+        `;
+
+        const container = document.querySelector('.question-container');
+        container.style.animation = 'none';
+        container.offsetHeight; 
+        container.style.animation = 'fadeIn 0.8s ease';
+    }
+
+    function getSelected() {
+        const answerEls = document.querySelectorAll('input[name="answer"]');
+        let answer;
+        answerEls.forEach(answerEl => {
+            if(answerEl.checked) {
+                answer = answerEl.value;
+            }
+        });
+        return answer;
+    }
+
+    function checkAnswer() {
+        initAudio(); // Ініціалізуємо аудіо після першого кліку користувача
+        
+        const answer = getSelected();
+        if(!answer) {
+            alert("Обери варіант відповіді, щоб продовжити!");
+            return;
+        }
+
+        submitBtn.style.display = 'none';
+        nextBtn.style.display = 'block';
+        
+        const currentQuizData = quizData[currentQuiz];
+        const labels = document.querySelectorAll('label');
+        
+        labels.forEach(label => {
+            const radio = label.querySelector('input');
+            radio.disabled = true;
+            if(radio.value === currentQuizData.correct) {
+                label.classList.add('option-correct');
+            } else if(radio.value === answer && answer !== currentQuizData.correct) {
+                label.classList.add('option-incorrect');
+            }
+        });
+
+        if(answer === currentQuizData.correct) {
+            score++;
+            playSound('correct');
+            feedbackEl.className = 'correct';
+            feedbackEl.innerHTML = '<strong>Правильно!</strong> Чудова відповідь.';
+        } else {
+            playSound('incorrect');
+            feedbackEl.className = 'incorrect';
+            feedbackEl.innerHTML = `<strong>Неправильно.</strong><br><br><em>Пояснення:</em> ${currentQuizData.explanation}`;
+        }
+        
+        feedbackEl.style.display = 'block';
+    }
+
+    function nextQuestion() {
+        currentQuiz++;
+        if(currentQuiz < quizData.length) {
+            loadQuiz();
+        } else {
+            quizBody.style.display = 'none';
+            resultsEl.style.display = 'block';
+            scoreText.innerText = `Твій результат: ${score} з ${quizData.length} правильних відповідей!`;
+        }
+    }
+
+    loadQuiz();
+</script>
+
+</body>
+</html>

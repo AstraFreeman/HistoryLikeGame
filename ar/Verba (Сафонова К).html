@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Myth Game | Античне Кохання</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff4d6d;
+            --secondary: #ff758c;
+            --success: #2ecc71;
+            --error: #e74c3c;
+            --bg-gradient: linear-gradient(-45deg, #f093fb 0%, #f5576c 50%, #ee7752 100%);
+            --glass: rgba(255, 255, 255, 0.95);
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+            background: var(--bg-gradient);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #2d3436;
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        .game-card {
+            width: 100%;
+            max-width: 420px;
+            background: var(--glass);
+            border-radius: 30px;
+            padding: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            animation: cardAppear 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            backdrop-filter: blur(5px);
+        }
+
+        @keyframes cardAppear {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header & Stats */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .lives { font-size: 20px; letter-spacing: 2px; transition: 0.2s ease; }
+        .lives.heartbeat { animation: heartbeat 0.3s ease-in-out; }
+        .level-badge {
+            background: var(--primary);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            height: 8px;
+            background: #eee;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        .progress-bar {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        /* Question Transition */
+        #game-ui {
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        #game-ui.new-q {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        h2 { font-size: 18px; margin: 10px 0 25px; line-height: 1.4; min-height: 70px; display: flex; align-items: center; justify-content: center; }
+
+        /* Buttons */
+        .options-grid { display: grid; gap: 10px; }
+        .btn-option {
+            background: white;
+            border: 2px solid #f0f0f0;
+            padding: 18px;
+            border-radius: 18px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #444;
+            font-family: 'Montserrat', sans-serif;
+            outline: none;
+        }
+        .btn-option:hover { border-color: var(--secondary); transform: scale(1.02); }
+        .btn-option:active { transform: scale(0.96); }
+        .btn-option.correct { 
+            background: var(--success); color: white; border-color: var(--success);
+            animation: pulseSuccess 0.5s;
+        }
+        .btn-option.wrong { 
+            background: var(--error); color: white; border-color: var(--error);
+            animation: shakeWrong 0.4s;
+        }
+
+        @keyframes pulseSuccess {
+            0% { box-shadow: 0 0 0 rgba(46, 204, 113, 0.4); }
+            100% { box-shadow: 0 0 15px rgba(46, 204, 113, 0.8); }
+        }
+        @keyframes shakeWrong {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        #feedback {
+            margin-top: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 10px;
+        }
+
+        /* Result Screen */
+        .result-screen h1 { font-size: 32px; color: var(--primary); margin-bottom: 10px; }
+        .score-box { font-size: 48px; font-weight: 800; margin: 15px 0; color: var(--primary); }
+        .grade-badge { font-size: 20px; font-weight: 700; color: #636e72; }
+        
+        .word-container {
+            margin: 25px 0;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .letter-box {
+            width: 45px;
+            height: 45px;
+            border: 2px solid var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 800;
+            border-radius: 12px;
+            background: #fff;
+            color: var(--primary);
+            animation: letterPop 0.5s ease;
+        }
+        @keyframes letterPop {
+            0% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .letter-hidden { background: #eee; border-color: #ccc; color: transparent; animation: none; }
+
+        .hint { font-size: 11px; color: #777; font-style: italic; margin-bottom: 20px; }
+
+        .restart-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 18px 40px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+        }
+        .restart-btn:hover { background: #b34700; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255, 77, 109, 0.3); }
+
+        /* Hearts Confetti */
+        .confetti-heart {
+            position: absolute;
+            color: var(--primary);
+            font-size: 18px;
+            pointer-events: none;
+            z-index: 50;
+        }
+        @keyframes floatHeart {
+            0% { opacity: 1; transform: translateY(0) scale(1); }
+            100% { opacity: 0; transform: translateY(-100px) scale(0.5); }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="game-card" id="game-card">
+    <div id="game-ui">
+        <div class="header">
+            <div class="level-badge" id="level-tag">Рівень 1/10</div>
+            <div class="lives" id="lives-display">❤️❤️❤️</div>
+        </div>
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        
+        <h2 id="question-text">Завантаження...</h2>
+        
+        <div class="options-grid" id="options-box"></div>
+        <div id="feedback"></div>
+    </div>
+</div>
+
+<audio id="sound-correct" src="https://assets.mixkit.co/active_storage/sfx/2000/2000-preview.mp3"></audio>
+<audio id="sound-wrong" src="https://assets.mixkit.co/active_storage/sfx/2019/2019-preview.mp3"></audio>
+
+<script>
+    const quizData = [
+        { q: "Що відображали давньогрецькі міфи про кохання?", a: ["Вигадки", "Уявлення людей про почуття", "Тільки життя богів", "Історичні факти"], c: 1, exp: "Міфи були дзеркалом реальних почуттів еллінів." },
+        { q: "Чому боги, як Зевс і Гера, були схожі на людей?", a: ["Жилы разом", "Щоб передати риси та емоції", "Без характеру", "Випадково"], c: 1, exp: "Боги втілювали людські пристрасті." },
+        { q: "Яка пара є символом істинного кохання?", a: ["Нарцис і Ехо", "Ерос і Психея", "Арес і Афродіта", "Зевс і Європа"], c: 1, exp: "Класика союзу Тіла та Душі." },
+        { q: "Що стало випробуванням для Психеї?", a: ["Війна", "Подорож морем", "Завдання у підземному світі", "Втрата пам’яті"], c: 2, exp: "Вона спускалася до Аїду за завданням." },
+        { q: "Що символізує міф про Пігмаліона та Галатею?", a: ["Ненависть", "Дружбу", "Ідеалізоване кохання", "Війну"], c: 2, exp: "Кохання до створеного власноруч ідеалу." },
+        { q: "Яку рису демонструє поведінка Зевса у міфах?", a: ["Вірність", "Байдужість", "Схильність до зради", "Скромність"], c: 2, exp: "Зевс часто піддавався новим пристрастям." },
+        { q: "Як у давньогрецькому суспільстві ставилися до зради?", a: ["Засуджували однаково", "Неважливо", "Засуджували переважно жіночу", "Заохочували"], c: 2, exp: "Патріархат був набагато суворішим до жінок." },
+        { q: "Яка риса притаманна коханню Орфея і Евридіки?", a: ["Легко", "Трагічність і відданість", "Жарт", "Байдуже"], c: 1, exp: "Це одна з найсумніших трагедій міфів." },
+        { q: "Що ілюструє міф про Нарциса і Ехо?", a: ["Щастя", "Вірність", "Нерозділене кохання та Его", "Героїзм"], c: 2, exp: "Міф про руйнівну силу самозакоханості." },
+        { q: "Що відображають міфи про Аполлона і Гіацинта?", a: ["Війни", "Політику", "Особливості сприйняття різних форм кохання", "Економіку"], c: 2, exp: "Греки визнавали багатогранність краси." }
+    ];
+
+    let currentQIdx = 0;
+    let lives = 3;
+    let score = 0;
+    const word = "ВЕРБА";
+
+    const gameUI = document.getElementById('game-ui');
+    const livesDisplay = document.getElementById('lives-display');
+
+    function animateHearts() {
+        for (let i = 0; i < 5; i++) {
+            const heart = document.createElement('div');
+            heart.className = 'confetti-heart';
+            heart.innerText = '❤️';
+            heart.style.left = (Math.random() * 80 + 10) + '%';
+            heart.style.top = (Math.random() * 20 + 70) + '%';
+            heart.style.animation = `floatHeart ${0.8 + Math.random()}s ease-out`;
+            gameUI.appendChild(heart);
+            setTimeout(() => heart.remove(), 1000);
+        }
+    }
+
+    function initQ() {
+        if (currentQIdx >= 10 || lives <= 0) {
+            showResults();
+            return;
+        }
+
+        const data = quizData[currentQIdx];
+        
+        // Stats
+        livesDisplay.innerText = '❤️'.repeat(lives) + '🖤'.repeat(3 - lives);
+        document.getElementById('level-tag').innerText = `Рівень ${currentQIdx + 1}/10`;
+        document.getElementById('progress-bar').style.width = `${(currentQIdx / 10) * 100}%`;
+        
+        // Transition
+        gameUI.classList.add('new-q');
+        
+        setTimeout(() => {
+            document.getElementById('question-text').innerText = data.q;
+            document.getElementById('feedback').innerText = "";
+            const box = document.getElementById('options-box');
+            box.innerHTML = "";
+            
+            data.a.forEach((opt, i) => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-option';
+                btn.innerText = opt;
+                btn.onclick = () => checkAns(i, btn);
+                box.appendChild(btn);
+            });
+            gameUI.classList.remove('new-q');
+        }, 400);
+    }
+
+    function checkAns(idx, btn) {
+        const data = quizData[currentQIdx];
+        const buttons = document.querySelectorAll('.btn-option');
+        buttons.forEach(b => b.disabled = true);
+
+        if (idx === data.c) {
+            score++;
+            btn.classList.add('correct');
+            animateHearts();
+            document.getElementById('sound-correct').play().catch(()=>{});
+        } else {
+            lives--;
+            btn.classList.add('wrong');
+            buttons[data.c].classList.add('correct');
+            livesDisplay.classList.add('heartbeat');
+            document.getElementById('sound-wrong').play().catch(()=>{});
+            document.getElementById('feedback').innerHTML = `<span style='color:var(--error)'>💔 ${data.exp}</span>`;
+            setTimeout(() => livesDisplay.classList.remove('heartbeat'), 300);
+        }
+
+        setTimeout(() => {
+            currentQIdx++;
+            initQ();
+        }, 1800);
+    }
+
+    function showResults() {
+        let grade = (score >= 9) ? 12 : (score >= 7) ? 9 : (score >= 5) ? 6 : 3;
+
+        let wordHtml = "";
+        for (let i = 0; i < 5; i++) {
+            const visible = score >= (i + 1) * 2;
+            wordHtml += `<div class="letter-box ${visible ? '' : 'letter-hidden'}" style="animation-delay: ${0.2 * i}s">${word[i]}</div>`;
+        }
+
+        gameUI.innerHTML = `
+            <div class="result-screen">
+                <h1>${lives > 0 ? '🏆 Перемога!' : '⏳ Гру закінчено'}</h1>
+                <div class="score-box">${score}/10</div>
+                <div class="grade-badge">Оцінка: ${grade}</div>
+                
+                <p style="margin-top:20px; font-weight:600;">Кодове слово:</p>
+                <div class="word-container">${wordHtml}</div>
+                <div class="hint">((1 літера відкривається за кожні 2 бали))</div>
+
+                <button class="restart-btn" onclick="location.reload()">Грати знову</button>
+            </div>
+        `;
+    }
+
+    initQ();
+</script>
+
+</body>
+</html>

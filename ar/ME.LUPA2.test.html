@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Міфи про кохання: Тест</title>
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --correct-color: #48bb78;
+            --wrong-color: #f56565;
+            --dark-text: #2d3748;
+            --bg-light: #f8f9fa;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+
+        body {
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+        }
+
+        #game-container {
+            background: white;
+            width: 100%;
+            max-width: 450px;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        /* UI */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .lives { font-size: 22px; letter-spacing: 3px; }
+        .level-info { font-weight: bold; color: #764ba2; }
+
+        .progress-container {
+            width: 100%; height: 6px; background: #eee; border-radius: 10px; margin-bottom: 25px;
+        }
+        .progress-bar {
+            height: 100%; background: var(--primary-gradient); width: 0%; border-radius: 10px; transition: 0.3s;
+        }
+
+        /* Quiz */
+        h2 { font-size: 1.25rem; margin-bottom: 20px; color: var(--dark-text); line-height: 1.3; }
+        .options { display: grid; gap: 10px; }
+        .option-btn {
+            background: var(--bg-light); border: 2px solid #e2e8f0; padding: 18px;
+            border-radius: 12px; cursor: pointer; font-size: 1rem; text-align: left;
+            transition: 0.2s; outline: none; -webkit-tap-highlight-color: transparent;
+        }
+        .option-btn:disabled { cursor: default; }
+        .option-btn.correct { background: var(--correct-color); color: white; border-color: var(--correct-color); }
+        .option-btn.wrong { background: var(--wrong-color); color: white; border-color: var(--wrong-color); }
+
+        #feedback {
+            margin-top: 15px; padding: 12px; border-radius: 8px; font-size: 0.95rem;
+            display: none; line-height: 1.4; border-left: 4px solid;
+        }
+
+        /* Result Screens */
+        .screen { display: none; text-align: center; }
+        .screen.active { display: block; animation: fadeIn 0.4s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .code-word { font-size: 2.5rem; letter-spacing: 8px; margin: 20px 0; color: #764ba2; font-weight: bold; }
+        .final-btn {
+            margin-top: 20px; padding: 15px 30px; border-radius: 50px; border: none;
+            background: var(--primary-gradient); color: white; font-size: 1rem; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div id="ui-elements">
+        <div class="header">
+            <div id="lives-display" class="lives">❤️❤️❤️</div>
+            <div id="level-text" class="level-info">Питання 1/10</div>
+        </div>
+        <div class="progress-container"><div id="progress-bar" class="progress-bar"></div></div>
+    </div>
+
+    <div id="quiz-screen" class="screen active">
+        <h2 id="question-text">Завантаження...</h2>
+        <div id="options-container" class="options"></div>
+        <div id="feedback"></div>
+    </div>
+
+    <div id="result-screen" class="screen">
+        <h1 id="result-title">Результат</h1>
+        <p id="result-stats" style="margin: 10px 0;"></p>
+        <p>Ваша оцінка: <strong id="grade-val">0</strong></p>
+        <div style="background: #f0f2f5; padding: 20px; border-radius: 15px; margin-top: 20px;">
+            <p>Відкрите кодове слово:</p>
+            <div id="code-display" class="code-word">____</div>
+            <p id="code-hint" style="font-size: 0.8rem; color: #666;"></p>
+        </div>
+        <button class="final-btn" onclick="location.reload()">Грати знову</button>
+        <button class="final-btn" style="background: #e2e8f0; color: #4a5568;" onclick="resetProgress()">Скинути все</button>
+    </div>
+</div>
+
+<audio id="sound-correct" src="https://cdn.pixabay.com/audio/2021/08/04/audio_bb63008034.mp3"></audio>
+<audio id="sound-wrong" src="https://cdn.pixabay.com/audio/2022/03/10/audio_c3523a4060.mp3"></audio>
+
+<script>
+    const questions = [
+        { q: "Яка була головна мета шлюбу в Стародавній Греції?", options: ["Романтичне кохання", "Народження дітей і суспільний інтерес", "Економічне збагачення", "Політична кар’єра"], correct: 1, hint: "Шлюб був передусім засобом продовження роду та громадянина." },
+        { q: "Хто зазвичай організовував шлюб у давнину?", options: ["Молоді люди самі", "Держава", "Батьки або опікуни", "Релігійні служителі"], correct: 2, hint: "Голова сім'ї (кіріос) вирішував долю підопічних." },
+        { q: "Чому весілля часто відбувалися у місяць Гамеліон?", options: ["Через погоду", "На честь богині Гери", "Бо це був вільний час", "Щоб уникнути війни"], correct: 1, hint: "Гера була покровителькою шлюбу, а Гамеліон — її місяцем." },
+        { q: "Яка умова робила шлюб законним у Афінах (після 451 р. до н.е.)?", options: ["Велике придане", "Обидва батьки — афінські громадяни", "Оголошення в театрі", "Договір у храмі"], correct: 1, hint: "Закон Перікла вимагав чистоти походження від обох батьків." },
+        { q: "Що таке engysis?", options: ["Ритуал викрадення", "Обмін приданим", "Формальний акт «да́вання застави в руку»", "Післявесільна церемонія"], correct: 2, hint: "Це юридичне зобов'язання між опікуном та нареченим." },
+        { q: "Яке положення характерне для Спарти?", options: ["Свобода вибору жінки", "Підпорядкування інтересів благу держави", "Заборона дітей поза шлюбом", "Відсутність ритуалів"], correct: 1, hint: "Спартанців могли карати за пізнє одруження, бо державі потрібні воїни." },
+        { q: "Що означали подарунки δῶра (dora)?", options: ["Символ любові", "Союз між домогосподарствами", "Податок державі", "Плата свасі"], correct: 1, hint: "Це було юридичне закріплення зв'язку двох родів." },
+        { q: "Що було дозволено багатим чоловікам поряд із дружиною?", options: ["Кілька офіційних дружин", "Мати дружину і наложницю", "Одружуватися лише з іноземками", "Нічого поза шлюбом"], correct: 1, hint: "Наложниці (паллакіди) були юридично визнаною практикою." },
+        { q: "Як вирішувалося питання спадкоємиці (epikleros)?", options: ["Вона вільно володіла землею", "Заміжжя за найближчого родича", "Землю забирала держава", "Ставала священницею"], correct: 1, hint: "Метою було збереження майна в межах одного роду." },
+        { q: "Які три частини складали весілля?", options: ["Заручини, шлюб, розлучення", "Проаулія, гамос, еполія", "Придане, подарунки, бенкет", "Викрадення, життя, визнання"], correct: 1, hint: "Це передвесільний ритуал, саме весілля та обряди наступного дня." }
+    ];
+
+    let currentIdx = 0;
+    let score = 0;
+    let lives = 3;
+    const FULL_WORD = "ЛИПА";
+
+    function updateHeader() {
+        document.getElementById('level-text').innerText = `Питання ${currentIdx + 1}/10`;
+        document.getElementById('progress-bar').style.width = `${(currentIdx / 10) * 100}%`;
+        document.getElementById('lives-display').innerText = "❤️".repeat(lives) + "💔".repeat(3 - lives);
+    }
+
+    function loadQuestion() {
+        const q = questions[currentIdx];
+        document.getElementById('question-text').innerText = q.q;
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        document.getElementById('feedback').style.display = 'none';
+
+        q.options.forEach((opt, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.innerText = opt;
+            btn.onclick = () => check(i, btn);
+            container.appendChild(btn);
+        });
+        updateHeader();
+    }
+
+    function check(choice, btn) {
+        const q = questions[currentIdx];
+        const feedback = document.getElementById('feedback');
+        const btns = document.querySelectorAll('.option-btn');
+        btns.forEach(b => b.disabled = true);
+
+        if (choice === q.correct) {
+            score++;
+            btn.classList.add('correct');
+            document.getElementById('sound-correct').play();
+            feedback.innerText = "Правильно! ✨";
+            feedback.style.borderColor = "var(--correct-color)";
+            feedback.style.background = "#e6fffa";
+        } else {
+            lives--;
+            btn.classList.add('wrong');
+            btns[q.correct].classList.add('correct');
+            document.getElementById('sound-wrong').play();
+            feedback.innerText = `Помилка. ${q.hint}`;
+            feedback.style.borderColor = "var(--wrong-color)";
+            feedback.style.background = "#fff5f5";
+            updateHeader();
+        }
+
+        feedback.style.display = 'block';
+
+        setTimeout(() => {
+            if (lives > 0 && currentIdx < 9) {
+                currentIdx++;
+                loadQuestion();
+            } else {
+                endGame();
+            }
+        }, 1500);
+    }
+
+    function endGame() {
+        document.getElementById('quiz-screen').classList.remove('active');
+        document.getElementById('ui-elements').style.display = 'none';
+        document.getElementById('result-screen').classList.add('active');
+
+        // Логіка оцінки
+        let grade = 3;
+        if (score >= 9) grade = 12;
+        else if (score >= 7) grade = 9;
+        else if (score >= 5) grade = 6;
+
+        document.getElementById('grade-val').innerText = grade;
+        document.getElementById('result-stats').innerText = `Ви відповіли на ${score} питань з 10.`;
+        
+        if (lives <= 0) {
+            document.getElementById('result-title').innerText = "Програш 😥";
+        } else {
+            document.getElementById('result-title').innerText = "Завершено! 🤩";
+        }
+
+        handleWordUnlock();
+    }
+
+    function handleWordUnlock() {
+        // Отримуємо кількість відкритих букв з пам'яті (localStorage)
+        let unlockedCount = parseInt(localStorage.getItem('greek_quiz_word_progress')) || 0;
+
+        if (score >= 9) {
+            unlockedCount = 4; // Відразу все
+        } else {
+            if (unlockedCount < 4) unlockedCount++; // +1 за проходження
+        }
+
+        localStorage.setItem('greek_quiz_word_progress', unlockedCount);
+
+        let display = "";
+        for(let i=0; i<4; i++) {
+            display += i < unlockedCount ? FULL_WORD[i] : "_";
+        }
+
+        document.getElementById('code-display').innerText = display;
+        
+        const hint = document.getElementById('code-hint');
+        if (unlockedCount >= 4) {
+            hint.innerText = "Вітаємо! Ви відкрили все слово.";
+        } else {
+            hint.innerText = `Відкрито ${unlockedCount} з 4 букв. Пройдіть тест ще раз, щоб відкрити наступну!`;
+        }
+    }
+
+    function resetProgress() {
+        localStorage.removeItem('greek_quiz_word_progress');
+        location.reload();
+    }
+
+    loadQuestion();
+</script>
+</body>
+</html>

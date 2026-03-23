@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<title>Тест: Стародавня Греція</title>
+
+<style>
+body {
+    font-family: Arial;
+    background: linear-gradient(to right, #a18cd1, #fbc2eb);
+    padding: 20px;
+}
+
+.container {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    max-width: 900px;
+    margin: auto;
+}
+
+h1 {
+    text-align: center;
+    color: #6a1b9a;
+}
+
+.question {
+    background: #f3e5f5;
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+}
+
+.correct { color: green; }
+.wrong { color: red; }
+
+button {
+    padding: 12px;
+    background: #6a1b9a;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+<h1>Тест: Любов і шлюб у Стародавній Греції</h1>
+
+<!-- 1 -->
+<div class="question">
+<p>1. Основна мета шлюбу:</p>
+<input type="radio" name="q1" value="1"> Народження спадкоємців<br>
+<input type="radio" name="q1" value="0"> Кохання<br>
+<p id="r1"></p>
+</div>
+
+<!-- 2 -->
+<div class="question">
+<p>2. Хто вирішував шлюб?</p>
+<input type="radio" name="q2" value="1"> Родина<br>
+<input type="radio" name="q2" value="0"> Закохані<br>
+<p id="r2"></p>
+</div>
+
+<!-- 3 -->
+<div class="question">
+<p>3. Який характер мав шлюб?</p>
+<input type="radio" name="q3" value="1"> Соціальний<br>
+<input type="radio" name="q3" value="0"> Романтичний<br>
+<p id="r3"></p>
+</div>
+
+<!-- 4 -->
+<div class="question">
+<p>4. Чи було кохання обов’язковим?</p>
+<input type="text" id="q4">
+<p id="r4"></p>
+</div>
+
+<!-- 5 -->
+<div class="question">
+<p>5. Становище жінки:</p>
+<input type="text" id="q5">
+<p id="r5"></p>
+</div>
+
+<!-- 6 -->
+<div class="question">
+<p>6. Встановіть відповідність:</p>
+Ерос → 
+<select id="m1">
+<option value="">--</option>
+<option value="1">Пристрасть</option>
+<option value="0">Дружба</option>
+</select><br><br>
+
+Філія → 
+<select id="m2">
+<option value="">--</option>
+<option value="1">Дружба</option>
+<option value="0">Пристрасть</option>
+</select>
+
+<p id="r6"></p>
+</div>
+
+<!-- 7 -->
+<div class="question">
+<p>7. Що означає "ерос"?</p>
+<input type="text" id="q7">
+<p id="r7"></p>
+</div>
+
+<!-- 8 -->
+<div class="question">
+<p>8. Шлюб був:</p>
+<input type="radio" name="q8" value="1"> Обов’язком<br>
+<input type="radio" name="q8" value="0"> Особистим вибором<br>
+<p id="r8"></p>
+</div>
+
+<!-- 9 -->
+<div class="question">
+<p>9. Роль жінки:</p>
+<input type="text" id="q9">
+<p id="r9"></p>
+</div>
+
+<!-- 10 -->
+<div class="question">
+<p>10. Чи були почуття головними?</p>
+<input type="text" id="q10">
+<p id="r10"></p>
+</div>
+
+<!-- 11 -->
+<div class="question">
+<p>11. Хто такий Ерос?</p>
+<input type="text" id="q11">
+<p id="r11"></p>
+</div>
+
+<!-- 12 -->
+<div class="question">
+<p>12. Чи був шлюб рівноправним?</p>
+<input type="radio" name="q12" value="0"> Так<br>
+<input type="radio" name="q12" value="1"> Ні<br>
+<p id="r12"></p>
+</div>
+
+<!-- 13 -->
+<div class="question">
+<p>13. Основна функція шлюбу:</p>
+<input type="text" id="q13">
+<p id="r13"></p>
+</div>
+
+<!-- 14 -->
+<div class="question">
+<p>14. Чи могла жінка брати участь у політиці?</p>
+<input type="radio" name="q14" value="0"> Так<br>
+<input type="radio" name="q14" value="1"> Ні<br>
+<p id="r14"></p>
+</div>
+
+<!-- 15 -->
+<div class="question">
+<p>15. Тип любові "філія" означає:</p>
+<input type="text" id="q15">
+<p id="r15"></p>
+</div>
+
+<button onclick="check()">Перевірити</button>
+
+</div>
+
+<script>
+function check() {
+
+function set(id, cond, text) {
+document.getElementById(id).innerHTML =
+cond ? "<span class='correct'>✔</span>"
+: "<span class='wrong'>✘ " + text + "</span>";
+}
+
+set("r1", document.querySelector('input[name="q1"]:checked')?.value=="1", "Народження спадкоємців");
+set("r2", document.querySelector('input[name="q2"]:checked')?.value=="1", "Родина");
+set("r3", document.querySelector('input[name="q3"]:checked')?.value=="1", "Соціальний");
+
+set("r4", q4.value.toLowerCase().includes("ні"), "Ні");
+set("r5", q5.value.toLowerCase().includes("під"), "Підпорядковане");
+
+set("r6", m1.value=="1" && m2.value=="1", "Ерос — пристрасть, Філія — дружба");
+
+set("r7", q7.value.toLowerCase().includes("пристрасть"), "Пристрасть");
+
+set("r8", document.querySelector('input[name="q8"]:checked')?.value=="1", "Обов’язок");
+
+set("r9", q9.value.toLowerCase().includes("ді"), "Дім і діти");
+
+set("r10", q10.value.toLowerCase().includes("ні"), "Ні");
+
+set("r11", q11.value.toLowerCase().includes("бог"), "Бог кохання");
+
+set("r12", document.querySelector('input[name="q12"]:checked')?.value=="1", "Ні");
+
+set("r13", q13.value.toLowerCase().includes("спад"), "Народження спадкоємців");
+
+set("r14", document.querySelector('input[name="q14"]:checked')?.value=="1", "Ні");
+
+set("r15", q15.value.toLowerCase().includes("друж"), "Дружба");
+
+}
+</script>
+
+</body>
+</html>
