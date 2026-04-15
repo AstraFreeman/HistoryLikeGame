@@ -10,6 +10,7 @@
  *         { id: 'q3', type: 'choice', group: 'style', correct: 'бароко' }
  *       ],
  *       password: 'Скоропадський Іван',
+ *       shuffle: true,  // NEW: randomize question order (default: false)
  *       passwordBlockId: 'passwordBlock',
  *       passwordDisplayId: 'password'
  *     });
@@ -20,6 +21,17 @@
   'use strict';
 
   var selections = {};
+
+  // Fisher-Yates shuffle
+  function shuffleArray(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = tmp;
+    }
+    return arr;
+  }
 
   function selectAnswer(button, answer, group) {
     var buttons = button.parentElement.querySelectorAll('.option-btn, button');
@@ -49,6 +61,11 @@
     var password = config.password || '';
     var blockId = config.passwordBlockId || 'passwordBlock';
     var displayId = config.passwordDisplayId || 'password';
+
+    // NEW: Shuffle questions if requested
+    if (config.shuffle === true && questions.length > 1) {
+      questions = shuffleArray(questions.slice());
+    }
 
     // Store config for check
     window._quizConfig = {

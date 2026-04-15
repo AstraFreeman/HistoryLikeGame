@@ -11,6 +11,7 @@
  *       addInterval: 5000,
  *       maxActive: 5,
  *       winImage: 'image/Cossack.jpg',
+ *       shuffle: true,  // NEW: randomize question order (default: false)
  *       gameAreaId: 'gameArea',
  *       inputId: 'input',
  *       scoreId: 'score',
@@ -30,6 +31,17 @@
 (function () {
   'use strict';
 
+  // Fisher-Yates shuffle
+  function shuffleArray(arr) {
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = arr[i];
+      arr[i] = arr[j];
+      arr[j] = tmp;
+    }
+    return arr;
+  }
+
   var cfg, els;
   var activeQuestions = [];
   var usedQuestions = new Set();
@@ -37,6 +49,7 @@
   var lives = 0;
   var gameInterval = null;
   var dropInterval = null;
+  var shuffleIndex = 0;  // For sequential mode when shuffle=true
 
   function getEl(id) {
     return id ? document.getElementById(id) : null;
@@ -50,8 +63,14 @@
       dropSpeed: config.dropSpeed || 1,
       addInterval: config.addInterval || 5000,
       maxActive: config.maxActive || 5,
-      winImage: config.winImage || ''
+      winImage: config.winImage || '',
+      shuffle: config.shuffle === true  // NEW: enable shuffling
     };
+
+    // NEW: Shuffle questions if requested
+    if (cfg.shuffle && cfg.questions.length > 1) {
+      cfg.questions = shuffleArray(cfg.questions.slice());
+    }
 
     els = {
       gameArea: getEl(config.gameAreaId || 'gameArea'),
@@ -135,6 +154,7 @@
     activeQuestions.forEach(function (q) { q.element.remove(); });
     activeQuestions = [];
     usedQuestions.clear();
+    shuffleIndex = 0;  // NEW: reset sequential index
     score = 0;
     lives = cfg.lives;
     updateUI();
@@ -149,17 +169,29 @@
   function addQuestion() {
     if (activeQuestions.length >= cfg.maxActive) return;
 
-    if (usedQuestions.size >= cfg.questions.length) {
-      usedQuestions.clear();
+    var data;
+
+    // NEW: Sequential selection when shuffle mode enabled
+    if (cfg.shuffle) {
+      if (shuffleIndex >= cfg.questions.length) {
+        shuffleIndex = 0;
+      }
+      data = cfg.questions[shuffleIndex];
+      shuffleIndex++;
+    } else {
+      // Original random selection logic
+      if (usedQuestions.size >= cfg.questions.length) {
+        usedQuestions.clear();
+      }
+
+      var available = cfg.questions.filter(function (q) {
+        return !usedQuestions.has(q.question);
+      });
+      if (available.length === 0) return;
+
+      data = available[Math.floor(Math.random() * available.length)];
+      usedQuestions.add(data.question);
     }
-
-    var available = cfg.questions.filter(function (q) {
-      return !usedQuestions.has(q.question);
-    });
-    if (available.length === 0) return;
-
-    var data = available[Math.floor(Math.random() * available.length)];
-    usedQuestions.add(data.question);
 
     var el = document.createElement('div');
     el.className = 'falling-question';
