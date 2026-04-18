@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Артилерист — Морський постріл</title>
+  <link rel="stylesheet" href="../../shared/css/reset.css">
+  <link rel="stylesheet" href="../../shared/css/theme.css">
+  <link rel="stylesheet" href="../../shared/css/components.css">
+  <link rel="stylesheet" href="../../shared/css/animations.css">
+  <style>
+    body {
+      background: var(--gradient-bg);
+      color: var(--color-text-primary);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ── Start screen ── */
+    #screen-start {
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: var(--space-lg);
+      background: var(--gradient-bg);
+      z-index: var(--z-overlay);
+    }
+    #screen-start h1 {
+      font-size: var(--text-4xl);
+      background: var(--gradient-warm);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+    }
+    #screen-start .subtitle {
+      color: var(--color-text-secondary);
+      font-size: var(--text-lg);
+      text-align: center;
+      max-width: 520px;
+    }
+    #screen-start .rules {
+      font-size: var(--text-sm);
+      color: var(--color-text-muted);
+      max-width: 440px;
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    /* ── Wave bar ── */
+    #wave-section {
+      flex-shrink: 0;
+      padding: var(--space-sm) var(--space-lg) 0;
+    }
+    #wave-bar {
+      position: relative;
+      height: 64px;
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+    #wave-track { position: absolute; inset: 0; }
+    .theme-chip {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: var(--space-xs) var(--space-sm);
+      border-radius: var(--radius-full);
+      font-size: var(--text-sm);
+      font-weight: 600;
+      white-space: nowrap;
+      border: 2px solid transparent;
+      pointer-events: none;
+      transition: box-shadow 0.2s;
+    }
+    .theme-chip[data-tid="1"] { background: rgba(59,130,246,0.2); color: #93c5fd; border-color: #3b82f6; }
+    .theme-chip[data-tid="2"] { background: rgba(34,197,94,0.2);  color: #86efac; border-color: #22c55e; }
+    .theme-chip[data-tid="3"] { background: rgba(249,115,22,0.2); color: #fdba74; border-color: #f97316; }
+    .theme-chip[data-tid="4"] { background: rgba(168,85,247,0.2); color: #d8b4fe; border-color: #a855f7; }
+    .theme-chip.in-phase { box-shadow: 0 0 18px currentColor; z-index: 2; }
+    /* Crosshair in center */
+    #wave-scope {
+      position: absolute; left: 50%; top: 0; bottom: 0;
+      width: 2px;
+      transform: translateX(-50%);
+      background: rgba(255,200,50,0.45);
+      pointer-events: none;
+      z-index: 3;
+    }
+    #wave-scope::before, #wave-scope::after {
+      content: '';
+      position: absolute; left: 50%;
+      width: 56px; height: 2px;
+      background: rgba(255,200,50,0.7);
+      transform: translateX(-50%);
+    }
+    #wave-scope::before { top: 10px; }
+    #wave-scope::after  { bottom: 10px; }
+
+    /* ── Controls row ── */
+    #controls-row {
+      display: flex; align-items: center;
+      gap: var(--space-sm);
+      padding: var(--space-sm) var(--space-lg);
+      flex-wrap: wrap;
+    }
+    #btn-lock {
+      padding: var(--space-sm) var(--space-lg);
+      font-size: var(--text-base);
+      font-weight: 700;
+      background: var(--gradient-warm);
+      color: white; border: none;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      letter-spacing: 0.05em;
+      transition: transform var(--transition-fast), opacity var(--transition-fast);
+    }
+    #btn-lock:hover:not(:disabled) { transform: scale(1.04); }
+    #btn-lock:disabled { opacity: 0.4; cursor: not-allowed; }
+    #phase-indicator { font-size: var(--text-sm); color: var(--color-text-secondary); }
+    #phase-val { font-weight: 700; color: var(--color-text-primary); }
+    #slow-badge {
+      display: none;
+      font-size: var(--text-xs); color: #93c5fd;
+      padding: 2px 8px;
+      border: 1px solid #3b82f6;
+      border-radius: var(--radius-full);
+    }
+    #round-ind { margin-left: auto; font-size: var(--text-sm); color: var(--color-text-muted); }
+    #score-disp { font-size: var(--text-sm); color: var(--color-accent-orange); font-weight: 700; }
+
+    /* ── Main area ── */
+    #game-area {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-md);
+      padding: 0 var(--space-lg) var(--space-md);
+      min-height: 0;
+    }
+
+    /* ── Cannon port ── */
+    #cannon-port {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      display: flex; flex-direction: column;
+      gap: var(--space-md);
+    }
+    .panel-title {
+      font-size: var(--text-xs);
+      text-transform: uppercase; letter-spacing: 0.1em;
+      color: var(--color-text-muted);
+      border-bottom: 1px solid var(--glass-border);
+      padding-bottom: var(--space-xs);
+    }
+    #excerpt-text {
+      flex: 1;
+      font-size: var(--text-base);
+      line-height: 1.7;
+      color: var(--color-text-secondary);
+      font-style: italic;
+    }
+    #excerpt-text.revealed { color: var(--color-text-primary); font-style: normal; }
+    #shot-code-row {
+      display: flex; gap: var(--space-sm);
+      align-items: center; margin-top: auto;
+    }
+    .code-digit {
+      width: 42px; height: 42px;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      font-size: var(--text-xl); font-weight: 900;
+      color: var(--color-text-muted);
+      background: var(--glass-bg);
+      transition: all var(--transition-base);
+    }
+    .code-digit.set     { color: var(--color-accent-orange); border-color: var(--color-accent-orange); box-shadow: 0 0 8px rgba(249,115,22,0.4); }
+    .code-digit.correct { color: #22c55e; border-color: #22c55e; box-shadow: 0 0 8px rgba(34,197,94,0.4); }
+    .code-digit.wrong   { color: #ef4444; border-color: #ef4444; }
+    #btn-fire {
+      margin-left: var(--space-xs);
+      padding: var(--space-sm) var(--space-md);
+      background: var(--gradient-primary);
+      color: white; border: none;
+      border-radius: var(--radius-md);
+      font-weight: 700; font-size: var(--text-sm);
+      cursor: pointer;
+      transition: transform var(--transition-fast), opacity var(--transition-fast);
+    }
+    #btn-fire:disabled { opacity: 0.3; cursor: not-allowed; }
+    #btn-fire:not(:disabled):hover { transform: scale(1.06); }
+
+    /* ── Truem ── */
+    #truem {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-lg);
+      display: flex; flex-direction: column;
+      gap: var(--space-xs);
+      overflow-y: auto;
+    }
+    .cat-label {
+      font-size: var(--text-xs);
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: var(--color-text-muted);
+      margin-top: var(--space-sm);
+    }
+    .opt-card {
+      padding: var(--space-xs) var(--space-sm);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-sm);
+      font-size: var(--text-sm);
+      cursor: pointer;
+      background: rgba(255,255,255,0.03);
+      transition: background var(--transition-fast), border-color var(--transition-fast);
+    }
+    .opt-card:hover { background: var(--color-surface-hover); border-color: rgba(255,255,255,0.25); }
+    .opt-card.selected { background: rgba(249,115,22,0.2); border-color: var(--color-accent-orange); color: #fdba74; }
+    .opt-card.locked   { pointer-events: none; }
+    #truem-hint { color: var(--color-text-muted); font-size: var(--text-sm); }
+
+    @keyframes rock {
+      0%, 100% { transform: rotate(-0.4deg) translateX(-1px); }
+      50%       { transform: rotate(0.4deg) translateX(1px); }
+    }
+    .rocking { animation: rock 3s ease-in-out infinite; }
+    .rocking:nth-child(even) { animation-delay: -1.5s; }
+
+    /* ── Feedback toast ── */
+    #feedback-toast {
+      position: fixed; top: 50%; left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: rgba(15,15,26,0.96);
+      border: 2px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-xl) var(--space-2xl);
+      text-align: center;
+      z-index: var(--z-modal);
+      backdrop-filter: blur(20px);
+      transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1);
+      min-width: 260px;
+    }
+    #feedback-toast.visible { transform: translate(-50%, -50%) scale(1); }
+    #fb-title  { font-size: var(--text-2xl); font-weight: 900; margin-bottom: var(--space-sm); }
+    #fb-detail { color: var(--color-text-secondary); font-size: var(--text-sm); }
+
+    /* ── Slow-mode banner ── */
+    #slow-banner {
+      position: fixed; top: var(--space-lg); left: 50%;
+      transform: translateX(-50%) translateY(-120px);
+      background: rgba(59,130,246,0.25);
+      border: 1px solid #3b82f6;
+      border-radius: var(--radius-full);
+      padding: var(--space-xs) var(--space-lg);
+      font-size: var(--text-sm); font-weight: 700; color: #93c5fd;
+      transition: transform 0.4s ease;
+      z-index: var(--z-toast);
+    }
+    #slow-banner.visible { transform: translateX(-50%) translateY(0); }
+
+    /* ── Game over ── */
+    #screen-gameover {
+      position: fixed; inset: 0;
+      display: none; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: var(--space-lg);
+      background: rgba(15,15,26,0.92);
+      z-index: var(--z-overlay);
+      backdrop-filter: blur(8px);
+    }
+    #screen-gameover.visible { display: flex; }
+    #gameover-card {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-xl);
+      padding: var(--space-2xl);
+      max-width: 400px; width: 90%;
+      text-align: center;
+    }
+    #gameover-card h2 { font-size: var(--text-3xl); margin-bottom: var(--space-md); }
+    #final-stats {
+      color: var(--color-text-secondary);
+      margin-bottom: var(--space-lg);
+      line-height: 2;
+    }
+    #final-stats strong { color: var(--color-text-primary); }
+    #btn-restart {
+      width: 100%;
+      padding: var(--space-sm) var(--space-lg);
+      background: var(--gradient-primary);
+      color: white; border: none;
+      border-radius: var(--radius-md);
+      font-weight: 700; font-size: var(--text-base);
+      cursor: pointer;
+      transition: transform var(--transition-fast);
+    }
+    #btn-restart:hover { transform: scale(1.03); }
+
+    /* ── Light theme ── */
+    body.theme-light {
+      background: linear-gradient(135deg, #f5f0e8 0%, #ece4d0 50%, #e5dcc8 100%);
+      --color-text-primary: #2a1f0e;
+      --color-text-secondary: #5a4a30;
+      --color-text-muted: #8a7a60;
+      --glass-bg: rgba(0,0,0,0.04);
+      --glass-border: rgba(0,0,0,0.12);
+    }
+    body.theme-light .opt-card { background: rgba(0,0,0,0.04); }
+    body.theme-light .opt-card:hover { background: rgba(0,0,0,0.08); }
+    body.theme-light .code-digit { background: rgba(0,0,0,0.05); }
+    body.theme-light #feedback-toast { background: rgba(240,235,225,0.97); }
+
+    /* ── High contrast ── */
+    .high-contrast .opt-card,
+    .high-contrast .code-digit { border-width: 2px; }
+    .high-contrast #wave-bar,
+    .high-contrast .theme-chip { border-width: 2px; }
+
+    /* ── Reduce motion ── */
+    .reduce-motion .rocking { animation: none !important; }
+
+    @media (max-width: 680px) {
+      #game-area { grid-template-columns: 1fr; }
+      #truem { max-height: 42vh; }
+    }
+  </style>
+</head>
+<body
+  data-section="Початок ХІХ ст."
+  data-game-title="Артилерист"
+  data-home-url="../../index.html"
+  data-nav="overlay"
+>
+
+  <!-- START SCREEN -->
+  <div id="screen-start">
+    <h1>⚓ Артилерист</h1>
+    <p class="subtitle">Початок ХІХ ст. Українські землі в складі двох імперій.<br>Зафіксуй фазу хвилі — влучи правильним пострілом!</p>
+    <button id="btn-start" style="padding:var(--space-md) var(--space-2xl);font-size:var(--text-lg);font-weight:700;background:var(--gradient-warm);color:#fff;border:none;border-radius:var(--radius-md);cursor:pointer;">
+      Зарядити гармату
+    </button>
+    <p class="rules">Натисни «ФІКСУВАТИ ФАЗУ», коли потрібна тема опиниться в центрі прицілу. Потім вибери організацію, дату й учасників у трюмі — та дай залп!</p>
+  </div>
+
+  <!-- WAVE BAR -->
+  <div id="wave-section">
+    <div id="wave-bar">
+      <div id="wave-track"></div>
+      <div id="wave-scope"></div>
+    </div>
+  </div>
+
+  <!-- CONTROLS -->
+  <div id="controls-row">
+    <button id="btn-lock" disabled>🎯 ФІКСУВАТИ ФАЗУ</button>
+    <span id="phase-indicator">Фаза: <span id="phase-val">—</span></span>
+    <span id="slow-badge">⏱ Уповільнення</span>
+    <span id="round-ind">Раунд 0 / 8</span>
+    <span id="score-disp">Очки: 0</span>
+  </div>
+
+  <!-- GAME AREA -->
+  <div id="game-area">
+
+    <!-- Left: Cannon Port -->
+    <div id="cannon-port">
+      <div class="panel-title">⚓ Гарматний порт — Джерело</div>
+      <div id="excerpt-text">Зафіксуй фазу, щоб отримати уривок джерела...</div>
+      <div id="shot-code-row">
+        <div class="code-digit" id="d0">?</div>
+        <span style="color:var(--color-text-muted);font-size:var(--text-lg)">–</span>
+        <div class="code-digit" id="d1">?</div>
+        <div class="code-digit" id="d2">?</div>
+        <div class="code-digit" id="d3">?</div>
+        <button id="btn-fire" disabled>ВОГОНЬ! 💥</button>
+      </div>
+    </div>
+
+    <!-- Right: Truem -->
+    <div id="truem">
+      <div class="panel-title">🪝 Трюм — Варіанти відповідей</div>
+      <div id="truem-opts" style="display:none">
+        <p class="cat-label">Організація / Процес</p>
+        <div id="org-opts"></div>
+        <p class="cat-label">Дата</p>
+        <div id="date-opts"></div>
+        <p class="cat-label">Учасники</p>
+        <div id="people-opts"></div>
+      </div>
+      <p id="truem-hint">Варіанти з'являться після фіксації фази.</p>
+    </div>
+
+  </div>
+
+  <!-- Feedback toast -->
+  <div id="feedback-toast">
+    <div id="fb-title"></div>
+    <div id="fb-detail"></div>
+  </div>
+
+  <!-- Slow-mode banner -->
+  <div id="slow-banner">⏳ Уповільнення часу активовано!</div>
+
+  <!-- Game over -->
+  <div id="screen-gameover">
+    <div id="gameover-card">
+      <h2>🏴‍☠️ Бій закінчено</h2>
+      <div id="final-stats">
+        <div id="fs-grade"></div>
+        <div>Рахунок: <strong id="fs-score"></strong></div>
+        <div>Серія: <strong id="fs-streak"></strong></div>
+      </div>
+      <button id="btn-restart">Новий бій</button>
+    </div>
+  </div>
+
+  <script>
+  // ═══════════════════════════════════════════════════
+  // GAME DATA
+  // ═══════════════════════════════════════════════════
+  var THEMES = [
+    {
+      id: 1,
+      short: 'КМ братство',
+      org:   'Кирило-Мефодіївське братство',
+      date:  '1845\u20131846',
+      people:'М.\u00a0Костомаров, Т.\u00a0Шевченко, П.\u00a0Куліш',
+      excerpts: [
+        'Таємне товариство, засноване у Києві в 1845\u20131846\u00a0рр., своєю метою визначало знищення кріпацтва, скасування станових відмінностей та встановлення рівності всіх слов\u2019янських народів.',
+        'Програмний документ цієї організації закликав до об\u2019єднання слов\u2019янських народів у федерацію вільних республік із збереженням народних мов і культур.'
+      ]
+    },
+    {
+      id: 2,
+      short: 'Відродження (Надд.)',
+      org:   'Харківський гурток',
+      date:  'початок ХІХ\u00a0ст.',
+      people:'В.\u00a0Капніст, І.\u00a0Котляревський',
+      excerpts: [
+        'Перший твір нової літературної мови — травестійна поема, що переказала давньоримський сюжет голосом простого народу, — поклала початок відродженню в Наддніпрянщині.',
+        'Відомий письменник і громадський діяч на початку ХІХ\u00a0ст. звертався до прусського двору з проханням підтримки для поневоленої батьківщини.'
+      ]
+    },
+    {
+      id: 3,
+      short: 'Весна народів',
+      org:   'Головна руська рада',
+      date:  '1848\u20131849',
+      people:'Головна руська рада, Т-во греко-кат. священників',
+      excerpts: [
+        'У 1848 році в Галичині постала перша українська (русинська) політична організація, що домагалась рівноправності русинів у монархії Габсбургів.',
+        'Революційні події в Австрійській монархії змусили галицьке духовенство та інтелігенцію організовано представляти власні інтереси перед владою.'
+      ]
+    },
+    {
+      id: 4,
+      short: 'Відродження (Галич.)',
+      org:   '\u00abРуська трійця\u00bb',
+      date:  '1833\u20131837',
+      people:'М.\u00a0Шашкевич, І.\u00a0Вагилевич, Я.\u00a0Головацький',
+      excerpts: [
+        'Гурток молодих галицьких семінаристів у 1833\u20131837\u00a0рр. видав альманах живою народною мовою — перший такий видавничий досвід у Галичині.',
+        'Збірник \u00abРусалка Дністровая\u00bb (1837) уперше вийшов народною мовою замість офіційної церковнослов\u2019янської, що стало символом культурного відродження краю.'
+      ]
+    }
+  ];
+
+  // [themeId(1-4), excerptIdx, isDuplicate]
+  var ROUNDS = [
+    [1, 0, false],
+    [3, 0, false],
+    [1, 0, true ],  // duplicate of round 0
+    [2, 0, false],
+    [4, 0, false],
+    [3, 1, false],
+    [4, 0, true ],  // duplicate of round 4
+    [2, 1, false]
+  ];
+
+  // ═══════════════════════════════════════════════════
+  // WAVE BAR
+  // ═══════════════════════════════════════════════════
+  var wave = { chips: [], time: 0, paused: true, slowMode: false, animId: null, W: 1 };
+
+  function initWaveBar() {
+    var track = document.getElementById('wave-track');
+    while (track.firstChild) track.removeChild(track.firstChild);
+    wave.chips = [];
+    wave.W = document.getElementById('wave-bar').offsetWidth || 700;
+
+    var spacing = wave.W / THEMES.length;
+    THEMES.forEach(function(th, i) {
+      var el = document.createElement('div');
+      el.className = 'theme-chip';
+      el.setAttribute('data-tid', th.id);
+      el.textContent = th.short;
+      track.appendChild(el);
+      wave.chips.push({
+        el: el, id: th.id,
+        x: spacing * i + spacing * 0.15,
+        spd: 0.55 + Math.random() * 0.55,
+        amp: 6  + Math.random() * 9,
+        phi: i * (Math.PI / 2)
+      });
+    });
+  }
+
+  function tickWave() {
+    if (!wave.paused) {
+      var m = wave.slowMode ? 0.35 : 1.0;
+      wave.time += 0.016 * m;
+      var cx = wave.W / 2;
+      wave.chips.forEach(function(c) {
+        c.x -= c.spd * m;
+        if (c.x < -170) c.x = wave.W + 20 + Math.random() * 100;
+        var y    = Math.sin(wave.time * 1.3 + c.phi) * c.amp;
+        var half = (c.el.offsetWidth || 80) / 2;
+        var sc   = Math.abs(c.x + half - cx) < 58;
+        c.el.style.left      = c.x + 'px';
+        c.el.style.transform = 'translateY(calc(-50% + ' + y + 'px))' + (sc ? ' scale(1.09)' : '');
+        c.el.classList.toggle('in-phase', sc);
+      });
+    }
+    wave.animId = requestAnimationFrame(tickWave);
+  }
+
+  function startWave()  { wave.paused = false; if (!wave.animId) wave.animId = requestAnimationFrame(tickWave); }
+  function pauseWave()  { wave.paused = true; }
+  function resumeWave() { wave.paused = false; }
+
+  function nearestChip() {
+    var cx = wave.W / 2, best = null, bd = Infinity;
+    wave.chips.forEach(function(c) {
+      var d = Math.abs(c.x + (c.el.offsetWidth || 80) / 2 - cx);
+      if (d < bd) { bd = d; best = c; }
+    });
+    return best;
+  }
+
+  // ═══════════════════════════════════════════════════
+  // GAME STATE
+  // ═══════════════════════════════════════════════════
+  var G = {
+    round: -1, score: 0, streak: 0,
+    phase: null, org: null, date: null, people: null,
+    history: {}, slowRounds: 0
+  };
+
+  function fp(idx) { var r = ROUNDS[idx]; return r[0] + ':' + r[1]; }
+
+  // ═══════════════════════════════════════════════════
+  // GAME FLOW
+  // ═══════════════════════════════════════════════════
+  function startGame() {
+    document.getElementById('screen-start').style.display = 'none';
+    G.round = -1; G.score = 0; G.streak = 0;
+    G.history = {}; G.slowRounds = 0;
+    wave.slowMode = false;
+    document.getElementById('slow-badge').style.display = 'none';
+    setScore();
+    initWaveBar();
+    startWave();
+    document.getElementById('btn-lock').disabled = false;
+    if (window.HLGAnalytics) HLGAnalytics.startSession('artillery');
+    nextRound();
+  }
+
+  function nextRound() {
+    G.round++;
+    if (G.round >= ROUNDS.length) { endGame(); return; }
+
+    G.phase = null; G.org = null; G.date = null; G.people = null;
+    setDigit(0,'?',''); setDigit(1,'?',''); setDigit(2,'?',''); setDigit(3,'?','');
+
+    var excerptEl = document.getElementById('excerpt-text');
+    excerptEl.textContent = 'Зафіксуй фазу, щоб отримати уривок джерела...';
+    excerptEl.className = '';
+
+    document.getElementById('truem-opts').style.display = 'none';
+    document.getElementById('truem-hint').style.display = '';
+    document.getElementById('btn-fire').disabled = true;
+    document.getElementById('btn-lock').disabled = false;
+    document.getElementById('round-ind').textContent = 'Раунд\u00a0' + (G.round + 1) + '\u00a0/\u00a0' + ROUNDS.length;
+    document.getElementById('phase-val').textContent = '—';
+
+    if (G.slowRounds > 0) {
+      wave.slowMode = true;
+      G.slowRounds--;
+      document.getElementById('slow-badge').style.display = '';
+      if (G.slowRounds === 0) {
+        wave.slowMode = false;
+        document.getElementById('slow-badge').style.display = 'none';
+      }
+    }
+    resumeWave();
+  }
+
+  function lockPhase() {
+    pauseWave();
+    document.getElementById('btn-lock').disabled = true;
+
+    var chip = nearestChip();
+    if (!chip) { resumeWave(); document.getElementById('btn-lock').disabled = false; return; }
+
+    G.phase = chip.id;
+    setDigit(0, chip.id, 'set');
+    document.getElementById('phase-val').textContent = THEMES[chip.id - 1].short;
+
+    var r  = ROUNDS[G.round];
+    var th = THEMES[r[0] - 1];
+    var excerptEl = document.getElementById('excerpt-text');
+    excerptEl.textContent = '\u00ab' + th.excerpts[r[1]] + '\u00bb';
+    excerptEl.className = 'revealed';
+
+    buildTruem();
+    document.getElementById('truem-opts').style.display = '';
+    document.getElementById('truem-hint').style.display = 'none';
+  }
+
+  // ═══════════════════════════════════════════════════
+  // TRUEM
+  // ═══════════════════════════════════════════════════
+  function buildTruem() {
+    var orgs   = THEMES.map(function(t) { return { v: t.id, txt: t.org    }; });
+    var dates  = THEMES.map(function(t) { return { v: t.id, txt: t.date   }; });
+    var people = THEMES.map(function(t) { return { v: t.id, txt: t.people }; });
+    shuffle(orgs); shuffle(dates); shuffle(people);
+
+    fillOpts('org-opts',    orgs,   'org');
+    fillOpts('date-opts',   dates,  'date');
+    fillOpts('people-opts', people, 'people');
+
+    setTimeout(function() {
+      var cards = document.querySelectorAll('.opt-card');
+      for (var i = 0; i < cards.length; i++) cards[i].classList.add('rocking');
+    }, 350);
+  }
+
+  function fillOpts(cid, items, cat) {
+    var box = document.getElementById(cid);
+    while (box.firstChild) box.removeChild(box.firstChild);
+    items.forEach(function(item) {
+      var d = document.createElement('div');
+      d.className = 'opt-card';
+      d.textContent = item.txt;
+      d.addEventListener('click', function() { pick(cat, item.v, d, cid); });
+      box.appendChild(d);
+    });
+  }
+
+  function pick(cat, val, el, cid) {
+    var box = document.getElementById(cid);
+    var cards = box.querySelectorAll('.opt-card');
+    for (var i = 0; i < cards.length; i++) cards[i].classList.remove('selected');
+    el.classList.add('selected');
+    if      (cat === 'org')    { G.org    = val; setDigit(1, val, 'set'); }
+    else if (cat === 'date')   { G.date   = val; setDigit(2, val, 'set'); }
+    else if (cat === 'people') { G.people = val; setDigit(3, val, 'set'); }
+    document.getElementById('btn-fire').disabled = !(G.phase && G.org && G.date && G.people);
+  }
+
+  // ═══════════════════════════════════════════════════
+  // SHOT
+  // ═══════════════════════════════════════════════════
+  function fire() {
+    document.getElementById('btn-fire').disabled = true;
+    var cards = document.querySelectorAll('.opt-card');
+    for (var i = 0; i < cards.length; i++) {
+      cards[i].classList.add('locked');
+      cards[i].classList.remove('rocking');
+    }
+
+    var r = ROUNDS[G.round];
+    var ct = r[0];
+    var key = fp(G.round);
+
+    var phOk = G.phase  === ct;
+    var oOk  = G.org    === ct;
+    var dOk  = G.date   === ct;
+    var pOk  = G.people === ct;
+    var cardOk = oOk && dOk && pOk;
+
+    setDigit(0, G.phase,  phOk ? 'correct' : 'wrong');
+    setDigit(1, G.org,    oOk  ? 'correct' : 'wrong');
+    setDigit(2, G.date,   dOk  ? 'correct' : 'wrong');
+    setDigit(3, G.people, pOk  ? 'correct' : 'wrong');
+
+    var dupPenalty = false;
+    if (r[2] && G.history[key]) {
+      var prev = G.history[key];
+      if (prev.o !== G.org || prev.d !== G.date || prev.p !== G.people) dupPenalty = true;
+    }
+    G.history[key] = { o: G.org, d: G.date, p: G.people };
+
+    var pts = 0;
+    if (phOk && cardOk) { pts = 100; G.streak++; }
+    else if (cardOk)    { pts =  60; G.streak++; }
+    else if (phOk)      { pts =  25; G.streak = 0; }
+    else                { pts =   0; G.streak = 0; }
+    if (dupPenalty) pts = Math.max(0, pts - 50);
+
+    G.score += pts;
+    setScore();
+
+    if (G.streak > 0 && G.streak % 3 === 0) {
+      wave.slowMode = true;
+      G.slowRounds = 2;
+      document.getElementById('slow-badge').style.display = '';
+      showBanner();
+    }
+
+    var title, detail, color;
+    if (phOk && cardOk && !dupPenalty) {
+      title = '💥 Ідеальний постріл!';  detail = '+' + pts + '\u00a0очок'; color = '#22c55e';
+    } else if (cardOk) {
+      title = '🎯 Картка вірна (3/4)';  detail = 'Фаза — мимо.\u00a0+' + pts; color = '#f97316';
+    } else if (phOk) {
+      title = '⚓ Фаза вірна (1/4)';    detail = 'Картку не влучив.\u00a0+' + pts; color = '#3b82f6';
+    } else {
+      title = '💨 Постріл у молоко';    detail = 'Код зламано.\u00a0+0'; color = '#ef4444';
+    }
+    if (dupPenalty) detail += '  ⚠\u00a0Штраф −50 (непослідовна відповідь)';
+
+    showToast(title, detail, color, nextRound);
+  }
+
+  // ═══════════════════════════════════════════════════
+  // FEEDBACK
+  // ═══════════════════════════════════════════════════
+  function showToast(title, detail, color, cb) {
+    var t = document.getElementById('feedback-toast');
+    document.getElementById('fb-title').textContent  = title;
+    document.getElementById('fb-title').style.color  = color;
+    document.getElementById('fb-detail').textContent = detail;
+    t.classList.add('visible');
+    setTimeout(function() {
+      t.classList.remove('visible');
+      setTimeout(cb, 320);
+    }, 1800);
+  }
+
+  function showBanner() {
+    var b = document.getElementById('slow-banner');
+    b.classList.add('visible');
+    setTimeout(function() { b.classList.remove('visible'); }, 2600);
+  }
+
+  // ═══════════════════════════════════════════════════
+  // GAME OVER
+  // ═══════════════════════════════════════════════════
+  function endGame() {
+    wave.paused = true;
+    var total = ROUNDS.length * 100;
+    var pct   = Math.round(G.score / total * 100);
+    var grade = pct >= 80 ? '🏆 Майстер-артилерист!' : pct >= 50 ? '⚓ Досвідчений моряк' : '🌊 Юнга з потенціалом';
+
+    document.getElementById('fs-grade').textContent  = grade;
+    document.getElementById('fs-score').textContent  = G.score + ' / ' + total + ' (' + pct + '%)';
+    document.getElementById('fs-streak').textContent = G.streak;
+    document.getElementById('screen-gameover').classList.add('visible');
+
+    if (window.HLGAnalytics) HLGAnalytics.endSession({ score: G.score, won: pct >= 60, attempts: 1 });
+  }
+
+  // ═══════════════════════════════════════════════════
+  // HELPERS
+  // ═══════════════════════════════════════════════════
+  function setDigit(idx, val, cls) {
+    var el = document.getElementById('d' + idx);
+    el.textContent = val;
+    el.className = 'code-digit' + (cls ? ' ' + cls : '');
+  }
+
+  function setScore() {
+    document.getElementById('score-disp').textContent = 'Очки:\u00a0' + G.score;
+  }
+
+  function shuffle(a) {
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+  }
+
+  // ═══════════════════════════════════════════════════
+  // EVENTS
+  // ═══════════════════════════════════════════════════
+  document.getElementById('btn-start').addEventListener('click', startGame);
+  document.getElementById('btn-lock').addEventListener('click', lockPhase);
+  document.getElementById('btn-fire').addEventListener('click', fire);
+  document.getElementById('btn-restart').addEventListener('click', function() {
+    document.getElementById('screen-gameover').classList.remove('visible');
+    document.getElementById('screen-start').style.display = '';
+  });
+  </script>
+
+  <script src="../../shared/js/nav.js"></script>
+  <script src="../../shared/js/analytics.js"></script>
+  <script src="../../shared/js/accessibility.js"></script>
+</body>
+</html>
