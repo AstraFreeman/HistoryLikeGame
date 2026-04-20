@@ -126,12 +126,40 @@
     <button class="btn btn-ghost" id="resetBtn">Скинути</button>
   </div>
 
+  <script src="../../data/questions/questions-db.js"></script>
   <script src="../../shared/js/nav.js"></script>
   <script src="../../shared/js/timeline-engine.js"></script>
   <script>
     (function () {
       var params = new URLSearchParams(window.location.search);
+
+      // ── Мульти-джерело: ?ids=key1,key2,... ────────────────────────────────
+      var idsParam = params.get('ids');
+      if (idsParam && window.QUESTIONS_DB && window.QUESTIONS_DB.timeline) {
+        var keys = idsParam.split(',').map(function (k) { return k.trim(); });
+        var merged = null;
+        keys.forEach(function (k) {
+          var entry = window.QUESTIONS_DB.timeline[k];
+          if (!entry) return;
+          if (!merged) {
+            merged = { title: entry.title, section: entry.section, rounds: [] };
+          }
+          merged.rounds = merged.rounds.concat(entry.rounds);
+        });
+        if (merged) { window.TIMELINE_DATA = merged; initGame(); return; }
+      }
+
+      // ── Одне джерело: ?id= (або дефолт) ──────────────────────────────────
       var id = params.get('id') || 'period-6-revolution';
+
+      // Пріоритет 1: QUESTIONS_DB
+      if (window.QUESTIONS_DB && window.QUESTIONS_DB.timeline && window.QUESTIONS_DB.timeline[id]) {
+        window.TIMELINE_DATA = window.QUESTIONS_DB.timeline[id];
+        initGame();
+        return;
+      }
+
+      // Пріоритет 2: окремий файл (fallback)
       var scriptEl = document.createElement('script');
       scriptEl.src = '../../data/timeline/' + id + '.js';
       scriptEl.onload = function () { initGame(); };

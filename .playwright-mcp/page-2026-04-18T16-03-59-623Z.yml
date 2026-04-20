@@ -1,0 +1,48 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e9]:
+    - generic: КМ братство
+    - generic: Відродження (Надд.)
+    - generic: Весна народів
+    - generic: Відродження (Галич.)
+  - generic [ref=e10]:
+    - button "🎯 ФІКСУВАТИ ФАЗУ" [ref=e11] [cursor=pointer]
+    - generic [ref=e12]: "Ціль: —"
+    - generic [ref=e13]: Раунд 1 / 8
+    - generic [ref=e14]: "Очки: 0"
+  - generic [ref=e15]:
+    - generic [ref=e16]:
+      - generic [ref=e17]: ⚓ Гарматний порт — Джерело
+      - generic [ref=e18]: Зафіксуй фазу, щоб отримати уривок джерела...
+      - generic [ref=e19]:
+        - generic [ref=e20]: "?"
+        - generic [ref=e21]: –
+        - generic [ref=e22]: "?"
+        - generic [ref=e23]: "?"
+        - generic [ref=e24]: "?"
+        - button "ВОГОНЬ! 💥" [disabled] [ref=e25]
+    - generic [ref=e27]:
+      - generic [ref=e28]: 🪝 Трюм — Варіанти відповідей
+      - paragraph [ref=e29]: Варіанти з'являться після фіксації фази.
+  - generic [ref=e30]: ⏳ Уповільнення часу активовано!
+  - link "← На головну" [ref=e31] [cursor=pointer]:
+    - /url: ../../index.html
+  - generic:
+    - generic: Налаштування
+    - generic:
+      - generic: Тема
+      - generic:
+        - button "Темна"
+        - button "Світла"
+    - generic:
+      - generic: Розмір тексту
+      - generic:
+        - button "A"
+        - button "A+"
+        - button "A++"
+    - generic:
+      - generic: Менше анімацій
+      - button
+    - generic:
+      - generic: Висока контрастність
+      - button
+  - button "Налаштування доступності" [ref=e32] [cursor=pointer]: ⚙

@@ -39,12 +39,43 @@
     <footer class="site-footer">&copy; 2024 Історична гра. Усі права захищені.</footer>
   </div>
 
+  <script src="../../data/questions/questions-db.js"></script>
   <script src="../../shared/js/nav.js"></script>
   <script src="../../shared/js/quiz-engine.js"></script>
   <script>
     (function () {
       var params = new URLSearchParams(window.location.search);
+
+      // ── Мульти-джерело: ?ids=key1,key2,... ────────────────────────────────
+      var idsParam = params.get('ids');
+      if (idsParam && window.QUESTIONS_DB && window.QUESTIONS_DB.quiz) {
+        var keys = idsParam.split(',').map(function (k) { return k.trim(); });
+        var merged = null;
+        keys.forEach(function (k) {
+          var entry = window.QUESTIONS_DB.quiz[k];
+          if (!entry) return;
+          if (!merged) {
+            merged = {
+              title: entry.title, background: entry.background,
+              theme: entry.theme, password: entry.password, questions: []
+            };
+          }
+          merged.questions = merged.questions.concat(entry.questions);
+        });
+        if (merged) { window.QUIZ_DATA = merged; renderQuiz(); return; }
+      }
+
+      // ── Одне джерело: ?id= (або дефолт) ──────────────────────────────────
       var id = params.get('id') || '1-1';
+
+      // Пріоритет 1: QUESTIONS_DB
+      if (window.QUESTIONS_DB && window.QUESTIONS_DB.quiz && window.QUESTIONS_DB.quiz[id]) {
+        window.QUIZ_DATA = window.QUESTIONS_DB.quiz[id];
+        renderQuiz();
+        return;
+      }
+
+      // Пріоритет 2: окремий файл (fallback)
       var scriptEl = document.createElement('script');
       scriptEl.src = '../../data/quiz/crstm-s-' + id + '.js';
       scriptEl.onload = function () { renderQuiz(); };

@@ -75,12 +75,46 @@
     <p>У вас закінчилися життя.</p>
   </div>
 
+  <script src="../../data/questions/questions-db.js"></script>
   <script src="../../shared/js/nav.js"></script>
   <script src="../../shared/js/game-engine.js"></script>
   <script>
     (function () {
       var params = new URLSearchParams(window.location.search);
+
+      // ── Мульти-джерело: ?ids=key1,key2,... ────────────────────────────────
+      var idsParam = params.get('ids');
+      if (idsParam && window.QUESTIONS_DB && window.QUESTIONS_DB.falling) {
+        var keys = idsParam.split(',').map(function (k) { return k.trim(); });
+        var merged = null;
+        keys.forEach(function (k) {
+          var entry = window.QUESTIONS_DB.falling[k];
+          if (!entry) return;
+          if (!merged) {
+            merged = {
+              title: entry.title, section: entry.section,
+              winScore: entry.winScore, lives: entry.lives,
+              dropSpeed: entry.dropSpeed, addInterval: entry.addInterval,
+              maxActive: entry.maxActive, winImage: entry.winImage,
+              questions: []
+            };
+          }
+          merged.questions = merged.questions.concat(entry.questions);
+        });
+        if (merged) { window.FALLING_DATA = merged; initGame(); return; }
+      }
+
+      // ── Одне джерело: ?id= (або дефолт) ──────────────────────────────────
       var id = params.get('id') || 'period-4-kozaky';
+
+      // Пріоритет 1: QUESTIONS_DB
+      if (window.QUESTIONS_DB && window.QUESTIONS_DB.falling && window.QUESTIONS_DB.falling[id]) {
+        window.FALLING_DATA = window.QUESTIONS_DB.falling[id];
+        initGame();
+        return;
+      }
+
+      // Пріоритет 2: окремий файл (fallback)
       var scriptEl = document.createElement('script');
       scriptEl.src = '../../data/falling/' + id + '.js';
       scriptEl.onload = function () { initGame(); };

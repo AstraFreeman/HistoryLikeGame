@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """
 process-raw.py — Парсер "сирих" файлів запитань НМТ.
 
@@ -32,9 +33,27 @@ SECTION_MAP = {
     'ancient': 'period-1-starodavnia',
     'starodavnia': 'period-1-starodavnia',
     'kyiv-rus': 'period-2-kyiv-rus',
+    'rus-ukraine': 'period-2-kyiv-rus',
+    'rus-ukraine2': 'period-2-kyiv-rus',
+    'rus-ukraine3': 'period-2-kyiv-rus',
     'vkl': 'period-3-vkl',
     'kozaky': 'period-4-kozaky',
+    'kossacks': 'period-4-kozaky',
+    'kossacks2': 'period-4-kozaky',
+    'kossacks3': 'period-4-kozaky',
+    'kossacks4': 'period-4-kozaky',
+    'kossacks5': 'period-4-kozaky',
+    'kossacks6': 'period-4-kozaky',
     'imperium': 'period-5-imperium',
+    'imperial': 'period-5-imperium',
+    'imperial2': 'period-5-imperium',
+    'imperial3': 'period-5-imperium',
+    'imperial4': 'period-5-imperium',
+    'ww1': 'period-6-revolution',
+    'ukr-rev': 'period-6-revolution',
+    'ukr-rev2': 'period-6-revolution',
+    'ukr-rev-direct': 'period-6-revolution',
+    'scoropadsky': 'period-6-revolution',
     'revolution': 'period-6-revolution',
     'radianskyi': 'period-7-radianskyi',
     'nezalezhnist': 'period-8-nezalezhnist',
@@ -179,7 +198,21 @@ def parse_raw_file(filepath):
     with open(filepath, encoding='utf-8') as f:
         content = f.read()
 
-    lines = content.splitlines()
+    raw_lines = content.splitlines()
+
+    # Фільтрація URL-рядків
+    skipped_urls = 0
+    lines = []
+    for ln in raw_lines:
+        stripped = ln.strip()
+        if re.match(r'https?://', stripped):
+            print(f"  [ПРОПУЩЕНО] URL-рядок: {stripped[:80]}", file=sys.stderr)
+            skipped_urls += 1
+        else:
+            lines.append(ln)
+
+    if skipped_urls:
+        print(f"  [ІНФО] Пропущено URL-рядків: {skipped_urls}", file=sys.stderr)
 
     # Мета-інформація з імені файлу
     filename = os.path.basename(filepath)
@@ -203,6 +236,8 @@ def parse_raw_file(filepath):
     }
 
     questions = []
+    seen_texts = {}   # fingerprint → question index, for duplicate detection
+    skipped_dupes = 0
     i = 0
 
     while i < len(lines):
@@ -221,8 +256,24 @@ def parse_raw_file(filepath):
         else:
             q, i = parse_choice_question(lines, i)
 
+        # Дедублікація: порівнюємо перші 70 символів нормалізованого тексту
+        fingerprint = re.sub(r'\s+', ' ', q['text'][:70]).strip().upper()
+        if fingerprint in seen_texts:
+            prev_idx = seen_texts[fingerprint]
+            print(
+                f"  [ДУБЛІКАТ] Пропущено питання схоже на Q{prev_idx+1:03d}: "
+                f"{fingerprint[:55]}...",
+                file=sys.stderr
+            )
+            skipped_dupes += 1
+            continue
+
+        seen_texts[fingerprint] = len(questions)
         q['id'] = f"Q{len(questions)+1:03d}"
         questions.append(q)
+
+    if skipped_dupes:
+        print(f"  [ІНФО] Пропущено дублікатів: {skipped_dupes}", file=sys.stderr)
 
     return meta, questions
 
@@ -299,12 +350,13 @@ def output_quiz_data(meta, questions):
         qtype = q['type']
         text = js_string(q['text'][:200])  # Скорочуємо для виводу
 
+        has_image = 'true' if q.get('has_image') else 'false'
         if qtype == 'choice':
-            print(f"    {{ type: 'choice', text: '{text}', hasImage: {q.get('has_image', False)} }},")
+            print(f"    {{ type: 'choice', text: '{text}', hasImage: {has_image} }},")
         elif qtype == 'matching':
-            print(f"    {{ type: 'matching', text: '{text}', hasImage: {q.get('has_image', False)} }},")
+            print(f"    {{ type: 'matching', text: '{text}', hasImage: {has_image} }},")
         elif qtype == 'sequence':
-            print(f"    {{ type: 'sequence', text: '{text}', hasImage: {q.get('has_image', False)} }},")
+            print(f"    {{ type: 'sequence', text: '{text}', hasImage: {has_image} }},")
 
     print("  ]")
     print("};")
@@ -373,6 +425,13 @@ def output_report(meta, questions, problems):
 
 def main():
     import argparse
+    import io
+
+    # Force UTF-8 output on Windows (cp1251 default breaks Ukrainian characters)
+    if hasattr(sys.stdout, 'buffer'):
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+    if hasattr(sys.stderr, 'buffer'):
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
 
     parser = argparse.ArgumentParser(description='Парсер сирих файлів запитань')
     parser.add_argument('file', help='Шлях до .txt файлу')

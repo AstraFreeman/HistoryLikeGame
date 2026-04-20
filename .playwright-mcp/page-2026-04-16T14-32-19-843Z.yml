@@ -1,0 +1,67 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e4]: "Очки:"
+      - generic [ref=e5]: "0"
+      - generic [ref=e6]: / 50
+    - button "🪙 РОЗДАТИ" [ref=e7] [cursor=pointer]
+  - generic [ref=e8]:
+    - generic [ref=e9]: "Порядок тем:"
+    - generic [ref=e12]: 1. Соціальне життя
+    - generic [ref=e15]: 2. Економічне життя
+    - generic [ref=e18]: 3. Культура і церква
+    - generic [ref=e21]: 4. Державне управління
+  - generic [ref=e22]:
+    - generic [ref=e23]:
+      - strong [ref=e24]: Поле порожнє
+      - text: Натисни
+      - strong [ref=e25]: РОЗДАТИ
+      - text: ", щоб отримати монетки."
+      - text: Спочатку дай відповідь на 4 запитання!
+    - generic [ref=e26]:
+      - generic [ref=e27]:
+        - generic: 0/12
+      - generic [ref=e28]:
+        - generic: 0/12
+      - generic [ref=e29]:
+        - generic: 0/12
+      - generic [ref=e30]:
+        - generic: 0/12
+      - generic [ref=e31]:
+        - generic: 0/12
+      - generic [ref=e32]:
+        - generic: 0/12
+      - generic [ref=e33]:
+        - generic: 0/12
+      - generic [ref=e34]:
+        - generic: 0/12
+      - generic [ref=e35]:
+        - generic: 0/12
+      - generic [ref=e36]:
+        - generic: 0/12
+      - generic [ref=e37]:
+        - generic: 0/12
+      - generic [ref=e38]:
+        - generic: 0/12
+  - link "← На головну" [ref=e39] [cursor=pointer]:
+    - /url: ../../index.html
+  - generic:
+    - generic: Налаштування
+    - generic:
+      - generic: Тема
+      - generic:
+        - button "Темна"
+        - button "Світла"
+    - generic:
+      - generic: Розмір тексту
+      - generic:
+        - button "A"
+        - button "A+"
+        - button "A++"
+    - generic:
+      - generic: Менше анімацій
+      - button
+    - generic:
+      - generic: Висока контрастність
+      - button
+  - button "Налаштування доступності" [ref=e40] [cursor=pointer]: ⚙

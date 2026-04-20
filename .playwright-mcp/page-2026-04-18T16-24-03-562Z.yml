@@ -1,0 +1,72 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e9]:
+    - generic: КМ братство
+    - generic: Відродження (Надд.)
+    - generic: Весна народів
+    - generic: Відродження (Галич.)
+  - generic [ref=e10]:
+    - button "🎯 ФІКСУВАТИ ФАЗУ" [disabled] [ref=e11]
+    - generic [ref=e12]: "Ціль: Відродження (Надд.)"
+    - generic [ref=e13]: Раунд 4 / 8
+    - generic [ref=e14]: "Очки: 360"
+  - generic [ref=e15]:
+    - generic [ref=e16]:
+      - generic [ref=e17]: ⚓ Гарматний порт — Джерело
+      - generic [ref=e18]: «Перший твір нової літературної мови — травестійна поема, що переказала давньоримський сюжет голосом простого народу, — поклала початок відродженню в Наддніпрянщині.»
+      - generic [ref=e19]:
+        - generic [ref=e20]: "2"
+        - generic [ref=e21]: –
+        - generic [ref=e22]: "2"
+        - generic [ref=e23]: "2"
+        - generic [ref=e24]: "2"
+        - button "ВОГОНЬ! 💥" [disabled] [ref=e25]
+    - generic [ref=e26]:
+      - generic:
+        - img
+    - generic [ref=e27]:
+      - generic [ref=e28]: 🪝 Трюм — Варіанти відповідей
+      - generic [ref=e61]:
+        - paragraph [ref=e62]: Організація / Процес
+        - generic [ref=e63]:
+          - generic: «Руська трійця»
+          - generic: Кирило-Мефодіївське братство
+          - generic: Харківський гурток
+          - generic: Головна руська рада
+        - paragraph [ref=e68]: Дата
+        - generic [ref=e69]:
+          - generic: 1833–1837
+          - generic: 1848–1849
+          - generic: початок ХІХ ст.
+          - generic: 1845–1846
+        - paragraph [ref=e74]: Учасники
+        - generic [ref=e75]:
+          - generic: В. Капніст, І. Котляревський
+          - generic: М. Костомаров, Т. Шевченко, П. Куліш
+          - generic: М. Шашкевич, І. Вагилевич, Я. Головацький
+          - generic: Головна руська рада, Т-во греко-кат. священників
+  - generic [ref=e80]:
+    - generic [ref=e81]: 💥 Ідеальний постріл!
+    - generic [ref=e82]: +100 очок
+  - generic [ref=e30]: ⏳ Уповільнення часу активовано!
+  - link "← На головну" [ref=e31] [cursor=pointer]:
+    - /url: ../../index.html
+  - generic:
+    - generic: Налаштування
+    - generic:
+      - generic: Тема
+      - generic:
+        - button "Темна"
+        - button "Світла"
+    - generic:
+      - generic: Розмір тексту
+      - generic:
+        - button "A"
+        - button "A+"
+        - button "A++"
+    - generic:
+      - generic: Менше анімацій
+      - button
+    - generic:
+      - generic: Висока контрастність
+      - button
+  - button "Налаштування доступності" [ref=e32] [cursor=pointer]: ⚙

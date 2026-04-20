@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Таємниці скарбниці</title>
+  <link rel="stylesheet" href="../../shared/css/reset.css">
+  <link rel="stylesheet" href="../../shared/css/theme.css">
+  <link rel="stylesheet" href="../../shared/css/animations.css">
+  <style>
+    body {
+      background: var(--gradient-bg);
+      min-height: 100vh;
+      overflow-x: hidden;
+      font-family: var(--font-main, system-ui, sans-serif);
+    }
+
+    /* ─── HUD ─── */
+    #hud {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 14px 0 60px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur));
+      border-bottom: 1px solid var(--glass-border);
+      box-shadow: var(--glass-shadow);
+      z-index: 50;
+    }
+
+    #score-panel {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--color-text-secondary);
+      font-size: var(--text-sm);
+    }
+
+    #score-val {
+      color: #f59e0b;
+      font-size: var(--text-xl);
+      font-weight: bold;
+      min-width: 28px;
+    }
+
+    #score-target {
+      color: var(--color-text-secondary);
+      font-size: var(--text-sm);
+    }
+
+    #deal-btn {
+      padding: 7px 20px;
+      font-size: var(--text-base);
+      font-weight: bold;
+      color: #fff;
+      background: var(--gradient-primary);
+      border: 2px solid rgba(255,255,255,0.18);
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 3px 14px rgba(59,130,246,0.4);
+    }
+
+    #deal-btn:hover:not(:disabled) {
+      transform: scale(1.05);
+      box-shadow: 0 5px 20px rgba(59,130,246,0.55);
+    }
+
+    #deal-btn:active:not(:disabled) { transform: scale(0.97); }
+
+    #deal-btn:disabled {
+      opacity: 0.45;
+      cursor: default;
+      transform: none;
+    }
+
+    /* ─── Topic order panel ─── */
+    #topic-order-panel {
+      position: fixed;
+      top: 60px;
+      right: 12px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(var(--glass-blur));
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      box-shadow: var(--glass-shadow);
+      z-index: 40;
+      min-width: 160px;
+    }
+
+    .topic-title {
+      font-size: var(--text-xs, 11px);
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+
+    .topic-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 3px 0;
+      font-size: var(--text-sm);
+      color: var(--color-text-primary);
+    }
+
+    .topic-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ─── Game area ─── */
+    #game-area {
+      padding: 64px 186px 80px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #empty-msg {
+      margin-top: 40px;
+      color: var(--color-text-secondary);
+      font-size: var(--text-lg);
+      text-align: center;
+      line-height: 1.8;
+    }
+
+    #empty-msg strong {
+      color: var(--color-text-primary);
+    }
+
+    /* ─── Cells grid ─── */
+    #cells-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 120px);
+      gap: 10px;
+    }
+
+    .cell {
+      position: relative;
+      width: 120px;
+      height: 280px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      overflow: visible;
+      touch-action: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .cell.drag-over {
+      border-color: rgba(59,130,246,0.7);
+      box-shadow: 0 0 16px rgba(59,130,246,0.35);
+    }
+
+    .cell-badge {
+      position: absolute;
+      top: 5px;
+      right: 7px;
+      font-size: 9px;
+      color: rgba(255,255,255,0.28);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* ─── Coin stack ─── */
+    .coin-stack {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .coin {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 76px;
+      height: 36px;
+      border-radius: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      user-select: none;
+      touch-action: none;
+      pointer-events: all;
+      transition: filter 0.1s;
+    }
+
+    .coin:hover {
+      filter: brightness(1.2);
+    }
+
+    .coin:active { cursor: grabbing; }
+
+    .coin--hidden {
+      background: #3a3a3a !important;
+      box-shadow: none !important;
+      cursor: default;
+      color: rgba(255,255,255,0.3);
+      font-size: var(--text-sm);
+      font-weight: bold;
+    }
+
+    .coin-text {
+      font-size: 9px;
+      font-weight: bold;
+      color: rgba(255,255,255,0.95);
+      text-align: center;
+      max-width: 68px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    /* ─── Drag ghost ─── */
+    #drag-ghost {
+      position: fixed;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    #drag-ghost.hidden { display: none; }
+
+    #drag-ghost .coin {
+      opacity: 0.85;
+    }
+
+    /* ─── Overlays ─── */
+    .screen-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: rgba(0,0,0,0.88);
+      backdrop-filter: blur(8px);
+      padding: 20px;
+    }
+
+    .screen-overlay.hidden { display: none !important; }
+
+    .screen-overlay h2 {
+      color: #f59e0b;
+      font-size: var(--text-3xl);
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .screen-overlay p {
+      color: var(--color-text-secondary);
+      font-size: var(--text-lg);
+      text-align: center;
+      max-width: 480px;
+      line-height: 1.7;
+      margin-bottom: 8px;
+    }
+
+    .score-result {
+      color: #f59e0b;
+      font-size: var(--text-2xl);
+      font-weight: bold;
+      margin: 12px 0;
+    }
+
+    .btn-play {
+      margin-top: 24px;
+      padding: 14px 48px;
+      font-size: var(--text-xl);
+      font-weight: bold;
+      color: #fff;
+      background: var(--gradient-primary);
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: var(--radius-full);
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+      box-shadow: 0 4px 20px rgba(59,130,246,0.4);
+    }
+
+    .btn-play:hover {
+      transform: scale(1.06);
+      box-shadow: 0 6px 28px rgba(59,130,246,0.55);
+    }
+
+    .btn-play:active { transform: scale(0.97); }
+
+    /* ─── Quiz modal ─── */
+    #quiz-box {
+      background: rgba(20,22,30,0.97);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 32px 28px 24px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.6);
+    }
+
+    #quiz-box h3 {
+      color: var(--color-text-secondary);
+      font-size: var(--text-sm);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 4px;
+    }
+
+    #quiz-question {
+      margin-bottom: 20px;
+    }
+
+    .quiz-q {
+      color: var(--color-text-secondary);
+      font-size: var(--text-base);
+      margin-bottom: 6px;
+    }
+
+    .quiz-concept {
+      color: #fff;
+      font-size: var(--text-2xl);
+      font-weight: bold;
+      text-align: center;
+      padding: 12px;
+      background: rgba(255,255,255,0.07);
+      border-radius: 10px;
+    }
+
+    #quiz-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .quiz-btn {
+      padding: 12px 10px;
+      font-size: var(--text-sm);
+      font-weight: bold;
+      color: var(--color-text-primary);
+      background: rgba(255,255,255,0.07);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, transform 0.1s;
+      line-height: 1.3;
+    }
+
+    .quiz-btn:hover:not(:disabled) {
+      background: rgba(255,255,255,0.13);
+      border-color: rgba(255,255,255,0.3);
+    }
+
+    .quiz-btn:disabled { cursor: default; }
+
+    .quiz-btn--correct {
+      background: rgba(34,197,94,0.25) !important;
+      border-color: #22c55e !important;
+      color: #4ade80;
+    }
+
+    .quiz-btn--wrong {
+      background: rgba(239,68,68,0.2) !important;
+      border-color: #ef4444 !important;
+      color: #f87171;
+    }
+
+    #quiz-progress {
+      text-align: center;
+      color: var(--color-text-secondary);
+      font-size: var(--text-sm);
+    }
+
+    /* ─── Conversion flash ─── */
+    @keyframes conversionPop {
+      0%   { transform: translateX(-50%) scale(1.4); opacity: 1; }
+      100% { transform: translateX(-50%) scale(0.6); opacity: 0; }
+    }
+
+    .conversion-flash {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #f59e0b;
+      font-size: var(--text-sm);
+      font-weight: bold;
+      pointer-events: none;
+      animation: conversionPop 0.7s ease-out forwards;
+      z-index: 100;
+      white-space: nowrap;
+    }
+
+    /* ─── Responsive ─── */
+    @media (max-width: 680px) {
+      #cells-grid {
+        grid-template-columns: repeat(3, 100px);
+      }
+
+      .cell { width: 100px; height: 250px; }
+
+      #topic-order-panel {
+        position: static;
+        margin: 0 auto 12px;
+        min-width: auto;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        justify-content: center;
+      }
+
+      .topic-title { display: none; }
+
+      .topic-row { font-size: 10px; }
+
+      #game-area { padding: 64px 8px 80px; }
+    }
+
+    @media (max-width: 420px) {
+      #cells-grid {
+        grid-template-columns: repeat(3, 90px);
+        gap: 7px;
+      }
+
+      .cell { width: 90px; height: 240px; }
+      .coin { width: 60px; height: 30px; border-radius: 15px; }
+    }
+  </style>
+</head>
+<body data-nav="overlay" data-home-url="../../index.html" data-game-title="Таємниці скарбниці">
+
+  <!-- HUD -->
+  <div id="hud">
+    <div id="score-panel">
+      <span>Очки:</span>
+      <span id="score-val">0</span>
+      <span id="score-target">/ 50</span>
+    </div>
+    <button id="deal-btn">🪙 РОЗДАТИ</button>
+  </div>
+
+  <!-- Topic order panel -->
+  <div id="topic-order-panel"></div>
+
+  <!-- Game area -->
+  <div id="game-area">
+    <div id="empty-msg">
+      <strong>Поле порожнє</strong><br>
+      Натисни <strong>РОЗДАТИ</strong>, щоб отримати монетки.<br>
+      Спочатку дай відповідь на 4 запитання!
+    </div>
+    <div id="cells-grid"></div>
+  </div>
+
+  <!-- Drag ghost -->
+  <div id="drag-ghost" class="hidden"></div>
+
+  <!-- Quiz modal -->
+  <div id="quiz-modal" class="screen-overlay hidden">
+    <div id="quiz-box">
+      <h3>Перевірка знань</h3>
+      <div id="quiz-question"></div>
+      <div id="quiz-options"></div>
+      <div id="quiz-progress"></div>
+    </div>
+  </div>
+
+  <!-- End screen -->
+  <div id="end-screen" class="screen-overlay hidden">
+    <h2 id="end-title"></h2>
+    <p id="end-desc"></p>
+    <div class="score-result" id="end-score"></div>
+    <button class="btn-play" id="restart-btn">Грати знову</button>
+  </div>
+
+  <script src="../../data/games/coin-sorter-data.js"></script>
+  <script>
+  (function () {
+    'use strict';
+
+    var DATA = window.COIN_SORTER_DATA;
+    if (!DATA) { return; }
+
+    /* ═══════════════════════ CONSTANTS ═══════════════════════ */
+    var CELLS_COUNT     = 12;
+    var CELL_CAPACITY   = 12;
+    var COIN_H          = 36;   // px, coin visual height
+    var COIN_STEP       = 20;   // px, vertical offset per coin (overlap)
+    var COIN_BOTTOM_PAD = 8;    // px, gap from cell bottom
+    var COMBO_THRESHOLD = 10;
+    var COMBO_RESULT    = 2;
+    var FILL_RATIO      = 0.75;
+    var WIN_SCORE       = DATA.winScore || 50;
+    var INITIAL_HIDDEN  = 6;
+
+    /* ═══════════════════════ STATE ══════════════════════════ */
+    var cells      = [];   // cells[i] = [{topicId,concept,hidden}]  index 0=bottom
+    var score      = 0;
+    var topicOrder = [];   // topic IDs in conversion chain
+    var dragState  = null; // {fromCell, coins:[]}
+    var attempts   = 0;
+    var isFirstDeal = true;
+    var gameOver   = false;
+    var quizState  = null;
+
+    /* ═══════════════════════ DOM REFS ════════════════════════ */
+    var cellsGrid        = document.getElementById('cells-grid');
+    var scoreVal         = document.getElementById('score-val');
+    var dealBtn          = document.getElementById('deal-btn');
+    var topicOrderPanel  = document.getElementById('topic-order-panel');
+    var quizModal        = document.getElementById('quiz-modal');
+    var quizQuestion     = document.getElementById('quiz-question');
+    var quizOptions      = document.getElementById('quiz-options');
+    var quizProgress     = document.getElementById('quiz-progress');
+    var endScreen        = document.getElementById('end-screen');
+    var endTitle         = document.getElementById('end-title');
+    var endDesc          = document.getElementById('end-desc');
+    var endScoreEl       = document.getElementById('end-score');
+    var dragGhost        = document.getElementById('drag-ghost');
+    var restartBtn       = document.getElementById('restart-btn');
+    var emptyMsg         = document.getElementById('empty-msg');
+
+    /* ═══════════════════════ UTILITIES ═══════════════════════ */
+    function shuffle(arr) {
+      var a = arr.slice();
+      for (var i = a.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var t = a[i]; a[i] = a[j]; a[j] = t;
+      }
+      return a;
+    }
+
+    function pickRandom(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function getTopicById(id) {
+      for (var i = 0; i < DATA.topics.length; i++) {
+        if (DATA.topics[i].id === id) return DATA.topics[i];
+      }
+      return DATA.topics[0];
+    }
+
+    function nextTopicId(topicId) {
+      var idx = topicOrder.indexOf(topicId);
+      return topicOrder[(idx + 1) % topicOrder.length];
+    }
+
+    function currentCoinCount() {
+      var n = 0;
+      for (var i = 0; i < cells.length; i++) n += cells[i].length;
+      return n;
+    }
+
+    /* ═══════════════════════ INIT ════════════════════════════ */
+    function initGame() {
+      score = 0;
+      attempts = 0;
+      isFirstDeal = true;
+      gameOver = false;
+      quizState = null;
+      dragState = null;
+      cells = [];
+      for (var i = 0; i < CELLS_COUNT; i++) cells.push([]);
+      topicOrder = shuffle(DATA.topics.map(function(t) { return t.id; }));
+
+      endScreen.classList.add('hidden');
+      quizModal.classList.add('hidden');
+      dragGhost.classList.add('hidden');
+      dealBtn.disabled = false;
+
+      renderTopicOrder();
+      renderScore();
+      renderAllCells();
+      emptyMsg.style.display = 'block';
+
+      if (window.HLGAnalytics) HLGAnalytics.startSession('coin-sorter');
+    }
+
+    /* ═══════════════════════ RENDER: TOPIC ORDER ═════════════ */
+    function renderTopicOrder() {
+      while (topicOrderPanel.firstChild) {
+        topicOrderPanel.removeChild(topicOrderPanel.firstChild);
+      }
+
+      var title = document.createElement('div');
+      title.className = 'topic-title';
+      title.textContent = 'Порядок тем:';
+      topicOrderPanel.appendChild(title);
+
+      topicOrder.forEach(function(id, idx) {
+        var topic = getTopicById(id);
+        var row = document.createElement('div');
+        row.className = 'topic-row';
+
+        var dot = document.createElement('span');
+        dot.className = 'topic-dot';
+        dot.style.background = topic.color;
+        dot.style.boxShadow = '0 0 5px ' + topic.color;
+
+        var lbl = document.createElement('span');
+        lbl.textContent = (idx + 1) + '. ' + topic.name;
+
+        row.appendChild(dot);
+        row.appendChild(lbl);
+        topicOrderPanel.appendChild(row);
+      });
+    }
+
+    /* ═══════════════════════ RENDER: SCORE ═══════════════════ */
+    function renderScore() {
+      scoreVal.textContent = score;
+    }
+
+    /* ═══════════════════════ RENDER: CELLS ═══════════════════ */
+    function renderAllCells() {
+      while (cellsGrid.firstChild) {
+        cellsGrid.removeChild(cellsGrid.firstChild);
+      }
+      for (var i = 0; i < CELLS_COUNT; i++) {
+        cellsGrid.appendChild(buildCellEl(i));
+      }
+      if (currentCoinCount() > 0) emptyMsg.style.display = 'none';
+    }
+
+    function buildCellEl(idx) {
+      var cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.cellId = idx;
+
+      var badge = document.createElement('div');
+      badge.className = 'cell-badge';
+      badge.textContent = cells[idx].length + '/' + CELL_CAPACITY;
+      cell.appendChild(badge);
+
+      var stack = document.createElement('div');
+      stack.className = 'coin-stack';
+
+      cells[idx].forEach(function(coin, coinIdx) {
+        stack.appendChild(buildCoinEl(coin, idx, coinIdx));
+      });
+
+      cell.appendChild(stack);
+      return cell;
+    }
+
+    function buildCoinEl(coin, cellIdx, coinIdx) {
+      var el = document.createElement('div');
+
+      if (coin.hidden) {
+        el.className = 'coin coin--hidden';
+        el.textContent = '?';
+      } else {
+        el.className = 'coin';
+        var topic = getTopicById(coin.topicId);
+        el.style.background = topic.color;
+        el.style.boxShadow = '0 0 8px ' + topic.color + '88';
+
+        var txt = document.createElement('span');
+        txt.className = 'coin-text';
+        var disp = coin.concept.length > 8
+          ? coin.concept.slice(0, 7) + '\u2026'
+          : coin.concept;
+        txt.textContent = disp;
+        el.title = coin.concept;
+        el.appendChild(txt);
+
+        el.addEventListener('pointerdown', function(e) {
+          onCoinPointerDown(cellIdx, e);
+        });
+      }
+
+      el.style.bottom = (COIN_BOTTOM_PAD + coinIdx * COIN_STEP) + 'px';
+      el.style.zIndex = coinIdx + 1;
+
+      return el;
+    }
+
+    /* ═══════════════════════ DRAG & DROP ═════════════════════ */
+    function onCoinPointerDown(cellIdx, e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (gameOver || quizState) return;
+
+      var stack = cells[cellIdx];
+      if (!stack.length) return;
+
+      var topCoin = stack[stack.length - 1];
+      if (topCoin.hidden) return;
+
+      // Collect consecutive same-topic coins from top
+      var topicId = topCoin.topicId;
+      var count = 0;
+      for (var i = stack.length - 1; i >= 0; i--) {
+        if (!stack[i].hidden && stack[i].topicId === topicId) {
+          count++;
+        } else {
+          break;
+        }
+      }
+
+      var pickedCoins = stack.splice(stack.length - count, count);
+      attempts++;
+
+      buildGhost(pickedCoins);
+      positionGhost(e.clientX, e.clientY);
+      dragGhost.classList.remove('hidden');
+
+      dragState = { fromCell: cellIdx, coins: pickedCoins };
+
+      // Re-render source cell immediately
+      var srcEl = cellsGrid.querySelector('[data-cell-id="' + cellIdx + '"]');
+      if (srcEl) {
+        var newEl = buildCellEl(cellIdx);
+        cellsGrid.replaceChild(newEl, srcEl);
+      }
+
+      document.addEventListener('pointermove', onPointerMove);
+      document.addEventListener('pointerup', onGlobalPointerUp);
+    }
+
+    function buildGhost(coins) {
+      while (dragGhost.firstChild) dragGhost.removeChild(dragGhost.firstChild);
+
+      var totalH = COIN_H + (coins.length - 1) * COIN_STEP;
+      dragGhost.style.width = '80px';
+      dragGhost.style.height = totalH + 'px';
+      dragGhost.style.position = 'fixed';
+
+      coins.forEach(function(coin, i) {
+        var g = document.createElement('div');
+        g.className = 'coin';
+        g.style.position = 'absolute';
+        g.style.left = '50%';
+        g.style.bottom = (i * COIN_STEP) + 'px';
+        g.style.zIndex = i + 1;
+        g.style.opacity = '0.85';
+
+        var topic = getTopicById(coin.topicId);
+        g.style.background = topic.color;
+        g.style.boxShadow = '0 0 10px ' + topic.color;
+
+        var txt = document.createElement('span');
+        txt.className = 'coin-text';
+        txt.textContent = coin.concept.length > 8
+          ? coin.concept.slice(0, 7) + '\u2026'
+          : coin.concept;
+        g.appendChild(txt);
+        dragGhost.appendChild(g);
+      });
+    }
+
+    function positionGhost(x, y) {
+      dragGhost.style.left = (x - 38) + 'px';
+      dragGhost.style.top  = (y - 18) + 'px';
+    }
+
+    function onPointerMove(e) {
+      if (!dragState) return;
+      positionGhost(e.clientX, e.clientY);
+
+      // Highlight target cell
+      dragGhost.style.display = 'none';
+      var el = document.elementFromPoint(e.clientX, e.clientY);
+      dragGhost.style.display = '';
+      var cellEl = el ? el.closest('.cell') : null;
+
+      document.querySelectorAll('.cell.drag-over').forEach(function(c) {
+        c.classList.remove('drag-over');
+      });
+      if (cellEl) cellEl.classList.add('drag-over');
+    }
+
+    function onGlobalPointerUp(e) {
+      document.removeEventListener('pointermove', onPointerMove);
+      document.removeEventListener('pointerup', onGlobalPointerUp);
+
+      dragGhost.classList.add('hidden');
+      document.querySelectorAll('.cell.drag-over').forEach(function(c) {
+        c.classList.remove('drag-over');
+      });
+
+      if (!dragState) return;
+
+      // Find drop target
+      dragGhost.style.display = 'none';
+      var el = document.elementFromPoint(e.clientX, e.clientY);
+      dragGhost.style.display = '';
+      var cellEl = el ? el.closest('.cell') : null;
+      var targetIdx = cellEl ? parseInt(cellEl.dataset.cellId) : -1;
+
+      if (targetIdx >= 0 && targetIdx !== dragState.fromCell) {
+        doDropToCell(targetIdx);
+      } else {
+        returnCoinsToSource();
+      }
+    }
+
+    function doDropToCell(targetIdx) {
+      var coins  = dragState.coins;
+      var target = cells[targetIdx];
+
+      if (target.length + coins.length > CELL_CAPACITY) {
+        returnCoinsToSource();
+        return;
+      }
+
+      var droppedTopicId = coins[0].topicId;
+
+      // Block drop onto a cell whose top visible coin belongs to a different topic
+      if (target.length > 0) {
+        var topOfTarget = target[target.length - 1];
+        if (!topOfTarget.hidden && topOfTarget.topicId !== droppedTopicId) {
+          returnCoinsToSource();
+          return;
+        }
+      }
+
+      coins.forEach(function(c) { target.push(c); });
+      dragState = null;
+
+      autoPull(targetIdx, droppedTopicId);
+      autoReveal();
+      checkConversion(targetIdx);
+
+      renderAllCells();
+      renderScore();
+    }
+
+    function returnCoinsToSource() {
+      if (!dragState) return;
+      var fc = dragState.fromCell;
+      dragState.coins.forEach(function(c) { cells[fc].push(c); });
+      dragState = null;
+      var srcEl = cellsGrid.querySelector('[data-cell-id="' + fc + '"]');
+      if (srcEl) {
+        cellsGrid.replaceChild(buildCellEl(fc), srcEl);
+      }
+    }
+
+    /* ═══════════════════════ AUTO-PULL ═══════════════════════ */
+    // Floats all visible coins of topicId to the top of the cell
+    function autoPull(cellIdx, topicId) {
+      var stack = cells[cellIdx];
+      var matching = [];
+      var rest     = [];
+
+      stack.forEach(function(coin) {
+        if (!coin.hidden && coin.topicId === topicId) {
+          matching.push(coin);
+        } else {
+          rest.push(coin);
+        }
+      });
+
+      cells[cellIdx] = rest.concat(matching);
+    }
+
+    /* ═══════════════════════ AUTO-REVEAL ════════════════════ */
+    // Reveal any hidden coin that has become the top of its stack
+    function autoReveal() {
+      cells.forEach(function(stack) {
+        if (stack.length > 0) {
+          var top = stack[stack.length - 1];
+          if (top.hidden) top.hidden = false;
+        }
+      });
+    }
+
+    /* ═══════════════════════ CONVERSION ══════════════════════ */
+    function checkConversion(cellIdx) {
+      var stack = cells[cellIdx];
+      if (stack.length < COMBO_THRESHOLD) return;
+
+      var topCoin = stack[stack.length - 1];
+      if (!topCoin || topCoin.hidden) return;
+
+      var topicId = topCoin.topicId;
+      var count = 0;
+      for (var i = stack.length - 1; i >= 0; i--) {
+        if (!stack[i].hidden && stack[i].topicId === topicId) {
+          count++;
+        } else {
+          break;
+        }
+      }
+
+      if (count < COMBO_THRESHOLD) return;
+
+      // Remove COMBO_THRESHOLD top coins
+      cells[cellIdx].splice(stack.length - COMBO_THRESHOLD, COMBO_THRESHOLD);
+
+      // Add COMBO_RESULT coins of next topic
+      var nxt     = nextTopicId(topicId);
+      var nxtData = getTopicById(nxt);
+      for (var j = 0; j < COMBO_RESULT; j++) {
+        cells[cellIdx].push({
+          topicId: nxt,
+          concept: pickRandom(nxtData.concepts),
+          hidden:  false
+        });
+      }
+
+      score += 10;
+      renderScore();
+      showConversionFlash(cellIdx, getTopicById(topicId).name);
+
+      if (score >= WIN_SCORE) {
+        renderAllCells();
+        endGame(true);
+        return;
+      }
+
+      // Chain: maybe the 2 new coins trigger another conversion
+      autoPull(cellIdx, nxt);
+      autoReveal();
+      checkConversion(cellIdx);
+    }
+
+    function showConversionFlash(cellIdx, topicName) {
+      var cellEl = cellsGrid.querySelector('[data-cell-id="' + cellIdx + '"]');
+      if (!cellEl) return;
+      var flash = document.createElement('div');
+      flash.className = 'conversion-flash';
+      flash.textContent = '+10 \u2728 ' + topicName;
+      flash.style.top = '50%';
+      cellEl.appendChild(flash);
+      setTimeout(function() {
+        if (flash.parentNode) flash.parentNode.removeChild(flash);
+      }, 800);
+    }
+
+    /* ═══════════════════════ HIDE COINS ══════════════════════ */
+    function hideCoinsPenalty(count) {
+      var candidates = [];
+      cells.forEach(function(stack, cellIdx) {
+        // Eligible: bottom half of the stack, not already hidden
+        var cutoff = Math.floor(stack.length / 2);
+        for (var i = 0; i < cutoff; i++) {
+          if (!stack[i].hidden) {
+            candidates.push({ cellIdx: cellIdx, coinIdx: i });
+          }
+        }
+      });
+
+      shuffle(candidates).slice(0, count).forEach(function(c) {
+        cells[c.cellIdx][c.coinIdx].hidden = true;
+      });
+    }
+
+    /* ═══════════════════════ DEAL COINS ══════════════════════ */
+    function dealCoinsBatch(count) {
+      if (count <= 0) return;
+
+      var allConcepts = [];
+      DATA.topics.forEach(function(t) {
+        t.concepts.forEach(function(c) {
+          allConcepts.push({ topicId: t.id, concept: c });
+        });
+      });
+
+      var added = 0;
+      var maxTries = count * 12;
+
+      while (added < count && maxTries > 0) {
+        maxTries--;
+        var cellIdx = Math.floor(Math.random() * CELLS_COUNT);
+        if (cells[cellIdx].length < CELL_CAPACITY) {
+          var pick = pickRandom(allConcepts);
+          cells[cellIdx].push({ topicId: pick.topicId, concept: pick.concept, hidden: false });
+          added++;
+        }
+      }
+    }
+
+    /* ═══════════════════════ DEAL BUTTON ═════════════════════ */
+    dealBtn.addEventListener('click', function() {
+      if (gameOver) return;
+      runPreDealQuiz();
+    });
+
+    /* ═══════════════════════ QUIZ ════════════════════════════ */
+    function runPreDealQuiz() {
+      dealBtn.disabled = true;
+
+      var totalSlots  = CELLS_COUNT * CELL_CAPACITY;
+      var curTotal    = currentCoinCount();
+      var targetFill  = Math.floor(totalSlots * FILL_RATIO);
+      var toAdd       = Math.max(0, targetFill - curTotal);
+      var batchPerQ   = Math.ceil(toAdd / 4) || Math.ceil(totalSlots * FILL_RATIO / 4);
+
+      quizState = {
+        questions:     generateQuizQuestions(4),
+        current:       0,
+        batchPerQ:     batchPerQ,
+        correctCount:  0
+      };
+
+      quizModal.classList.remove('hidden');
+      renderQuizQuestion();
+    }
+
+    function generateQuizQuestions(n) {
+      var allConcepts = [];
+      DATA.topics.forEach(function(t) {
+        t.concepts.forEach(function(c) {
+          allConcepts.push({ concept: c, topicId: t.id, topicName: t.name });
+        });
+      });
+
+      return shuffle(allConcepts).slice(0, n).map(function(item) {
+        var wrongTopics = shuffle(DATA.topics.filter(function(t) {
+          return t.id !== item.topicId;
+        })).slice(0, 3);
+
+        var options = shuffle(
+          [{ text: item.topicName, correct: true }].concat(
+            wrongTopics.map(function(t) { return { text: t.name, correct: false }; })
+          )
+        );
+
+        return { concept: item.concept, options: options };
+      });
+    }
+
+    function renderQuizQuestion() {
+      var q = quizState.questions[quizState.current];
+
+      while (quizQuestion.firstChild) quizQuestion.removeChild(quizQuestion.firstChild);
+      while (quizOptions.firstChild) quizOptions.removeChild(quizOptions.firstChild);
+
+      var qLbl = document.createElement('p');
+      qLbl.className = 'quiz-q';
+      qLbl.textContent = 'До якої теми належить поняття:';
+      quizQuestion.appendChild(qLbl);
+
+      var concept = document.createElement('div');
+      concept.className = 'quiz-concept';
+      concept.textContent = '\u00ab' + q.concept + '\u00bb';
+      quizQuestion.appendChild(concept);
+
+      q.options.forEach(function(opt) {
+        var btn = document.createElement('button');
+        btn.className = 'quiz-btn';
+        btn.textContent = opt.text;
+        btn.addEventListener('click', function() {
+          onQuizAnswer(opt.correct, btn);
+        });
+        quizOptions.appendChild(btn);
+      });
+
+      quizProgress.textContent = (quizState.current + 1) + ' / ' + quizState.questions.length;
+    }
+
+    function onQuizAnswer(isCorrect, btn) {
+      // Disable all options
+      quizOptions.querySelectorAll('.quiz-btn').forEach(function(b) {
+        b.disabled = true;
+      });
+
+      if (isCorrect) {
+        btn.classList.add('quiz-btn--correct');
+        quizState.correctCount++;
+        dealCoinsBatch(quizState.batchPerQ);
+      } else {
+        btn.classList.add('quiz-btn--wrong');
+        hideCoinsPenalty(2);
+      }
+
+      quizState.current++;
+
+      if (quizState.current < quizState.questions.length) {
+        setTimeout(renderQuizQuestion, 650);
+      } else {
+        setTimeout(finishQuiz, 650);
+      }
+    }
+
+    function finishQuiz() {
+      // Apply initial hidden coins once, after first deal
+      if (isFirstDeal && currentCoinCount() > 0) {
+        isFirstDeal = false;
+        hideCoinsPenalty(INITIAL_HIDDEN);
+      }
+
+      quizModal.classList.add('hidden');
+      dealBtn.disabled = false;
+      quizState = null;
+
+      autoReveal();
+      renderAllCells();
+      renderScore();
+    }
+
+    /* ═══════════════════════ END GAME ════════════════════════ */
+    function endGame(won) {
+      gameOver = true;
+
+      endTitle.textContent = won ? '\ud83c\udfc6 Перемога!' : 'Гру завершено';
+      endDesc.textContent = won
+        ? 'Чудово! Ти набрав ' + score + ' балів і переміг!'
+        : 'Гру завершено. Спробуй ще раз!';
+      endScoreEl.textContent = 'Рахунок: ' + score + ' / ' + WIN_SCORE;
+
+      endScreen.classList.remove('hidden');
+
+      if (window.HLGAnalytics) {
+        HLGAnalytics.endSession({ score: score, won: won, attempts: attempts });
+      }
+    }
+
+    /* ═══════════════════════ RESTART ═════════════════════════ */
+    restartBtn.addEventListener('click', initGame);
+
+    /* ═══════════════════════ START ═══════════════════════════ */
+    initGame();
+
+  }());
+  </script>
+
+  <script src="../../shared/js/nav.js"></script>
+  <script src="../../shared/js/analytics.js"></script>
+  <script src="../../shared/js/accessibility.js"></script>
+</body>
+</html>

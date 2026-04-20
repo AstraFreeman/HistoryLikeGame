@@ -352,6 +352,41 @@
       80%  { opacity: 1; }
       100% { transform: translateX(-240px) translateY(12px); opacity: 0; }
     }
+    .player-ball {
+      position: absolute;
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #ddd, #777);
+      box-shadow: 0 0 4px rgba(255,140,0,0.7);
+      animation: p-ball-fly 0.52s ease-out forwards;
+      pointer-events: none;
+    }
+    @keyframes p-ball-fly {
+      0%   { transform: translateX(0); opacity: 1; }
+      100% { transform: translateX(300px); opacity: 0.1; }
+    }
+    .ship-splash-big {
+      position: absolute;
+      border-radius: 50% 50% 0 0;
+      background: rgba(100,210,255,0.85);
+      transform-origin: bottom center;
+      animation: splash-up 0.9s ease-out forwards;
+      pointer-events: none;
+    }
+    .ship-cannonball-approach {
+      position: absolute;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #888, #111);
+      box-shadow: 0 0 14px 5px rgba(255,70,0,0.85);
+      animation: ball-approach 0.9s ease-in forwards;
+      pointer-events: none;
+    }
+    @keyframes ball-approach {
+      0%   { transform: translateX(0) scale(0.4); opacity: 0.6; }
+      55%  { opacity: 1; }
+      100% { transform: translateX(-300px) scale(3); opacity: 0; }
+    }
 
     #sea-panel.firing { animation: sea-flash 0.4s ease-out forwards; }
     @keyframes sea-flash {
@@ -518,7 +553,10 @@
     .reduce-motion .ship-smoke,
     .reduce-motion .ship-explosion,
     .reduce-motion .ship-splash,
-    .reduce-motion .ship-cannonball { animation-duration: 0.01s !important; }
+    .reduce-motion .ship-splash-big,
+    .reduce-motion .ship-cannonball,
+    .reduce-motion .ship-cannonball-approach,
+    .reduce-motion .player-ball { animation-duration: 0.01s !important; }
   </style>
 </head>
 <body
@@ -576,47 +614,66 @@
     <div id="sea-panel" aria-hidden="true">
       <div id="ship-wrap">
         <svg id="ship-svg" viewBox="0 0 240 95" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
-          <!-- Bowsprit -->
-          <line x1="42" y1="44" x2="8" y2="26" stroke="#6b3f18" stroke-width="2.5" stroke-linecap="round"/>
-          <!-- Fore-mast -->
-          <line x1="72" y1="16" x2="72" y2="62" stroke="#6b3f18" stroke-width="3" stroke-linecap="round"/>
-          <!-- Fore yard -->
-          <line x1="50" y1="26" x2="95" y2="26" stroke="#6b3f18" stroke-width="2"/>
-          <!-- Fore sail -->
-          <polygon points="72,17 94,27 72,57" fill="rgba(240,220,165,0.82)" stroke="rgba(180,150,80,0.4)" stroke-width="0.5"/>
-          <!-- Main-mast -->
-          <line x1="122" y1="4" x2="122" y2="62" stroke="#6b3f18" stroke-width="4" stroke-linecap="round"/>
-          <!-- Main yard -->
-          <line x1="92" y1="18" x2="152" y2="18" stroke="#6b3f18" stroke-width="2.5"/>
-          <!-- Main sail -->
-          <polygon points="122,5 152,19 122,59" fill="rgba(240,220,165,0.86)" stroke="rgba(180,150,80,0.4)" stroke-width="0.5"/>
-          <!-- Mizzen-mast -->
-          <line x1="175" y1="22" x2="175" y2="62" stroke="#6b3f18" stroke-width="3" stroke-linecap="round"/>
-          <!-- Mizzen yard -->
-          <line x1="154" y1="32" x2="198" y2="32" stroke="#6b3f18" stroke-width="2"/>
-          <!-- Mizzen sail -->
-          <polygon points="175,23 198,33 175,57" fill="rgba(240,220,165,0.80)" stroke="rgba(180,150,80,0.4)" stroke-width="0.5"/>
-          <!-- Flag -->
-          <polygon points="122,4 144,7 122,11" fill="#c0392b"/>
-          <!-- Hull body -->
-          <path d="M28,62 Q34,76 68,80 L175,80 Q208,76 214,62 Z" fill="#3d1a07"/>
-          <!-- Gun deck stripe -->
-          <rect x="32" y="58" width="182" height="7" fill="#1e0c02" rx="1"/>
-          <!-- Gun ports row -->
-          <rect x="42"  y="59" width="7" height="5" fill="#7a5010" rx="1"/>
-          <rect x="60"  y="59" width="7" height="5" fill="#7a5010" rx="1"/>
-          <rect x="78"  y="59" width="7" height="5" fill="#7a5010" rx="1"/>
-          <rect x="96"  y="59" width="7" height="5" fill="#7a5010" rx="1"/>
-          <rect x="114" y="59" width="7" height="5" fill="#7a5010" rx="1"/>
-          <rect x="132" y="59" width="7" height="5" fill="#7a5010" rx="1"/>
-          <rect x="150" y="59" width="7" height="5" fill="#7a5010" rx="1"/>
-          <rect x="168" y="59" width="7" height="5" fill="#7a5010" rx="1"/>
-          <rect x="186" y="59" width="7" height="5" fill="#7a5010" rx="1"/>
+          <!-- Bowsprit + sail -->
+          <line x1="42" y1="46" x2="4" y2="24" stroke="#6b3f18" stroke-width="2.5" stroke-linecap="round"/>
+          <polygon points="42,46 8,27 13,36 28,44" fill="rgba(240,220,165,0.68)" stroke="rgba(180,150,80,0.4)" stroke-width="0.5"/>
+          <!-- FORE MAST (x=72) -->
+          <line x1="72" y1="5" x2="72" y2="62" stroke="#6b3f18" stroke-width="3" stroke-linecap="round"/>
+          <line x1="56" y1="12" x2="88" y2="12" stroke="#6b3f18" stroke-width="1.5"/>
+          <line x1="50" y1="26" x2="94" y2="26" stroke="#6b3f18" stroke-width="2"/>
+          <line x1="44" y1="42" x2="100" y2="42" stroke="#6b3f18" stroke-width="2"/>
+          <polygon points="56,12 88,12 84,26 60,26" fill="rgba(240,220,165,0.78)" stroke="rgba(180,150,80,0.4)" stroke-width="0.5"/>
+          <polygon points="50,26 94,26 90,42 54,42" fill="rgba(240,220,165,0.83)" stroke="rgba(180,150,80,0.4)" stroke-width="0.5"/>
+          <polygon points="44,42 100,42 96,58 48,58" fill="rgba(240,220,165,0.87)" stroke="rgba(180,150,80,0.4)" stroke-width="0.5"/>
+          <!-- MAIN MAST (x=122) -->
+          <line x1="122" y1="2" x2="122" y2="62" stroke="#6b3f18" stroke-width="4" stroke-linecap="round"/>
+          <line x1="100" y1="9"  x2="144" y2="9"  stroke="#6b3f18" stroke-width="1.8"/>
+          <line x1="92"  y1="24" x2="152" y2="24" stroke="#6b3f18" stroke-width="2.2"/>
+          <line x1="82"  y1="40" x2="162" y2="40" stroke="#6b3f18" stroke-width="2.5"/>
+          <polygon points="100,9 144,9 140,24 104,24"  fill="rgba(240,220,165,0.78)" stroke="rgba(180,150,80,0.4)" stroke-width="0.5"/>
+          <polygon points="92,24 152,24 148,40 96,40"  fill="rgba(240,220,165,0.83)" stroke="rgba(180,150,80,0.4)" stroke-width="0.5"/>
+          <polygon points="82,40 162,40 158,58 86,58"  fill="rgba(240,220,165,0.87)" stroke="rgba(180,150,80,0.4)" stroke-width="0.5"/>
+          <polygon points="122,2 144,5 122,9" fill="#c0392b"/>
+          <!-- MIZZEN MAST (x=175) -->
+          <line x1="175" y1="16" x2="175" y2="62" stroke="#6b3f18" stroke-width="3" stroke-linecap="round"/>
+          <line x1="162" y1="22" x2="188" y2="22" stroke="#6b3f18" stroke-width="1.5"/>
+          <line x1="158" y1="34" x2="192" y2="34" stroke="#6b3f18" stroke-width="2"/>
+          <line x1="155" y1="47" x2="196" y2="47" stroke="#6b3f18" stroke-width="2"/>
+          <polygon points="162,22 188,22 184,34 166,34" fill="rgba(240,220,165,0.76)" stroke="rgba(180,150,80,0.4)" stroke-width="0.5"/>
+          <polygon points="158,34 192,34 188,47 162,47" fill="rgba(240,220,165,0.81)" stroke="rgba(180,150,80,0.4)" stroke-width="0.5"/>
+          <polygon points="155,47 196,47 192,58 159,58" fill="rgba(240,220,165,0.85)" stroke="rgba(180,150,80,0.4)" stroke-width="0.5"/>
+          <!-- Upper hull + upper gun deck -->
+          <rect x="30" y="44" width="182" height="14" fill="#3d1a07" rx="1"/>
+          <rect x="30" y="44" width="182" height="6"  fill="#1e0c02" rx="1"/>
+          <rect x="40"  y="45" width="6" height="4" fill="#8a5a10" rx="1"/>
+          <rect x="57"  y="45" width="6" height="4" fill="#8a5a10" rx="1"/>
+          <rect x="74"  y="45" width="6" height="4" fill="#8a5a10" rx="1"/>
+          <rect x="91"  y="45" width="6" height="4" fill="#8a5a10" rx="1"/>
+          <rect x="108" y="45" width="6" height="4" fill="#8a5a10" rx="1"/>
+          <rect x="125" y="45" width="6" height="4" fill="#8a5a10" rx="1"/>
+          <rect x="142" y="45" width="6" height="4" fill="#8a5a10" rx="1"/>
+          <rect x="159" y="45" width="6" height="4" fill="#8a5a10" rx="1"/>
+          <rect x="176" y="45" width="6" height="4" fill="#8a5a10" rx="1"/>
+          <!-- Lower hull body -->
+          <path d="M28,58 Q34,74 68,78 L175,78 Q208,74 214,58 Z" fill="#3d1a07"/>
+          <!-- Lower gun deck stripe -->
+          <rect x="30" y="56" width="184" height="7" fill="#1e0c02" rx="1"/>
+          <!-- Lower gun ports (9) -->
+          <rect x="40"  y="57" width="7" height="5" fill="#7a5010" rx="1"/>
+          <rect x="58"  y="57" width="7" height="5" fill="#7a5010" rx="1"/>
+          <rect x="76"  y="57" width="7" height="5" fill="#7a5010" rx="1"/>
+          <rect x="94"  y="57" width="7" height="5" fill="#7a5010" rx="1"/>
+          <rect x="112" y="57" width="7" height="5" fill="#7a5010" rx="1"/>
+          <rect x="130" y="57" width="7" height="5" fill="#7a5010" rx="1"/>
+          <rect x="148" y="57" width="7" height="5" fill="#7a5010" rx="1"/>
+          <rect x="166" y="57" width="7" height="5" fill="#7a5010" rx="1"/>
+          <rect x="184" y="57" width="7" height="5" fill="#7a5010" rx="1"/>
           <!-- Stern castle -->
-          <rect x="200" y="52" width="15" height="12" fill="#4a2008" rx="2"/>
-          <!-- Stern windows -->
-          <rect x="202" y="54" width="5" height="4" fill="rgba(255,200,100,0.5)" rx="1"/>
-          <rect x="209" y="54" width="5" height="4" fill="rgba(255,200,100,0.5)" rx="1"/>
+          <rect x="200" y="48" width="16" height="14" fill="#4a2008" rx="2"/>
+          <rect x="202" y="50" width="5" height="4" fill="rgba(255,200,100,0.6)" rx="1"/>
+          <rect x="209" y="50" width="5" height="4" fill="rgba(255,200,100,0.6)" rx="1"/>
+          <rect x="202" y="56" width="5" height="4" fill="rgba(255,200,100,0.4)" rx="1"/>
+          <rect x="209" y="56" width="5" height="4" fill="rgba(255,200,100,0.4)" rx="1"/>
         </svg>
       </div>
     </div>
@@ -774,10 +831,13 @@
   function nearestChip() {
     var cx = wave.W / 2, best = null, bd = Infinity;
     wave.chips.forEach(function(c) {
-      var d = Math.abs(c.x + (c.el.offsetWidth || 80) / 2 - cx);
+      var half   = (c.el.offsetWidth || 80) / 2;
+      var chipCx = c.x + half;
+      if (chipCx < cx) return; // пройшов приціл — не зараховується
+      var d = chipCx - cx;
       if (d < bd) { bd = d; best = c; }
     });
-    return best;
+    return best; // null якщо всі чіпи ліворуч → фаза 0 → промах
   }
 
   // ═══════════════════════════════════════════════════
@@ -839,9 +899,10 @@
 
   function spawnEffect(kind, container, x, y, w, h) {
     var el = document.createElement('div');
-    if (kind === 'smoke')     el.className = 'ship-smoke';
-    if (kind === 'explosion') el.className = 'ship-explosion';
-    if (kind === 'splash')    el.className = 'ship-splash';
+    if (kind === 'smoke')      el.className = 'ship-smoke';
+    if (kind === 'explosion')  el.className = 'ship-explosion';
+    if (kind === 'splash')     el.className = 'ship-splash';
+    if (kind === 'big-splash') el.className = 'ship-splash-big';
     el.style.left   = x + 'px';
     el.style.top    = y + 'px';
     el.style.width  = w + 'px';
@@ -850,30 +911,63 @@
     setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 2000);
   }
 
+  function firePlayerBalls(shotType) {
+    var sea = document.getElementById('sea-panel');
+    if (!sea) return;
+    var seaH  = sea.getBoundingClientRect().height;
+    var count = shotType === 'perfect' ? 18
+              : shotType === 'card'    ? 13
+              : shotType === 'phase'   ? 7
+              : 4;
+    var baseY = seaH * 0.58;
+    for (var i = 0; i < count; i++) {
+      (function(delay, startY) {
+        setTimeout(function() {
+          var ball = document.createElement('div');
+          ball.className = 'player-ball';
+          ball.style.left = '6px';
+          ball.style.top  = startY + 'px';
+          sea.appendChild(ball);
+          setTimeout(function() {
+            var wrap = document.getElementById('ship-wrap');
+            if (wrap) {
+              var seaR  = sea.getBoundingClientRect();
+              var shipR = wrap.getBoundingClientRect();
+              var sx = shipR.left + Math.random() * shipR.width - seaR.left;
+              var sy = shipR.top  + shipR.height * 0.55 - seaR.top;
+              spawnEffect('splash', sea, sx - 5, sy - 10,
+                          8 + Math.random() * 10, 18 + Math.random() * 16);
+            }
+            if (ball.parentNode) ball.parentNode.removeChild(ball);
+          }, 540);
+        }, delay);
+      })(i * 28, baseY + (Math.random() - 0.5) * 36);
+    }
+  }
+
   function shipReturnFire(count) {
     var sea  = document.getElementById('sea-panel');
     var wrap = document.getElementById('ship-wrap');
     if (!sea || !wrap) return;
-    var seaR  = sea.getBoundingClientRect();
-    var shipR = wrap.getBoundingClientRect();
-    var sx = shipR.left - seaR.left;
-    var sy = shipR.top  + shipR.height * 0.55 - seaR.top;
-
+    var seaR    = sea.getBoundingClientRect();
+    var shipR   = wrap.getBoundingClientRect();
+    var sx      = shipR.left - seaR.left;
+    var centerY = seaR.height / 2;
     for (var i = 0; i < count; i++) {
-      (function(delay, yOff) {
+      (function(delay) {
         setTimeout(function() {
           var ball = document.createElement('div');
-          ball.className = 'ship-cannonball';
+          ball.className = 'ship-cannonball-approach';
           ball.style.left = sx + 'px';
-          ball.style.top  = (sy + yOff) + 'px';
+          ball.style.top  = (centerY + (Math.random() - 0.5) * 44 - 7) + 'px';
           sea.appendChild(ball);
           setTimeout(function() {
-            var splashX = Math.max(10, sx - 240);
-            spawnEffect('splash', sea, splashX, sy + yOff - 5, 18, 32);
+            var splashX = Math.max(8, sx - 300);
+            spawnEffect('big-splash', sea, splashX, centerY - 35, 28, 58);
             if (ball.parentNode) ball.parentNode.removeChild(ball);
-          }, 760);
+          }, 910);
         }, delay);
-      })(i * 180, (i - 1) * 8);
+      })(i * 210);
     }
   }
 
@@ -1021,6 +1115,7 @@
     }
 
     shipReact(shotType);
+    firePlayerBalls(shotType);
 
     if (small) {
       port.classList.add('shot-hide');
