@@ -1,5 +1,0 @@
-[     404ms] [WARNING] THREE.WebGLRenderer: The property .useLegacyLights has been deprecated. Migrate your lighting according to the following guide: https://discourse.threejs.org/t/updates-to-lighting-in-three-js-r155/53733. @ https://aframe.io/releases/1.5.0/aframe.min.js:0
-[     432ms] [WARNING] THREE.Material: parameter 'glslVersion' has value of undefined. @ https://aframe.io/releases/1.5.0/aframe.min.js:0
-[     467ms] [WARNING] THREE.Material: parameter 'glslVersion' has value of undefined. @ https://aframe.io/releases/1.5.0/aframe.min.js:0
-[     472ms] [WARNING] THREE.Material: parameter 'glslVersion' has value of undefined. @ https://aframe.io/releases/1.5.0/aframe.min.js:0
-[     642ms] [WARNING] ArMarkerControls: 'markersAreaEnabled' is not a property of this material. @ https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js:0
