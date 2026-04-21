@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Хто ти з української історії?</title>
+  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+  <style>
+    body { font-family: Arial; background:#f5f5f5; margin:0; padding:20px; }
+    .question { margin-bottom:20px; }
+    .result { font-size:20px; font-weight:bold; margin-top:20px; }
+    button { padding:10px 20px; font-size:16px; cursor:pointer; }
+    a { display:inline-block; margin-top:15px; font-size:18px; }
+  </style>
+</head>
+<body>
+
+<h1>Хто ти з української історії?</h1>
+
+<form id="quiz">
+
+<div class="question">
+  <p>1. Як ти приймаєш рішення?</p>
+  <label><input type="radio" name="q1" value="A"> Планую і веду інших</label><br>
+  <label><input type="radio" name="q1" value="B"> Балансую варіанти</label><br>
+  <label><input type="radio" name="q1" value="C"> Думаю про сенс</label><br>
+  <label><input type="radio" name="q1" value="D"> Збираю факти</label>
+</div>
+
+<div class="question">
+  <p>2. Що цікавіше?</p>
+  <label><input type="radio" name="q2" value="A"> Битви</label><br>
+  <label><input type="radio" name="q2" value="B"> Політика</label><br>
+  <label><input type="radio" name="q2" value="C"> Культура</label><br>
+  <label><input type="radio" name="q2" value="D"> Джерела</label>
+</div>
+
+<button type="button" onclick="calculate()">Дізнатись результат</button>
+</form>
+
+<div class="result" id="result"></div>
+<div id="link"></div>
+
+<script>
+function calculate() {
+  let scores = {A:0, B:0, C:0, D:0};
+  let answers = document.querySelectorAll('input[type=radio]:checked');
+
+  answers.forEach(a => scores[a.value]++);
+
+  let max = Object.keys(scores).reduce((a,b)=>scores[a]>scores[b]?a:b);
+
+  let resultText = "";
+
+  if(max==='A') resultText = "Ти — Хмельницький (лідер)";
+  if(max==='B') resultText = "Ти — Мазепа (дипломат)";
+  if(max==='C') resultText = "Ти — Леся Українка (ідейник)";
+  if(max==='D') resultText = "Ти — Нестор Літописець (дослідник)";
+
+  document.getElementById('result').innerText = resultText;
+
+  document.getElementById('link').innerHTML = '<a href="compas.html">Перейти до AR-нагороди</a>';
+}
+</script>
+
+</body>
+</html>
+
+
+<!-- AR СТОРІНКА compas.html -->
+
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>AR Винагорода</title>
+  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+</head>
+<body>
+
+<h2>Твій історичний артефакт</h2>
+
+<a-scene>
+  <a-sky color="#ECECEC"></a-sky>
+
+  <!-- Примітив як заміна 3D-моделі -->
+  <a-box position="0 1.5 -3" rotation="0 45 0" color="#4CC3D9"></a-box>
+
+  <!-- Можна замінити на зображення -->
+  <a-plane src="https://upload.wikimedia.org/wikipedia/commons/6/6a/Bohdan_Khmelnytsky.png"
+           position="0 1.5 -2" width="2" height="2"></a-plane>
+
+  <a-camera></a-camera>
+</a-scene>
+
+</body>
+</html>
